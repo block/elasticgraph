@@ -10,6 +10,7 @@ module ElasticGraph
         attr_reader schema_element_names: SchemaElementNames
         attr_reader graphql_extension_modules: ::Array[ComponentExtension]
         attr_reader graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver]
+        attr_reader schema_artifact_extensions: ::Hash[::String, ComponentExtension]
         attr_reader indexer_extension_modules: ::Array[ComponentExtension]
         attr_reader static_script_ids_by_scoped_name: ::Hash[::String, ::String]
 
@@ -22,6 +23,7 @@ module ElasticGraph
           schema_element_names: SchemaElementNames,
           graphql_extension_modules: ::Array[ComponentExtension],
           graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver],
+          schema_artifact_extensions: ::Hash[::String, ComponentExtension],
           indexer_extension_modules: ::Array[ComponentExtension],
           static_script_ids_by_scoped_name: ::Hash[::String, ::String]) -> void
 
@@ -34,6 +36,7 @@ module ElasticGraph
           ?schema_element_names: SchemaElementNames,
           ?graphql_extension_modules: ::Array[ComponentExtension],
           ?graphql_resolvers_by_name: ::Hash[::Symbol, GraphQLResolver],
+          ?schema_artifact_extensions: ::Hash[::String, ComponentExtension],
           ?indexer_extension_modules: ::Array[ComponentExtension],
           ?static_script_ids_by_scoped_name: ::Hash[::String, ::String]) -> Schema
       end
@@ -47,6 +50,7 @@ module ElasticGraph
         SCHEMA_ELEMENT_NAMES: "schema_element_names"
         GRAPHQL_EXTENSION_MODULES: "graphql_extension_modules"
         GRAPHQL_RESOLVERS_BY_NAME: "graphql_resolvers_by_name"
+        SCHEMA_ARTIFACT_EXTENSIONS: "schema_artifact_extensions"
         INDEXER_EXTENSION_MODULES: "indexer_extension_modules"
         STATIC_SCRIPT_IDS_BY_NAME: "static_script_ids_by_scoped_name"
 

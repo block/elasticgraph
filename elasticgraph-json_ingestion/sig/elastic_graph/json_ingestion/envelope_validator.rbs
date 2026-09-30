@@ -10,7 +10,7 @@ module ElasticGraph
         ?configure_record_validator: (^(Support::JSONSchema::ValidatorFactory) -> Support::JSONSchema::ValidatorFactory)?
       ) -> void
 
-      @schema_artifacts: schemaArtifacts
+      @schema_artifacts: Artifacts::_Provider
       @logger: ::Logger
       @configure_record_validator: (^(Support::JSONSchema::ValidatorFactory) -> Support::JSONSchema::ValidatorFactory)?
 

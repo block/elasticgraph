@@ -22,6 +22,7 @@ module ElasticGraph
           graphql_extension_modules: [],
           graphql_resolvers_by_name: {},
           indexer_extension_modules: [],
+          schema_artifact_extensions: {},
           static_script_ids_by_scoped_name: {}
         )
           Schema.new(
@@ -34,6 +35,7 @@ module ElasticGraph
             graphql_extension_modules: graphql_extension_modules,
             graphql_resolvers_by_name: graphql_resolvers_by_name,
             indexer_extension_modules: indexer_extension_modules,
+            schema_artifact_extensions: schema_artifact_extensions,
             static_script_ids_by_scoped_name: static_script_ids_by_scoped_name
           )
         end

@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/apollo/schema_definition/api_extension"
+require "elastic_graph/json_ingestion/artifacts/from_disk"
 require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
@@ -169,6 +170,16 @@ module ElasticGraph
       EOS
     end
 
+    doctest.before "ElasticGraph::SchemaDefinition::API#register_schema_artifact_extension" do
+      ::FileUtils.mkdir_p "my_gem"
+      ::File.write("my_gem/artifacts.rb", <<~EOS)
+        module MyGem
+          module Artifacts
+          end
+        end
+      EOS
+    end
+
     [
       "ElasticGraph::Apollo@Use elasticgraph-apollo in a project",
       "ElasticGraph::Apollo::SchemaDefinition::APIExtension@Define local rake tasks with this extension module",
@@ -198,8 +209,10 @@ module ElasticGraph
       end
     end
 
-    doctest.before "ElasticGraph::SchemaArtifacts" do
-      extend SchemaArtifactsDoctestSupport
+    ["ElasticGraph::JSONIngestion::Artifacts", "ElasticGraph::SchemaArtifacts"].each do |description|
+      doctest.before description do
+        extend SchemaArtifactsDoctestSupport
+      end
     end
   end
 

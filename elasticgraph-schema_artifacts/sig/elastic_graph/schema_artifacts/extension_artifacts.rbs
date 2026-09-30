@@ -1,0 +1,22 @@
+module ElasticGraph
+  module SchemaArtifacts
+    interface _Factory
+      def from_disk: (::String, config: ::Hash[::Symbol | ::String, untyped]) -> untyped
+      def from_schema_definition: (untyped, config: ::Hash[::Symbol | ::String, untyped]) -> untyped
+    end
+
+    class ExtensionArtifacts
+      def initialize: (::Hash[::String, RuntimeMetadata::ComponentExtension]) { (_Factory, ::Hash[::Symbol | ::String, untyped]) -> untyped } -> void
+      def key?: (::String) -> bool
+      def fetch: (::String) -> untyped
+      @extensions_by_name: ::Hash[::String, RuntimeMetadata::ComponentExtension]
+      @build_provider: ^(_Factory, ::Hash[::Symbol | ::String, untyped]) -> untyped
+      @providers_by_name: ::Hash[::String, untyped]
+      @loader: RuntimeMetadata::ExtensionLoader
+
+      module Factory
+        extend _Factory
+      end
+    end
+  end
+end
