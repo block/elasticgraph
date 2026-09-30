@@ -3104,7 +3104,7 @@ module ElasticGraph
             define_schema(schema_element_name_form: "snake_case") do |s|
               s.json_schema_version 1
             end.json_schemas_for(2)
-          }.to raise_error(Errors::NotFoundError, a_string_including("The requested json schema version (2) is not available", "Available versions: 1"))
+          }.to raise_error(Errors::MissingSchemaArtifactError, a_string_including("The requested json schema version (2) is not available", "Available versions: 1"))
         end
 
         it "ignores runtime fields during json schema generation" do

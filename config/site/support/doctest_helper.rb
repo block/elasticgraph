@@ -12,6 +12,7 @@ require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema_element_names"
 require "elastic_graph/schema_definition/api"
 require "elastic_graph/schema_definition/schema_artifact_manager"
+require "elastic_graph/schema_definition/test_support"
 require "elastic_graph/warehouse/schema_definition/api_extension"
 require "rspec/mocks"
 require "stringio"
@@ -65,7 +66,7 @@ module ElasticGraph
           SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: :camelCase, overrides: {}),
           true,
           path_to_schema: "#{@tmp_dir}/schema.rb",
-          extension_modules: extension_modules
+          extension_modules: [SchemaDefinition::TestSupport::APIExtension, *extension_modules]
         )
 
         # This is required in all JSON ingestion schemas, but we don't want to have to put it in all

@@ -1,6 +1,14 @@
 module ElasticGraph
   module SchemaDefinition
     module TestSupport
+      module IndexerExtension : ::ElasticGraph::Indexer
+        def ingestion_adapters_by_format: () -> ::Hash[::String, ::ElasticGraph::Indexer::IngestionAdapter::_Adapter]
+      end
+
+      module APIExtension
+        def self.extended: (API) -> void
+      end
+
       def define_schema: (
         schema_element_name_form: SchemaArtifacts::RuntimeMetadata::SchemaElementNames::form,
         ?schema_element_name_overrides: ::Hash[::Symbol, ::String],

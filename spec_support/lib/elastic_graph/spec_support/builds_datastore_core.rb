@@ -30,7 +30,7 @@ module ElasticGraph
       clusters: nil,
       schema_artifacts_directory: nil,
       schema_artifacts: nil,
-      schema_definition_extension_modules: [],
+      schema_definition_extension_modules: nil,
       datastore_backend: nil,
       **config_overrides,
       &customize_config

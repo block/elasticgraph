@@ -352,9 +352,13 @@ module ElasticGraph
 
       # Registers an indexer extension module that will be loaded and used by `elasticgraph-indexer`. While such
       # extension modules can also be configured in a settings YAML file, it can be useful to register it here
-      # when you want to ensure that the extension is used in all environments. For example, an ingestion format
-      # library needs to ensure its corresponding indexer extension module is used since events of its format
-      # would not be ingestible otherwise.
+      # when you want to ensure that the extension is used in all environments.
+      #
+      # A schema that defines indexed types must register at least one indexer extension that defines
+      # `ingestion_adapters_by_format`, since its events would not be ingestible otherwise; schema artifact
+      # generation fails when none is registered. Ingestion format libraries (such as `elasticgraph-json_ingestion`)
+      # register theirs automatically. Extension modules configured in a settings YAML file can contribute
+      # additional ingestion adapters, but do not satisfy this requirement.
       #
       # @param extension_module [Module] indexer extension module
       # @param defined_at [String] the `require` path of the extension module

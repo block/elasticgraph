@@ -19,7 +19,12 @@ module ElasticGraph
     RSpec.describe SqsProcessor, :capture_logs do
       let(:ignore_sqs_latency_timestamps_from_arns) { [] }
       let(:json_indexer) do
-        JSONIngestion::Indexer.new(instance_double(Indexer, logger: logger)).tap do |json_indexer|
+        JSONIngestion::Indexer.new(instance_double(
+          Indexer,
+          ingestion_adapters_by_format: {"json" => nil},
+          logger: logger,
+          schema_artifacts: instance_double(SchemaArtifacts::FromDisk, available_json_schema_versions: [1])
+        )).tap do |json_indexer|
           allow(json_indexer).to receive(:process_returning_failures).and_return([])
         end
       end

@@ -8,9 +8,11 @@
 
 require "bundler"
 require "elastic_graph/constants"
+require "elastic_graph/indexer/event"
 require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/rake_tasks"
 require "elastic_graph/schema_definition/schema_elements/type_namer"
+require "elastic_graph/spec_support/example_extensions/ingestion"
 require "graphql"
 require "yaml"
 
@@ -32,6 +34,27 @@ module ElasticGraph
       end
 
       describe "schema_artifacts:dump", :in_temp_dir do
+        it "dumps artifacts that register a working non-JSON ingestion adapter", :builds_indexer do
+          ::File.write("schema.rb", <<~EOS)
+            ElasticGraph.define_schema do |schema|
+              schema.object_type "Widget" do |type|
+                type.field "id", "ID!"
+                type.index "widgets"
+              end
+            end
+          EOS
+          run_rake("schema_artifacts:dump")
+
+          indexer = build_indexer(schema_artifacts: SchemaArtifacts::FromDisk.new("config/schema/artifacts"))
+          result = indexer.operation_factory.build(Indexer::Event.new(
+            ingestion_format: "example", op: "upsert", type: "Widget",
+            id: "1", version: 1, schema_version: 1, record: {"id" => "1"}
+          ))
+
+          expect(result.failed_event_error).to be nil
+          expect(result.operations.map(&:prepared_record)).to eq([{"id" => "1"}])
+        end
+
         it "exposes `path_to_schema` on schema definition state before applying extensions" do
           write_elastic_graph_schema_def_code
           observed_paths = []
@@ -633,7 +656,7 @@ module ElasticGraph
             index_document_sizes: true,
             path_to_schema: path_to_schema,
             schema_artifacts_directory: "config/schema/artifacts",
-            extension_modules: extension_modules + [extension_module].compact,
+            extension_modules: extension_modules + (include_extension_module ? [extension_module, SpecSupport::ExampleIngestion::APIExtension] : []),
             derived_type_name_formats: derived_type_name_formats,
             type_name_overrides: type_name_overrides,
             enum_value_overrides_by_type: enum_value_overrides_by_type,
