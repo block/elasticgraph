@@ -50,7 +50,6 @@ module ElasticGraph
         # @param artifacts_dir [String] directory containing the saved schema artifacts
         # @param config [Hash] configuration supplied when registering the extension
         # @return [Object] a disk-backed artifact provider
-        # simplecov:disable -- interface definition only
         def self.from_disk(artifacts_dir, config:)
         end
 
@@ -59,7 +58,6 @@ module ElasticGraph
         # @return [Object] an in-memory artifact provider
         def self.from_schema_definition(results, config:)
         end
-        # simplecov:enable
       end
     end
   end

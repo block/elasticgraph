@@ -39,8 +39,8 @@ module ElasticGraph
         # @see #latest_json_schema_version
         #
         # @example Get the JSON schema for a `Widget` type at version 1
-        #   artifacts = ElasticGraph::JSONIngestion::Artifacts::FromDisk.new(schema_artifacts_dir)
-        #   widget_v1_json_schema = artifacts.json_schemas_for(1).fetch("$defs").fetch("Widget")
+        #   json_artifacts = ElasticGraph::SchemaArtifacts::FromDisk.new(schema_artifacts_dir).extension_artifacts.fetch("json")
+        #   widget_v1_json_schema = json_artifacts.json_schemas_for(1).fetch("$defs").fetch("Widget")
         def json_schemas_for(version)
           unless available_json_schema_versions.include?(version)
             raise Errors::MissingSchemaArtifactError, "The requested json schema version (#{version}) is not available. " \
@@ -57,8 +57,8 @@ module ElasticGraph
         # @see #latest_json_schema_version
         #
         # @example Print the list of available JSON schema versions
-        #   artifacts = ElasticGraph::JSONIngestion::Artifacts::FromDisk.new(schema_artifacts_dir)
-        #   puts artifacts.available_json_schema_versions.sort.join(", ")
+        #   json_artifacts = ElasticGraph::SchemaArtifacts::FromDisk.new(schema_artifacts_dir).extension_artifacts.fetch("json")
+        #   puts json_artifacts.available_json_schema_versions.sort.join(", ")
         def available_json_schema_versions
           @available_json_schema_versions ||= begin
             versioned_json_schemas_dir = ::File.join(artifacts_dir, JSON_SCHEMAS_BY_VERSION_DIRECTORY)
@@ -78,8 +78,8 @@ module ElasticGraph
         # @see #json_schemas_for
         #
         # @example Print the latest JSON schema version
-        #   artifacts = ElasticGraph::JSONIngestion::Artifacts::FromDisk.new(schema_artifacts_dir)
-        #   puts artifacts.latest_json_schema_version
+        #   json_artifacts = ElasticGraph::SchemaArtifacts::FromDisk.new(schema_artifacts_dir).extension_artifacts.fetch("json")
+        #   puts json_artifacts.latest_json_schema_version
         def latest_json_schema_version
           @latest_json_schema_version ||= available_json_schema_versions.max || raise(
             Errors::MissingSchemaArtifactError,

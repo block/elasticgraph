@@ -108,6 +108,14 @@ module ElasticGraph
         }.to raise_error Errors::SchemaError, a_string_including("already registered", "example/custom")
       end
 
+      it "rejects provider names that are not strings, since they could not be loaded from the dumped artifacts" do
+        expect {
+          TestSupport.define_schema(schema_element_name_form: :snake_case) do |schema|
+            schema.register_schema_artifact_extension :custom, CustomArtifactsExample::Artifacts, defined_at: __FILE__
+          end
+        }.to raise_error Errors::SchemaError, a_string_including("must be strings", ":custom")
+      end
+
       it "rejects factories without both storage implementations" do
         expect {
           TestSupport.define_schema(schema_element_name_form: :snake_case) do |schema|

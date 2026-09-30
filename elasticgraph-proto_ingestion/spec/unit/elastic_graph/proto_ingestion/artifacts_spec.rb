@@ -40,7 +40,7 @@ module ElasticGraph
       it "reports a missing protobuf schema", :in_temp_dir do
         expect {
           Artifacts.from_disk(Dir.pwd, config: {}).proto_schema
-        }.to raise_error Errors::MissingSchemaArtifactError, a_string_including("schema.proto", Dir.pwd)
+        }.to raise_error Errors::MissingSchemaArtifactError, a_string_including("schema.proto", Dir.pwd, "no protobuf messages", "regenerate the schema artifacts")
       end
 
       it "reports a missing in-memory protobuf schema when no messages were generated" do
