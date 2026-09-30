@@ -1,4 +1,4 @@
-# Copyright 2024 - 2025 Block, Inc.
+# Copyright 2024 - 2026 Block, Inc.
 #
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE file or at
@@ -43,8 +43,8 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
-  spec.add_dependency "graphql", "~> 2.5.4"
-  spec.add_dependency "apollo-federation", "~> 3.10", ">= 3.10.1"
+  spec.add_dependency "graphql", "~> 2.6.6"
+  spec.add_dependency "apollo-federation", "~> 3.10", ">= 3.10.3"
 
   # Note: technically, this is not purely a development dependency, but since `eg-schema_def`
   # isn't intended to be used in production (or even included in a deployed bundle) we don't

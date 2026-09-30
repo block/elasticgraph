@@ -32,6 +32,6 @@ growing data sets. Modern APIs allow us to:
 
 ElasticGraph is released under the [MIT License](https://opensource.org/licenses/MIT).
 
-[Part of the distributed code](https://github.com/block/elasticgraph/blob/main/elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html)
+[Part of the distributed code](https://github.com/block/elasticgraph/blob/pre-1.0/elasticgraph-rack/lib/elastic_graph/rack/graphiql/index.html)
 comes from the [GraphiQL project](https://github.com/graphql/graphiql), also licensed under the
 MIT License, Copyright (c) GraphQL Contributors.

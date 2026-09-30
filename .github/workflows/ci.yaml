@@ -30,9 +30,11 @@ jobs:
           - "3.3"
           - "3.4"
         datastore:
+          - "elasticsearch:9.4.2"
           - "elasticsearch:9.0.0"
-          - "opensearch:2.19.1"
-          - "opensearch:2.7.0"
+          - "opensearch:3.6.0"
+          - "opensearch:3.3.0"
+          - "opensearch:2.19.0"
         include:
           # We have 4 build parts. The "primary" one is `run_each_gem_spec`, and we need that to be run on
           # every supported Ruby version and against every supported datastore. It's not necessary to run
@@ -40,13 +42,13 @@ jobs:
           # configuration here.
           - build_part: "run_misc_checks"
             ruby: "3.4"
-            datastore: "elasticsearch:9.0.0"
+            datastore: "elasticsearch:9.4.2"
           - build_part: "run_specs_with_vcr"
             ruby: "3.4"
-            datastore: "elasticsearch:9.0.0"
+            datastore: "elasticsearch:9.4.2"
           - build_part: "run_specs_file_by_file"
             ruby: "3.4"
-            datastore: "elasticsearch:9.0.0"
+            datastore: "elasticsearch:9.4.2"
 
     steps:
       - name: Harden Runner
@@ -86,7 +88,7 @@ jobs:
       contents: read
       packages: write
     env:
-      OPENSEARCH_VERSION: "2.19.1"
+      OPENSEARCH_VERSION: "3.6.0"
 
     steps:
       - name: Harden Runner
@@ -183,7 +185,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Install action-validator with asdf
-        uses: asdf-vm/actions/install@05e0d2ed97b598bfce82fd30daf324ae0c4570e6 # v3.0.2
+        uses: asdf-vm/actions/install@b7bcd026f18772e44fe1026d729e1611cc435d47 # v4.0.1
         with:
           tool_versions: |
             action-validator 0.5.1

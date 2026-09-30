@@ -1,4 +1,4 @@
-# Copyright 2024 - 2025 Block, Inc.
+# Copyright 2024 - 2026 Block, Inc.
 #
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE file or at
@@ -1091,6 +1091,260 @@ module ElasticGraph
           ids_of(search_datastore(filter:
             {"any_of" => [{"amount_cents" => {"equal_to_any_of" => [nil]}}]}).to_a)
         ).to eq ids_of(widget2)
+      end
+
+      context "multiple filters on the same field", :expect_index_exclusions do
+        it "correctly ANDs multiple filters for upper bounds (lt/lte)" do
+          index_into(
+            graphql,
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Before both timestamps
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # Between the timestamps
+            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # Exactly at the boundary
+          )
+
+          # first filter is more restrictive for results 1-4
+          results1 = search_datastore(
+            filters: [{"created_at" => {"lt" => "2025-09-04T00:00:00.000Z"}}, {"created_at" => {"lte" => "2025-09-05T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results1.map(&:id)).to match_array(["w1"])
+
+          results2 = search_datastore(
+            filters: [{"created_at" => {"lt" => "2025-09-04T00:00:00.000Z"}}, {"created_at" => {"lt" => "2025-09-05T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results2.map(&:id)).to match_array(["w1"])
+
+          results3 = search_datastore(
+            filters: [{"created_at" => {"lte" => "2025-09-04T00:00:00.000Z"}}, {"created_at" => {"lt" => "2025-09-05T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results3.map(&:id)).to match_array(["w1", "w2"])
+
+          results4 = search_datastore(
+            filters: [{"created_at" => {"lte" => "2025-09-04T00:00:00.000Z"}}, {"created_at" => {"lte" => "2025-09-05T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results4.map(&:id)).to match_array(["w1", "w2"])
+
+          # second filter is more restrictive for results 5-8
+          results5 = search_datastore(
+            filters: [{"created_at" => {"lt" => "2025-09-05T00:00:00.000Z"}}, {"created_at" => {"lte" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results5.map(&:id)).to match_array(["w1", "w2"])
+
+          results6 = search_datastore(
+            filters: [{"created_at" => {"lt" => "2025-09-05T00:00:00.000Z"}}, {"created_at" => {"lt" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results6.map(&:id)).to match_array(["w1"])
+
+          results7 = search_datastore(
+            filters: [{"created_at" => {"lte" => "2025-09-05T00:00:00.000Z"}}, {"created_at" => {"lt" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results7.map(&:id)).to match_array(["w1"])
+
+          results8 = search_datastore(
+            filters: [{"created_at" => {"lte" => "2025-09-05T00:00:00.000Z"}}, {"created_at" => {"lte" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results8.map(&:id)).to match_array(["w1", "w2"])
+        end
+
+        it "correctly ANDs multiple filters for lower bounds (gt/gte)" do
+          index_into(
+            graphql,
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # After the timestamps
+            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # After the timestamps
+          )
+
+          # first filter is more restrictive for results 1-4
+          res1 = search_datastore(
+            filters: [{"created_at" => {"gt" => "2025-09-04T00:00:00.000Z"}}, {"created_at" => {"gte" => "2025-09-03T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(res1.map(&:id)).to match_array(["w3", "w4"])
+
+          res2 = search_datastore(
+            filters: [{"created_at" => {"gt" => "2025-09-04T00:00:00.000Z"}}, {"created_at" => {"gt" => "2025-09-03T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(res2.map(&:id)).to match_array(["w3", "w4"])
+
+          res3 = search_datastore(
+            filters: [{"created_at" => {"gte" => "2025-09-04T12:00:00.000Z"}}, {"created_at" => {"gt" => "2025-09-03T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(res3.map(&:id)).to match_array(["w3", "w4"])
+
+          res4 = search_datastore(
+            filters: [{"created_at" => {"gte" => "2025-09-04T00:00:00.000Z"}}, {"created_at" => {"gte" => "2025-09-03T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(res4.map(&:id)).to match_array(["w2", "w3", "w4"])
+
+          # second lower bound is more restrictive
+          res5 = search_datastore(
+            filters: [{"created_at" => {"gt" => "2025-09-03T00:00:00.000Z"}}, {"created_at" => {"gte" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(res5.map(&:id)).to match_array(["w2", "w3", "w4"])
+
+          res6 = search_datastore(
+            filters: [{"created_at" => {"gt" => "2025-09-03T00:00:00.000Z"}}, {"created_at" => {"gt" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(res6.map(&:id)).to match_array(["w3", "w4"])
+
+          res7 = search_datastore(
+            filters: [{"created_at" => {"gte" => "2025-09-03T00:00:00.000Z"}}, {"created_at" => {"gt" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(res7.map(&:id)).to match_array(["w3", "w4"])
+
+          res8 = search_datastore(
+            filters: [{"created_at" => {"gte" => "2025-09-03T00:00:00.000Z"}}, {"created_at" => {"gte" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(res8.map(&:id)).to match_array(["w2", "w3", "w4"])
+        end
+
+        it "correctly ANDs multiple filters for mixed bounds" do
+          index_into(
+            graphql,
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # Between the timestamps
+            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # Exactly at the boundary
+          )
+
+          res1 = search_datastore(
+            filters: [{"created_at" => {"gt" => "2025-09-04T00:00:00.000Z", "lt" => "2025-09-05T00:00:00.000Z"}}, {"created_at" => {"gte" => "2025-09-04T00:00:00.000Z", "lte" => "2025-09-05T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(res1.map(&:id)).to match_array(["w3"])
+
+          res2 = search_datastore(
+            filters: [{"created_at" => {"gte" => "2025-09-03T00:00:00.000Z", "lte" => "2025-09-04T00:00:00.000Z"}}, {"created_at" => {"gte" => "2025-09-04T00:00:00.000Z", "lte" => "2025-09-05T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(res2.map(&:id)).to match_array(["w2"])
+
+          res3 = search_datastore(
+            filters: [{"created_at" => {"gte" => "2025-09-04T00:00:00.000Z", "lte" => "2025-09-04T00:00:00.000Z"}}, {"created_at" => {"gte" => "2025-09-03T00:00:00.000Z", "lte" => "2025-09-05T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(res3.map(&:id)).to match_array(["w2"])
+        end
+      end
+
+      context "mixed operators in one filter", :expect_index_exclusions do
+        it "correctly handles conflicting operators by keeping the stricter one for upper bounds (lt/lte)" do
+          index_into(
+            graphql,
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Before both timestamps
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # Between the timestamps
+            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # Exactly at the boundary
+          )
+
+          results1 = search_datastore(
+            filters: [{"created_at" => {"lte" => "2025-09-05T00:00:00.000Z", "lt" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results1.map(&:id)).to match_array(["w1"])
+
+          results2 = search_datastore(
+            filters: [{"created_at" => {"lt" => "2025-09-05T00:00:00.000Z", "lte" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results2.map(&:id)).to match_array(["w1", "w2"])
+
+          results3 = search_datastore(
+            filters: [{"created_at" => {"lte" => "2025-09-04T00:00:00.000Z", "lt" => "2025-09-05T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results3.map(&:id)).to match_array(["w1", "w2"])
+
+          results4 = search_datastore(
+            filters: [{"created_at" => {"lt" => "2025-09-04T00:00:00.000Z", "lte" => "2025-09-05T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results4.map(&:id)).to match_array(["w1"])
+        end
+
+        it "correctly handles conflicting operators by keeping the stricter one for lower bounds (gt/gte)" do
+          index_into(
+            graphql,
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # After the timestamps
+            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # After the timestamps
+          )
+
+          r1 = search_datastore(
+            filters: [{"created_at" => {"gte" => "2025-09-03T00:00:00.000Z", "gt" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(r1.map(&:id)).to match_array(["w3", "w4"])
+
+          r2 = search_datastore(
+            filters: [{"created_at" => {"gt" => "2025-09-02T00:00:00.000Z", "gte" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(r2.map(&:id)).to match_array(["w2", "w3", "w4"])
+
+          r3 = search_datastore(
+            filters: [{"created_at" => {"gte" => "2025-09-04T00:00:00.000Z", "gt" => "2025-09-02T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(r3.map(&:id)).to match_array(["w2", "w3", "w4"])
+
+          r4 = search_datastore(
+            filters: [{"created_at" => {"gt" => "2025-09-04T00:00:00.000Z", "gte" => "2025-09-03T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(r4.map(&:id)).to match_array(["w3", "w4"])
+        end
+
+        it "correctly handles conflicting operators by keeping the stricter one for mixed bounds" do
+          index_into(
+            graphql,
+            build(:widget, id: "w1", created_at: "2025-09-03T00:00:00.000Z"), # Before both timestamps
+            build(:widget, id: "w2", created_at: "2025-09-04T00:00:00.000Z"), # Exactly at the boundary
+            build(:widget, id: "w3", created_at: "2025-09-04T12:00:00.000Z"), # Between the timestamps
+            build(:widget, id: "w4", created_at: "2025-09-05T00:00:00.000Z")  # Exactly at the boundary
+          )
+
+          results1 = search_datastore(
+            filters: [{"created_at" => {"lte" => "2025-09-04T00:00:00.000Z", "lt" => "2025-09-05T00:00:00.000Z", "gte" => "2025-09-04T00:00:00.000Z", "gt" => "2025-09-02T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results1.map(&:id)).to match_array(["w2"])
+
+          results2 = search_datastore(
+            filters: [{"created_at" => {"lt" => "2025-09-05T00:00:00.000Z", "lte" => "2025-09-04T00:00:00.000Z", "gt" => "2025-09-02T00:00:00.000Z", "gte" => "2025-09-04T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results2.map(&:id)).to match_array(["w2"])
+
+          results3 = search_datastore(
+            filters: [{"created_at" => {"lt" => "2025-09-05T00:00:00.000Z", "lte" => "2025-09-05T00:00:00.000Z", "gt" => "2025-09-03T00:00:00.000Z", "gte" => "2025-09-03T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results3.map(&:id)).to match_array(["w2", "w3"])
+
+          results4 = search_datastore(
+            filters: [{"created_at" => {"lte" => "2025-09-05T00:00:00.000Z", "lt" => "2025-09-05T00:00:00.000Z", "gte" => "2025-09-03T00:00:00.000Z", "gt" => "2025-09-03T00:00:00.000Z"}}],
+            index_def_name: "widgets"
+          ).to_a
+          expect(results4.map(&:id)).to match_array(["w2", "w3"])
+        end
       end
 
       describe "`not`" do

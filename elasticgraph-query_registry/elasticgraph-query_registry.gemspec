@@ -1,4 +1,4 @@
-# Copyright 2024 - 2025 Block, Inc.
+# Copyright 2024 - 2026 Block, Inc.
 #
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE file or at
@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "elasticgraph-graphql", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
-  spec.add_dependency "graphql", "~> 2.5.4"
+  spec.add_dependency "graphql", "~> 2.6.6"
   spec.add_dependency "graphql-c_parser", "~> 1.1", ">= 1.1.2"
   spec.add_dependency "rake", "~> 13.2", ">= 13.2.1"
 

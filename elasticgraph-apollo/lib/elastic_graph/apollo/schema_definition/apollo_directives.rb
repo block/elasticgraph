@@ -1,4 +1,4 @@
-# Copyright 2024 - 2025 Block, Inc.
+# Copyright 2024 - 2026 Block, Inc.
 #
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE file or at
@@ -157,13 +157,13 @@ module ElasticGraph
           # Adds the [`@policy` directive](https://www.apollographql.com/docs/federation/federated-types/federated-directives/#policy)
           # to the schema element.
           #
-          # @param policies [Array<String>] List of authorization policies.
+          # @param policies [Array<Array<String>>] List of authorization policies to evaluate.
           # @return [void]
           #
           # @example Add `@policy` to a type
           #   ElasticGraph.define_schema do |schema|
           #     schema.object_type "Campaign" do |t|
-          #       t.apollo_policy policies: ["Policy1", "Policy2"]
+          #       t.apollo_policy policies: [["Policy1", "Policy2"]]
           #     end
           #   end
           def apollo_policy(policies:)
@@ -227,14 +227,14 @@ module ElasticGraph
           # Adds the [`@requiresScopes` directive](https://www.apollographql.com/docs/federation/federated-types/federated-directives/#requiresscopes)
           # to the schema element.
           #
-          # @param scopes [Array<String>] List of JWT scopes that must be granted to the user in order to access the underlying element data.
+          # @param scopes [Array<Array<String>>] List of JWT scopes that must be granted to the user in order to access the underlying element data.
           # @return [void]
           #
           # @example Add `@requiresScopes` to a field
           #   ElasticGraph.define_schema do |schema|
           #     schema.object_type "Product" do |t|
           #       t.field "shippingEstimate", "String" do |f|
-          #         f.apollo_requires_scopes scopes: "shipping"
+          #         f.apollo_requires_scopes scopes: [["shipping"]]
           #       end
           #     end
           #   end
