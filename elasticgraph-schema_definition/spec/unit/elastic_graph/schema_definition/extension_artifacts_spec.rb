@@ -85,7 +85,6 @@ module ElasticGraph
         first, second = results.map { |schema| schema.extension_artifacts.fetch("example/custom") }
         expect(first.label).to eq "first"
         expect(second.label).to eq "second"
-        expect(first).not_to be second
         expect(results.first.extension_artifacts.fetch("example/custom")).to be first
       end
 

@@ -170,6 +170,16 @@ module ElasticGraph
       EOS
     end
 
+    doctest.before "ElasticGraph::SchemaDefinition::API#register_schema_artifact_extension" do
+      ::FileUtils.mkdir_p "my_gem"
+      ::File.write("my_gem/artifacts.rb", <<~EOS)
+        module MyGem
+          module Artifacts
+          end
+        end
+      EOS
+    end
+
     [
       "ElasticGraph::Apollo@Use elasticgraph-apollo in a project",
       "ElasticGraph::Apollo::SchemaDefinition::APIExtension@Define local rake tasks with this extension module",

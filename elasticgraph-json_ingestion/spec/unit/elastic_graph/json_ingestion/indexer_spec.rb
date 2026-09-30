@@ -9,6 +9,8 @@
 require "elastic_graph/indexer/config"
 require "elastic_graph/indexer/malformed_event_error"
 require "elastic_graph/json_ingestion/indexer"
+require "elastic_graph/json_ingestion/indexer_extension"
+require "elastic_graph/schema_definition/test_support"
 
 module ElasticGraph
   module JSONIngestion
@@ -31,6 +33,28 @@ module ElasticGraph
         result = Indexer.from_parsed_yaml(parsed_test_settings_yaml)
 
         expect(result.indexer).to be_a(ElasticGraph::Indexer)
+      end
+
+      it "rejects a format-neutral indexer whose schema artifacts do not register the JSON artifact extension" do
+        # This matches artifacts dumped before the JSON artifact extension was registered in them. We use the
+        # format-neutral `TestSupport` directly because this gem's spec support always applies the JSON extension.
+        schema_artifacts = ElasticGraph::SchemaDefinition::TestSupport.define_schema(schema_element_name_form: :snake_case) do |schema|
+          schema.register_indexer_extension IndexerExtension, defined_at: "elastic_graph/json_ingestion/indexer_extension"
+          schema.object_type "Widget" do |t|
+            t.field "id", "ID!"
+            t.index "widgets"
+          end
+        end
+        base_indexer = build_indexer(schema_artifacts: schema_artifacts)
+        expect(base_indexer.schema_artifacts.extension_artifacts.key?("json")).to be false
+
+        expect {
+          Indexer.new(base_indexer)
+        }.to raise_error Errors::ConfigError, a_string_including(
+          "requires JSON schema artifacts and a `json` ingestion adapter",
+          "ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension",
+          "regenerate the schema artifacts"
+        )
       end
 
       it "rejects a format-neutral indexer with JSON schema artifacts but no JSON ingestion adapter" do
