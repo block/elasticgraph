@@ -9,10 +9,14 @@
 require "elastic_graph/constants"
 require "elastic_graph/errors"
 require "elastic_graph/schema_artifacts/from_disk"
+require "elastic_graph/spec_support/runtime_metadata_support"
+require "yaml"
 
 module ElasticGraph
   module SchemaArtifacts
     RSpec.describe FromDisk do
+      include RuntimeMetadata::RuntimeMetadataSupport
+
       it "loads each schema artifact from disk" do
         artifacts = FromDisk.new(::File.join(CommonSpecHelpers::REPO_ROOT, "config", "schema", "artifacts"))
 
@@ -26,10 +30,8 @@ module ElasticGraph
           "name" => "ElasticGraph::Extensions::ArtifactFactory",
           "require_path" => "support/example_extensions/artifact_factory"
         })
+        ::File.write(RUNTIME_METADATA_FILE, ::YAML.dump(schema_with(schema_artifact_extensions: {"example" => registration}).to_dumpable_hash))
         artifacts = FromDisk.new(Dir.pwd)
-        allow(artifacts).to receive(:runtime_metadata).and_return(
-          instance_double(RuntimeMetadata::Schema, schema_artifact_extensions: {"example" => registration})
-        )
 
         expect(artifacts.extension_artifacts.fetch("example")).to eq [Dir.pwd, {}]
       end

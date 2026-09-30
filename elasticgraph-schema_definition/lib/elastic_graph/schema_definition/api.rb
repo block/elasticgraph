@@ -362,6 +362,27 @@ module ElasticGraph
       # @param config [Hash] configuration passed to both factory methods
       # @return [void]
       # @raise [Errors::SchemaError] when the name has already been registered
+      #
+      # @example Register a schema artifact extension
+      #   # In `my_gem/artifacts.rb`:
+      #   module MyGem
+      #     module Artifacts
+      #       def self.from_disk(artifacts_dir, config:)
+      #         # Return a provider that reads this extension's artifacts from `artifacts_dir`.
+      #       end
+      #
+      #       def self.from_schema_definition(results, config:)
+      #         # Return a provider with the same API that reads them from the in-memory `results`.
+      #       end
+      #     end
+      #   end
+      #
+      #   require(artifacts_require_path = "./my_gem/artifacts")
+      #
+      #   ElasticGraph.define_schema do |schema|
+      #     schema.register_schema_artifact_extension "my_gem", MyGem::Artifacts,
+      #       defined_at: artifacts_require_path
+      #   end
       def register_schema_artifact_extension(name, extension_module, defined_at:, **config)
         if @state.schema_artifact_extensions.key?(name)
           raise Errors::SchemaError, "A schema artifact extension is already registered as `#{name}`. Choose a unique name for each extension."
