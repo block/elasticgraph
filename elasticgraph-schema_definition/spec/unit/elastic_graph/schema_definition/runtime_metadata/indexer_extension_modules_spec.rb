@@ -14,9 +14,11 @@ module ElasticGraph
       include_context "RuntimeMetadata support"
 
       it "includes any modules registered during schema definition" do
+        # The extension that provides ingestion adapters is registered last, so this also verifies that
+        # any registered extension (not just the first) can satisfy the ingestion adapter requirement.
         metadata = define_schema(extension_modules: []) do |s|
-          s.register_indexer_extension TestSupport::IndexerExtension, defined_at: "elastic_graph/schema_definition/test_support"
           s.register_indexer_extension Enumerable, defined_at: "set"
+          s.register_indexer_extension TestSupport::IndexerExtension, defined_at: "elastic_graph/schema_definition/test_support"
 
           s.object_type "Widget" do |t|
             t.field "id", "ID!"
@@ -26,10 +28,10 @@ module ElasticGraph
 
         expect(metadata.indexer_extension_modules).to eq [
           SchemaArtifacts::RuntimeMetadata::ComponentExtension.new(
-            SchemaArtifacts::RuntimeMetadata::Extension.new(TestSupport::IndexerExtension, "elastic_graph/schema_definition/test_support", {}).to_dumpable_hash
+            SchemaArtifacts::RuntimeMetadata::Extension.new(Enumerable, "set", {}).to_dumpable_hash
           ),
           SchemaArtifacts::RuntimeMetadata::ComponentExtension.new(
-            SchemaArtifacts::RuntimeMetadata::Extension.new(Enumerable, "set", {}).to_dumpable_hash
+            SchemaArtifacts::RuntimeMetadata::Extension.new(TestSupport::IndexerExtension, "elastic_graph/schema_definition/test_support", {}).to_dumpable_hash
           )
         ]
       end

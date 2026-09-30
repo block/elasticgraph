@@ -81,8 +81,7 @@ module ElasticGraph
       @operation_factory ||= begin
         if ingestion_adapters_by_format.empty?
           raise Errors::ConfigError, "No ingestion adapters are available. Enable an ingestion format extension " \
-            "in your schema definition and regenerate the schema artifacts, or configure `indexer.extension_modules` " \
-            "with an extension module that registers an ingestion adapter."
+            "in your schema definition and regenerate the schema artifacts."
         end
 
         require "elastic_graph/indexer/operation/factory"

@@ -252,7 +252,8 @@ module ElasticGraph
         raise Errors::SchemaError, <<~EOS.strip
           This schema defines indexed types but does not register an indexer extension that provides `ingestion_adapters_by_format`.
 
-          Add an ingestion format extension to your schema definition Rake tasks and regenerate the schema artifacts.
+          Add an ingestion format extension (such as `ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension`) to the
+          extension modules for your schema definition Rake tasks, then regenerate the schema artifacts.
         EOS
       end
 
