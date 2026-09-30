@@ -2,7 +2,9 @@
 # This file determines the versions the ElasticGraph CI build tests against, and is also
 # used to provide the default versions offered by the `elasticgraph-local` rake tasks.
 elasticsearch:
-- 9.0.0 # latest version as of 2025-04-23.
+- 9.4.2 # latest version as of 2026-06-01.
+- 9.0.0 # lowest version ElasticGraph currently supports
 opensearch:
-- 2.19.1 # latest version as of 2025-03-10.
-- 2.7.0 # lowest version ElasticGraph currently supports
+- 3.6.0  # latest minor release as of 2026-06-01.
+- 3.3.0  # minor release as of 2025-10-31.
+- 2.19.0 # lowest version ElasticGraph currently supports
