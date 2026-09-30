@@ -107,6 +107,18 @@ module ElasticGraph
         end
       end
 
+      describe "#conflict_retries_for" do
+        it "returns the per-type value when one is configured, and the default otherwise" do
+          config = Config.from_parsed_yaml("indexer" => {
+            "conflict_retries" => 7,
+            "conflict_retries_by_type" => {"Widget" => 9}
+          })
+
+          expect(config.conflict_retries_for("Widget")).to eq(9)
+          expect(config.conflict_retries_for("Component")).to eq(7)
+        end
+      end
+
       describe "#extension_modules", :in_temp_dir do
         it "loads the extension modules from disk" do
           File.write("eg_extension_module1.rb", <<~EOS)

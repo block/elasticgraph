@@ -482,7 +482,7 @@ module ElasticGraph
               record_preparer: latest_json_record_preparer_for(indexer),
               update_target: update_target,
               destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(destination_index),
-              conflict_retries: indexer.config.conflict_retries
+              conflict_retries: indexer.config.conflict_retries_for(destination_type)
             )
           end
 

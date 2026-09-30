@@ -102,6 +102,12 @@ module ElasticGraph
           extension_modules: Support::Config::EXTENSION_MODULE_SCHEMA
         }
 
+      # @param type [String] name of the type whose documents are being updated
+      # @return [Integer] the `retry_on_conflict` budget for updates to documents of that type
+      def conflict_retries_for(type)
+        conflict_retries_by_type.fetch(type, conflict_retries)
+      end
+
       private
 
       def convert_values(skip_derived_indexing_type_updates:, latency_slo_thresholds_by_timestamp_in_ms:, skip_record_validation_percents_by_type:, conflict_retries:, conflict_retries_by_type:, extension_modules:)

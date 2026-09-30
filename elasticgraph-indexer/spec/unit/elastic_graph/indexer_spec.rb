@@ -41,8 +41,8 @@ module ElasticGraph
           "conflict_retries_by_type" => {"Widget" => 9}
         }))
 
-        expect(indexer.operation_factory.conflict_retries).to eq(7)
-        expect(indexer.operation_factory.conflict_retries_by_type).to eq("Widget" => 9)
+        expect(indexer.operation_factory.conflict_retries_for.call("Widget")).to eq(9)
+        expect(indexer.operation_factory.conflict_retries_for.call("Component")).to eq(7)
       end
     end
 

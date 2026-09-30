@@ -41,7 +41,7 @@ module ElasticGraph
           update_target: update_targets.first,
           doc_id: event.id,
           destination_index_mapping: idxr.schema_artifacts.index_mappings_by_index_def_name.fetch(index_def.name),
-          conflict_retries: idxr.config.conflict_retries
+          conflict_retries: idxr.config.conflict_retries_for(update_targets.first.type)
         )
       end
     end

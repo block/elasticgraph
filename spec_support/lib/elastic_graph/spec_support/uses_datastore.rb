@@ -340,7 +340,7 @@ RSpec.shared_context "datastore support", :capture_logs do
           update_target: update_target,
           doc_id: event.id,
           destination_index_mapping: destination_index_mapping,
-          conflict_retries: indexer.config.conflict_retries
+          conflict_retries: indexer.config.conflict_retries_for(update_target.type)
         )
       end
     end

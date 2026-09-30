@@ -308,7 +308,7 @@ module ElasticGraph
             update_target: update_target,
             doc_id: "the-id",
             destination_index_mapping: destination_index_mapping,
-            conflict_retries: indexer.config.conflict_retries
+            conflict_retries: indexer.config.conflict_retries_for(update_target.type)
           )
 
           update.to_datastore_bulk.dig(1, :script, :params)

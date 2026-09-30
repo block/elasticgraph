@@ -52,7 +52,7 @@ module ElasticGraph
           end
 
           context "when the indexer is configured with `conflict_retries_by_type`" do
-            let(:indexer) { build_indexer(conflict_retries: 5, conflict_retries_by_type: {"WidgetCurrency" => 15}) }
+            let(:indexer) { build_indexer(conflict_retries: 3, conflict_retries_by_type: {"WidgetCurrency" => 15}) }
 
             it "applies the per-type value to updates of that destination type and the default to everything else" do
               event = build_upsert_event(:widget, id: "1", __version: 1)
@@ -61,7 +61,7 @@ module ElasticGraph
                 [op.update_target.type, op.to_datastore_bulk.first.fetch(:update).fetch(:retry_on_conflict)]
               end
 
-              expect(retries_by_type).to eq("Widget" => 5, "WidgetCurrency" => 15)
+              expect(retries_by_type).to eq("Widget" => 3, "WidgetCurrency" => 15)
             end
           end
 
@@ -488,7 +488,7 @@ module ElasticGraph
             record_preparer: latest_json_record_preparer_for(indexer),
             update_target: indexer.schema_artifacts.runtime_metadata.object_types_by_name.fetch("Widget").update_targets.first,
             destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch("widget_currencies"),
-            conflict_retries: indexer.config.conflict_retries
+            conflict_retries: indexer.config.conflict_retries_for("WidgetCurrency")
           )
 
           expect(operations.size).to be < 2

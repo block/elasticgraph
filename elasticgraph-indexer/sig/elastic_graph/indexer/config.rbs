@@ -30,6 +30,8 @@ module ElasticGraph
     end
 
     class Config < ConfigSupertype
+      def conflict_retries_for: (::String) -> ::Integer
+
       private
 
       def convert_values: (
