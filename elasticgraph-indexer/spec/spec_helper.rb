@@ -14,4 +14,10 @@ RSpec.configure do |config|
   config.define_derived_metadata(absolute_file_path: %r{/elasticgraph-indexer/}) do |meta|
     meta[:builds_indexer] = true
   end
+
+  # Every indexer integration and acceptance spec must run against each ingestion format.
+  config.define_derived_metadata(absolute_file_path: %r{/elasticgraph-indexer/spec/(acceptance|integration)/}) do |meta|
+    require "support/ingestion_formats"
+    meta[:ingests_data] = true
+  end
 end

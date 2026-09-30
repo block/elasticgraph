@@ -6,13 +6,9 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/spec_support/ingestion_formats"
-
 module ElasticGraph
-  RSpec.describe "A derived indexing type", :ingests_json_data, :factories, :capture_logs do
+  RSpec.describe "A derived indexing type", :factories, :capture_logs do
     for_each_ingestion_format do
-      let(:indexer) { build_indexer(schema_artifacts: ingestion_schema_artifacts) }
-
       it "maintains derived fields, handling nested source and destination fields as needed" do
         # Index only 1 record initially, so we can verify the state of the document when it is
         # first inserted. This is important because the metadata available to `ctx` in our script

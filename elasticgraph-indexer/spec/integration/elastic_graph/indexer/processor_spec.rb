@@ -7,14 +7,11 @@
 # frozen_string_literal: true
 
 require "elastic_graph/indexer/processor"
-require "elastic_graph/spec_support/ingestion_formats"
 
 module ElasticGraph
   class Indexer
-    RSpec.describe Processor, :ingests_json_data, :factories, :capture_logs do
+    RSpec.describe Processor, :factories, :capture_logs do
       for_each_ingestion_format do |format|
-        let(:indexer) { build_indexer(schema_artifacts: ingestion_schema_artifacts) }
-
         context "process non-rollover upsert events" do
           describe "upserts" do
             let(:component_1_old) { build_upsert_event(:component, id: "123", name: "old_name") }

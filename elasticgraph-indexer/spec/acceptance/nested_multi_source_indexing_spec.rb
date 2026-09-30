@@ -6,12 +6,9 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/spec_support/ingestion_formats"
-
 module ElasticGraph
-  RSpec.describe "Nested multi-source indexing", :ingests_json_data, :factories, :capture_logs do
+  RSpec.describe "Nested multi-source indexing", :factories, :capture_logs do
     for_each_ingestion_format do
-      let(:indexer) { build_indexer(schema_artifacts: ingestion_schema_artifacts) }
       let(:league) { "NBA" }
       let(:formed_on) { "2019-04-23" }
 

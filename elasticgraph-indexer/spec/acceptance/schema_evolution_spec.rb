@@ -9,10 +9,9 @@
 require "elastic_graph/indexer"
 require "elastic_graph/indexer/event"
 require "elastic_graph/schema_definition/rake_tasks"
-require "elastic_graph/spec_support/ingestion_formats"
 
 module ElasticGraph
-  RSpec.describe "Indexing schema evolution", :ingests_json_data, :factories, :capture_logs, :in_temp_dir, :rake_task do
+  RSpec.describe "Indexing schema evolution", :factories, :capture_logs, :in_temp_dir, :rake_task do
     for_each_ingestion_format do
       let(:path_to_schema) { "config/schema.rb" }
 
@@ -341,7 +340,7 @@ module ElasticGraph
 
         ::File.write(path_to_schema, <<~EOS)
           ElasticGraph.define_schema do |schema|
-            #{schema_version_declaration(json_schema_version)}
+            schema.json_schema_version #{json_schema_version} if schema.respond_to?(:json_schema_version)
 
             # Money is referenced by the team schema but is defined in the widgets schema so we have duplicate it here.
             schema.object_type "Money" do |t|
@@ -358,7 +357,7 @@ module ElasticGraph
         # This is a pared down schema definition of our normal test schema `Address` type.
         ::File.write(path_to_schema, <<~EOS)
           ElasticGraph.define_schema do |schema|
-            #{schema_version_declaration(json_schema_version)}
+            schema.json_schema_version #{json_schema_version} if schema.respond_to?(:json_schema_version)
 
             schema.object_type "Address" do |t|
               t.field "id", "ID!"
@@ -376,7 +375,7 @@ module ElasticGraph
         # This is a pared down schema definition of our normal test schema `Address` type.
         ::File.write(path_to_schema, <<~EOS)
           ElasticGraph.define_schema do |schema|
-            #{schema_version_declaration(json_schema_version)}
+            schema.json_schema_version #{json_schema_version} if schema.respond_to?(:json_schema_version)
 
             schema.object_type "Widget" do |t|
               t.field "id", "ID!"
@@ -411,11 +410,6 @@ module ElasticGraph
             output: output
           )
         end
-      end
-
-      # Protobuf events do not carry a schema version, so only the JSON variant declares one.
-      def schema_version_declaration(json_schema_version)
-        "schema.json_schema_version #{json_schema_version}" if ingestion_format == :json
       end
 
       def boot_indexer

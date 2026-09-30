@@ -7,15 +7,13 @@
 # frozen_string_literal: true
 
 require "elastic_graph/indexer/datastore_indexing_router"
-require "elastic_graph/spec_support/ingestion_formats"
 require "elastic_graph/support/monotonic_clock"
 
 module ElasticGraph
   class Indexer
-    RSpec.describe DatastoreIndexingRouter, :ingests_json_data, :capture_logs do
+    RSpec.describe DatastoreIndexingRouter, :capture_logs do
       for_each_ingestion_format do
         describe "#source_event_versions_in_index", :factories do
-          let(:indexer) { build_indexer(schema_artifacts: ingestion_schema_artifacts) }
           let(:router) { indexer.datastore_router }
           let(:operation_factory) { indexer.operation_factory }
 
