@@ -56,7 +56,7 @@ json.json_schemas_for(json.latest_json_schema_version)
 
 `FromDisk` and in-memory `SchemaDefinition::Results` expose the same `extension_artifacts` registry. An extension owns its provider's methods: JSON supplies versioned JSON schemas, protobuf supplies `proto_schema`, and a third-party gem can supply an unrelated API. Core does not enumerate supported formats.
 
-Register a provider factory with `schema.register_schema_artifact_extension(name, factory, defined_at:, **config)`. The factory must define both `from_disk(artifacts_dir, config:)` and `from_schema_definition(results, config:)`. Each returns a provider implementing the extension's own interface. Use the existing schema artifact manager extension hook to dump the provider's files.
+Register a provider factory with `schema.register_schema_artifact_extension(name, factory, defined_at:, **config)`. The factory must define both `from_disk(artifacts_dir, config:)` and `from_schema_definition(results, config:)`. Each returns a provider implementing the extension's own interface. To dump the provider's files, extend the schema artifact manager built by the schema definition factory and override its `artifacts_from_schema_def` method, as the JSON, protobuf, and warehouse extensions do.
 
 Registrations, require paths, and configuration are saved in runtime metadata. `extension_artifacts.key?(name)` checks registration without loading the provider. `extension_artifacts.fetch(name)` loads and caches it for that artifact instance, or raises `MissingSchemaArtifactError` if it is unregistered. Each application needs the gems for the providers it accesses; other registered providers remain unloaded.
 

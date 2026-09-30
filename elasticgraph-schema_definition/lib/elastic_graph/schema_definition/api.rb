@@ -361,7 +361,8 @@ module ElasticGraph
       # @param defined_at [String] require path for the factory
       # @param config [Hash] configuration passed to both factory methods
       # @return [void]
-      # @raise [Errors::SchemaError] when the name has already been registered
+      # @raise [Errors::SchemaError] when the name is not a string or has already been registered
+      # @raise [Errors::InvalidExtensionError] when the factory does not implement both storage methods
       #
       # @example Register a schema artifact extension
       #   # In `my_gem/artifacts.rb`:
@@ -384,6 +385,10 @@ module ElasticGraph
       #       defined_at: artifacts_require_path
       #   end
       def register_schema_artifact_extension(name, extension_module, defined_at:, **config)
+        unless name.is_a?(::String)
+          raise Errors::SchemaError, "Schema artifact extension names must be strings, but got `#{name.inspect}`."
+        end
+
         if @state.schema_artifact_extensions.key?(name)
           raise Errors::SchemaError, "A schema artifact extension is already registered as `#{name}`. Choose a unique name for each extension."
         end

@@ -41,7 +41,7 @@ module ElasticGraph
           @proto_schema ||= begin
             file = ::File.join(artifacts_dir, PROTO_SCHEMA_FILE)
             unless ::File.exist?(file)
-              raise Errors::MissingSchemaArtifactError, "Schema artifact `#{PROTO_SCHEMA_FILE}` could not be found in `#{artifacts_dir}`. Regenerate the schema artifacts."
+              raise Errors::MissingSchemaArtifactError, "Schema artifact `#{PROTO_SCHEMA_FILE}` could not be found in `#{artifacts_dir}`. It is not dumped when the schema has no protobuf messages to generate; otherwise, regenerate the schema artifacts."
             end
             ::File.read(file)
           end
