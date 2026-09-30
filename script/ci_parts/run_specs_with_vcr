@@ -10,5 +10,5 @@ source "script/ci_parts/setup_env" "test" $1 $2
 unset NO_VCR
 unset RUBYOPT
 
-# In addition, we want to run the extra GraphQL schema validation when running the whole schema together.
-VALIDATE_GRAPHQL_SCHEMAS=1 script/run_specs
+# In addition, validate generated GraphQL and protobuf schemas when running the whole suite together.
+VALIDATE_SCHEMA_ARTIFACTS=1 script/run_specs
