@@ -26,6 +26,14 @@ module ElasticGraph
         # The protobuf syntax emitted when the schema does not configure one.
         DEFAULT_SYNTAX = "proto3"
 
+        # Field declarations for the indexing event's transport metadata, in allocation order.
+        ENVELOPE_METADATA_FIELDS = {
+          "op" => "optional string",
+          "id" => "optional string",
+          "version" => "optional int64",
+          "latency_timestamps" => "map<string, google.protobuf.Timestamp>"
+        }.freeze
+
         # Normalizes a configured `syntax` to one of {SUPPORTED_SYNTAXES}.
         #
         # Both the `proto_schema_artifacts` API and this class validate through here so that a
@@ -143,6 +151,68 @@ module ElasticGraph
 
         private
 
+        def envelope_definitions
+          record_fields = envelope_record_fields
+          active_names = ENVELOPE_METADATA_FIELDS.keys + record_fields.keys
+          metadata = render_envelope_fields(ENVELOPE_METADATA_FIELDS, indent: "  ")
+          alternatives = render_envelope_fields(record_fields, indent: "    ")
+          reserved = render_reserved_envelope_fields(active_names)
+
+          body_sections = [metadata, "  oneof record {\n#{alternatives}\n  }", reserved].reject(&:empty?)
+          envelope = <<~PROTO
+            message ElasticGraphEventEnvelope {
+            #{body_sections.join("\n\n")}
+            }
+          PROTO
+
+          batch = <<~PROTO
+            message ElasticGraphEventBatch {
+              repeated ElasticGraphEventEnvelope events = 1;
+            }
+          PROTO
+
+          {"ElasticGraphEventEnvelope" => envelope.strip, "ElasticGraphEventBatch" => batch.strip}
+        end
+
+        def envelope_record_fields
+          type_names_by_field_name = {} # : ::Hash[::String, ::String]
+
+          @ingestible_types_by_name.values.sort_by(&:name).to_h do |type|
+            # @type var proto_type: SchemaElements::ObjectInterfaceAndUnionExtension
+            proto_type = _ = type
+            field_name = Support::Casing.to_upper_snake(proto_type.proto_name).downcase
+            if ENVELOPE_METADATA_FIELDS.key?(field_name) || field_name == "record"
+              raise Errors::SchemaError, "Ingestible type `#{type.name}` maps to reserved protobuf envelope field `#{field_name}`. " \
+                "Rename `#{type.name}` so its snake_case name does not conflict with a reserved envelope field."
+            end
+            if (existing_type_name = type_names_by_field_name[field_name])
+              raise Errors::SchemaError, "Ingestible types `#{existing_type_name}` and `#{type.name}` map to " \
+                "the same protobuf envelope field `#{field_name}`. " \
+                "Rename one of these types so their names remain distinct when converted to snake_case."
+            end
+
+            type_names_by_field_name[field_name] = type.name
+            [field_name, proto_type.proto_type_reference(@package_name)]
+          end
+        end
+
+        def render_envelope_fields(fields, indent:)
+          fields.map do |name, declaration|
+            number = field_number_for(
+              message_name: "ElasticGraphEventEnvelope",
+              type_name: "ElasticGraphEventEnvelope",
+              public_field_name: name
+            )
+            [number, "#{indent}#{declaration} #{name} = #{number};"]
+          end.sort_by(&:first).map(&:last).join("\n")
+        end
+
+        def render_reserved_envelope_fields(active_names)
+          reserved_field_numbers_for("ElasticGraphEventEnvelope", active_names).map do |name, number|
+            "  reserved #{number}; // Previously used by #{name}."
+          end.join("\n")
+        end
+
         # Selects the ingestible types and every type transitively referenced by their protobuf
         # representations. All traversal state is local so repeated calls are independent.
         def proto_types
@@ -163,19 +233,17 @@ module ElasticGraph
         end
 
         def render_definitions(types)
-          types
-            .sort_by(&:proto_name)
-            .filter_map { |type| type.to_proto(self, @package_name) }
-            .join("\n\n")
+          definitions = types.to_h { |type| [type.proto_name, type.to_proto(self, @package_name)] }
+          definitions.merge(envelope_definitions).compact.sort.map(&:last).join("\n\n")
         end
 
         # Every type reports the proto file it needs imported, or `nil` when it needs none. Today only
         # scalar types map to an externally defined proto type, but enum and object types can start
         # requiring an import without any change here.
         def render_imports(types)
-          imports = types.filter_map(&:protobuf_import).uniq.sort
+          imports = (types.filter_map(&:protobuf_import) + ["google/protobuf/timestamp.proto"]).uniq.sort
 
-          imports.empty? ? [] : [imports.map { |import| %(import "#{import}";) }.join("\n")]
+          [imports.map { |import| %(import "#{import}";) }.join("\n")]
         end
 
         def render_header_lines

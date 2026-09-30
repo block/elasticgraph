@@ -1,0 +1,16 @@
+// Copyright 2024 - 2026 Block, Inc.
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file or at
+// https://opensource.org/licenses/MIT.
+
+// Minimal external types for the scalar import specs. The schema helper supplies
+// this fixture to protoc so both generated type references can compile.
+// Two scalars import this file to test import deduplication. Its z/ path sorts
+// after a/types.proto even though these scalars are defined first in the spec.
+
+syntax = "proto3";
+package example;
+
+message FirstZType {}
+message SecondZType {}

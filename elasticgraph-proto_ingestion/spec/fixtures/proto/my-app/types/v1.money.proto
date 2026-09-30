@@ -1,0 +1,15 @@
+// Copyright 2024 - 2026 Block, Inc.
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file or at
+// https://opensource.org/licenses/MIT.
+
+// Minimal external type for the custom scalar mapping spec. The schema helper
+// supplies this fixture to protoc so the generated myapp.types.Money reference can
+// compile. The hyphenated directory and dotted filename exercise valid import paths
+// that do not simply mirror the protobuf package name.
+
+syntax = "proto3";
+package myapp.types;
+
+message Money {}

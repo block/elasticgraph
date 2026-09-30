@@ -116,7 +116,7 @@ module ElasticGraph
             end
           end
 
-          expect(proto_types_defined_in(proto)).to contain_exactly("Widget")
+          expect(proto_types_defined_in(proto)).to contain_exactly("Widget", "ElasticGraphEventEnvelope", "ElasticGraphEventBatch")
         end
 
         it "generates no message for a type that no ingestible type references" do
@@ -132,7 +132,7 @@ module ElasticGraph
             end
           end
 
-          expect(proto_types_defined_in(proto)).to contain_exactly("Widget")
+          expect(proto_types_defined_in(proto)).to contain_exactly("Widget", "ElasticGraphEventEnvelope", "ElasticGraphEventBatch")
         end
 
         # Defines an indexed type with a top-level `sourced_from` field fed by `ComponentDesign`.

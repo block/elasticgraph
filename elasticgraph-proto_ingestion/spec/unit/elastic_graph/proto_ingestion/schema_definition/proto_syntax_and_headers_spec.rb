@@ -94,6 +94,8 @@ module ElasticGraph
             option java_package = "com.myapp.events";
             option java_multiple_files = true;
 
+            import "google/protobuf/timestamp.proto";
+
             message Account {
           PROTO
         end

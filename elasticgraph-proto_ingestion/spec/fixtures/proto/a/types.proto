@@ -1,0 +1,15 @@
+// Copyright 2024 - 2026 Block, Inc.
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file or at
+// https://opensource.org/licenses/MIT.
+
+// Minimal external type for the scalar import specs. The schema helper supplies this
+// fixture to protoc so generated references to example.AType can compile.
+// The a/ and z/ paths test alphabetical import ordering independently of scalar
+// definition order. Keep them separate to preserve that coverage.
+
+syntax = "proto3";
+package example;
+
+message AType {}

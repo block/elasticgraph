@@ -215,8 +215,9 @@ end
 ```
 
 Each call to `protobuf` replaces the full protobuf configuration. The override above omits
-`import:`, so `schema.proto` no longer imports `google/protobuf/timestamp.proto`. An override that
-omits `field_comment:` likewise drops the built-in comment.
+`import:`, so the scalar no longer requires `google/protobuf/timestamp.proto`. The generated event
+envelope still requires that import for its latency timestamps. An override that omits
+`field_comment:` likewise drops the built-in comment.
 
 ## Type Mappings
 

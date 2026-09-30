@@ -14,6 +14,8 @@ module ElasticGraph
       # Covers how schema generation uses `proto_field_numbers.yaml` mappings to keep field numbers
       # and enum value numbers stable as the schema evolves.
       RSpec.describe Schema, "proto field-number mappings" do
+        let(:envelope_mapping) { envelope_field_number_mapping("account") }
+
         it "assigns a new field the stored `next_number` rather than filling an earlier gap" do
           # A cursor with gaps below it can only arise from a hand-edited artifact, so this test
           # must seed raw mappings instead of results from a prior dump.
@@ -86,7 +88,8 @@ module ElasticGraph
                   "name" => 2
                 },
                 "next_number" => 3
-              }
+              },
+              "ElasticGraphEventEnvelope" => envelope_mapping
             }
           })
         end
@@ -125,7 +128,8 @@ module ElasticGraph
                   "name" => 3
                 },
                 "next_number" => 4
-              }
+              },
+              "ElasticGraphEventEnvelope" => envelope_mapping
             }
           })
 
@@ -205,7 +209,8 @@ module ElasticGraph
                   "display_name" => 1
                 },
                 "next_number" => 3
-              }
+              },
+              "ElasticGraphEventEnvelope" => envelope_mapping
             }
           })
         end

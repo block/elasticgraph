@@ -17,11 +17,19 @@ module ElasticGraph
     module SchemaSupport
       include ElasticGraph::SchemaDefinition::TestSupport
 
+      def envelope_field_number_mapping(record_name)
+        {
+          "fields" => {"op" => 1, "id" => 2, "version" => 3, "latency_timestamps" => 4, record_name => 5},
+          "next_number" => 6
+        }
+      end
+
       def define_proto_schema(**options, &block)
         define_proto_schema_results(**options, &block).proto_schema
       end
 
-      # Defines a schema and returns its `Results`. Pass the results of a previous
+      # Defines a schema, verifies its proto compiles, and returns its `Results`.
+      # Pass the results of a previous
       # `define_proto_schema_results` call as `prior_results` to seed the new schema with the
       # field-number mappings the previous one generated, standing in for the
       # `proto_field_numbers.yaml` file that `schema_artifacts:dump` would have written between
@@ -32,7 +40,7 @@ module ElasticGraph
       def define_proto_schema_results(prior_results = nil, proto_field_number_mappings: nil, **options, &block)
         mappings = proto_field_number_mappings || prior_results&.proto_field_number_mappings
 
-        define_schema(
+        results = define_schema(
           schema_element_name_form: :snake_case,
           extension_modules: [SchemaDefinition::APIExtension],
           **options
@@ -40,6 +48,10 @@ module ElasticGraph
           schema.state.proto_ingestion_state.field_number_mappings = mappings if mappings
           block.call(schema)
         end
+
+        proto = results.proto_schema
+        run_protoc(proto, "--descriptor_set_out=#{::File::NULL}", "") unless proto.empty?
+        results
       end
 
       # The `grpc-tools` gem vendors precompiled `protoc` binaries under `bin/<arch>-<os>/`.
@@ -77,6 +89,7 @@ module ElasticGraph
           output, errors, status = Open3.capture3(
             PROTOC_BINARY,
             "--proto_path=#{directory}",
+            "--proto_path=#{::File.expand_path("../fixtures/proto", __dir__)}",
             operation,
             ::File.basename(schema_file.path),
             stdin_data: input,

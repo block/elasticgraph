@@ -12,6 +12,17 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       RSpec.describe APIExtension do
+        %w[ElasticGraphEventEnvelope ElasticGraphEventBatch].each do |name|
+          it "reserves #{name} for the generated transport messages" do
+            expect {
+              define_proto_schema do |schema|
+                schema.object_type(name) { |type| type.field "id", "ID!" }
+              end
+            }.to raise_error(Errors::SchemaError,
+              "`#{name}` cannot be used as a schema type because it is a reserved name.")
+          end
+        end
+
         it "uses the configured package name" do
           proto = define_proto_schema do |s|
             s.proto_schema_artifacts package_name: "proto.package.v1"
