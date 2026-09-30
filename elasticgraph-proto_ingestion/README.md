@@ -105,6 +105,24 @@ Events naming a known deleted type are ignored in raw and envelope formats. Unkn
 record alternatives fail rather than disappearing silently. Known messages can still contain unknown
 added fields, which protobuf discards: deploy the indexer before publishers when adding fields or types.
 
+## Indexer Wrapper
+
+Add the decoder configuration to your indexer's settings:
+
+```yaml
+proto_ingestion:
+  descriptor_set_file: config/schema/artifacts/schema.pb
+```
+
+Require `elastic_graph/proto_ingestion/indexer`, then load your settings using
+`ElasticGraph::ProtoIngestion::Indexer.from_yaml_file`. Its `process` method accepts a serialized
+`ElasticGraphEventBatch`, or a domain message when configured with `format: raw`. Raw-message callers
+pass transport properties through `metadata:`. The wrapper supports both binary and base64 encoding.
+
+`process` raises if any events fail validation, after indexing valid events. Use `decode` followed by
+`process_returning_failures` to handle failures individually or combine payloads before one bulk operation.
+The wrapper uses the same versionless validation and schema-evolution rules described above.
+
 ## Schema Definition API
 
 ### Protobuf Syntax (`proto2` / `proto3`)
