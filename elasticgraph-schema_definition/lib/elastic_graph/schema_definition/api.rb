@@ -354,7 +354,7 @@ module ElasticGraph
       # extension modules can also be configured in a settings YAML file, it can be useful to register it here
       # when you want to ensure that the extension is used in all environments.
       #
-      # A schema that defines indexed types must register at least one indexer extension that provides
+      # A schema that defines indexed types must register at least one indexer extension that defines
       # `ingestion_adapters_by_format`, since its events would not be ingestible otherwise; schema artifact
       # generation fails when none is registered. Ingestion format libraries (such as `elasticgraph-json_ingestion`)
       # register theirs automatically. Extension modules configured in a settings YAML file can contribute
