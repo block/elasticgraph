@@ -61,6 +61,30 @@ module ElasticGraph
             latency_timestamps: {}
           ))
         end
+
+        it "requires a JSON schema version" do
+          expect {
+            Event.from_validated_hash({
+              "op" => "upsert", "type" => "Widget", "id" => "w1", "version" => 3, "record" => {"id" => "w1"}
+            })
+          }.to raise_error(KeyError, a_string_including(JSON_SCHEMA_VERSION_KEY))
+        end
+      end
+
+      describe ".new" do
+        it "allows an unversioned event" do
+          event = Event.new(
+            op: "upsert",
+            type: "Widget",
+            id: "w1",
+            version: 3,
+            record: {"id" => "w1"},
+            schema_version: nil,
+            ingestion_format: "proto"
+          )
+
+          expect(event.schema_version).to be_nil
+        end
       end
 
       describe "#event_id" do

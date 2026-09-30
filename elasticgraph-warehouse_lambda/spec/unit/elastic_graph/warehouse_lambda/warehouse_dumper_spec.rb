@@ -36,6 +36,20 @@ module ElasticGraph
         }))
       end
 
+      it "writes events without a JSON schema version to an unversioned partition" do
+        operation = widget_primary_indexing_op.with(
+          event: widget_primary_indexing_op.event.with(schema_version: nil)
+        )
+
+        result = warehouse_dumper.bulk([operation])
+
+        upload = s3_client.api_requests.fetch(0).fetch(:params)
+        expect(upload.fetch(:key)).to start_with("Data0001/Widget/unversioned/2024-09-15/")
+        record = ::JSON.parse(::Zlib::GzipReader.new(StringIO.new(upload.fetch(:body))).read)
+        expect(record).to include("id" => "1", "__eg_version" => 3)
+        expect(result.successful_operations_by_cluster_name).to eq("warehouse" => [operation])
+      end
+
       it "writes operations to S3 as gzipped JSONL files and returns success results" do
         op1 = new_primary_indexing_operation(upsert_event({"type" => "Widget", "id" => "1", "version" => 3, "json_schema_version" => 1, "record" => {"id" => "1", "dayOfWeek" => "MON", "created_at" => "2024-09-15T12:30:12Z", "workspace_id" => "ws-1"}}))
         op2 = new_primary_indexing_operation(upsert_event({"type" => "Widget", "id" => "2", "version" => 5, "json_schema_version" => 2, "record" => {"id" => "2", "dayOfWeek" => "TUE", "created_at" => "2024-09-15T13:30:12Z", "workspace_id" => "ws-2"}}))
