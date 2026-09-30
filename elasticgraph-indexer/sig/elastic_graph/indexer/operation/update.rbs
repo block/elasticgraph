@@ -8,6 +8,7 @@ module ElasticGraph
         attr_reader update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget
         attr_reader doc_id: ::String
         attr_reader destination_index_mapping: ::Hash[::String, untyped]
+        attr_reader conflict_retries: ::Integer
 
         def initialize: (
           event,
@@ -15,7 +16,8 @@ module ElasticGraph
           DatastoreCore::_IndexDefinition,
           SchemaArtifacts::RuntimeMetadata::UpdateTarget,
           ::String,
-          ::Hash[::String, untyped]
+          ::Hash[::String, untyped],
+          ::Integer
         ) -> void
 
         def self.with: (
@@ -24,7 +26,8 @@ module ElasticGraph
           destination_index_def: DatastoreCore::_IndexDefinition,
           update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget,
           doc_id: ::String,
-          destination_index_mapping: ::Hash[::String, untyped]
+          destination_index_mapping: ::Hash[::String, untyped],
+          conflict_retries: ::Integer
         ) -> Update
 
         def with: (
@@ -33,7 +36,8 @@ module ElasticGraph
           ?destination_index_def: DatastoreCore::_IndexDefinition,
           ?update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget,
           ?doc_id: ::String,
-          ?destination_index_mapping: ::Hash[::String, untyped]
+          ?destination_index_mapping: ::Hash[::String, untyped],
+          ?conflict_retries: ::Integer
         ) -> Update
       end
 
@@ -45,12 +49,12 @@ module ElasticGraph
           destination_index_def: DatastoreCore::_IndexDefinition,
           record_preparer: _RecordPreparer[untyped],
           update_target: SchemaArtifacts::RuntimeMetadata::UpdateTarget,
-          destination_index_mapping: ::Hash[::String, untyped]
+          destination_index_mapping: ::Hash[::String, untyped],
+          conflict_retries: ::Integer
         ) -> ::Array[Update]
 
         private
 
-        CONFLICT_RETRIES: ::Integer
         def metadata: () -> ::Hash[::Symbol, untyped]
 
         def update_request: () -> ::Hash[::Symbol, untyped]

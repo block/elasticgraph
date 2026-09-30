@@ -92,7 +92,8 @@ module ElasticGraph
           ingestion_adapters_by_format: ingestion_adapters_by_format,
           logger: datastore_core.logger,
           skip_derived_indexing_type_updates: config.skip_derived_indexing_type_updates,
-          skip_record_validation_percents_by_type: config.skip_record_validation_percents_by_type
+          skip_record_validation_percents_by_type: config.skip_record_validation_percents_by_type,
+          conflict_retries_for: ->(type) { config.conflict_retries_for(type) }
         )
       end
     end

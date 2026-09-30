@@ -8,6 +8,7 @@ module ElasticGraph
         attr_reader logger: ::Logger
         attr_reader skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]]
         attr_reader skip_record_validation_percents_by_type: ::Hash[::String, ::Float]
+        attr_reader conflict_retries_for: ^(::String) -> ::Integer
 
         def initialize: (
           schema_artifacts: schemaArtifacts,
@@ -15,7 +16,8 @@ module ElasticGraph
           ingestion_adapters_by_format: ::Hash[::String, IngestionAdapter::_Adapter],
           logger: ::Logger,
           skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-          skip_record_validation_percents_by_type: ::Hash[::String, ::Float]
+          skip_record_validation_percents_by_type: ::Hash[::String, ::Float],
+          conflict_retries_for: ^(::String) -> ::Integer
         ) -> void
 
         def with: (
@@ -24,7 +26,8 @@ module ElasticGraph
           ?ingestion_adapters_by_format: ::Hash[::String, IngestionAdapter::_Adapter],
           ?logger: ::Logger,
           ?skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
-          ?skip_record_validation_percents_by_type: ::Hash[::String, ::Float]
+          ?skip_record_validation_percents_by_type: ::Hash[::String, ::Float],
+          ?conflict_retries_for: ^(::String) -> ::Integer
         ) -> instance
       end
 

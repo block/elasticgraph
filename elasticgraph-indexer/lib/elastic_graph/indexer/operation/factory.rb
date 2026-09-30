@@ -22,7 +22,8 @@ module ElasticGraph
         :ingestion_adapters_by_format,
         :logger,
         :skip_derived_indexing_type_updates,
-        :skip_record_validation_percents_by_type
+        :skip_record_validation_percents_by_type,
+        :conflict_retries_for
       )
         def build(event)
           format = event.ingestion_format
@@ -139,6 +140,7 @@ module ElasticGraph
 
           runtime_metadata.update_targets.flat_map do |update_target|
             ids_to_skip = skip_derived_indexing_type_updates.fetch(update_target.type, ::Set.new)
+            retries = conflict_retries_for.call(update_target.type)
 
             index_definitions_for(update_target.type).flat_map do |destination_index_def|
               operations = Update.operations_for(
@@ -146,7 +148,8 @@ module ElasticGraph
                 destination_index_def: destination_index_def,
                 record_preparer: record_preparer,
                 update_target: update_target,
-                destination_index_mapping: schema_artifacts.index_mappings_by_index_def_name.fetch(destination_index_def.name)
+                destination_index_mapping: schema_artifacts.index_mappings_by_index_def_name.fetch(destination_index_def.name),
+                conflict_retries: retries
               )
 
               operations.reject do |op|

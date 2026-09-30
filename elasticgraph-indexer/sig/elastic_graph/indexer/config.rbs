@@ -6,30 +6,40 @@ module ElasticGraph
       attr_reader latency_slo_thresholds_by_timestamp_in_ms: ::Hash[::String, ::Integer]
       attr_reader skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]]
       attr_reader skip_record_validation_percents_by_type: ::Hash[::String, ::Float]
+      attr_reader conflict_retries: ::Integer
+      attr_reader conflict_retries_by_type: ::Hash[::String, ::Integer]
       attr_reader extension_modules: ::Array[::Module]
 
       def initialize: (
         ?latency_slo_thresholds_by_timestamp_in_ms: ::Hash[::String, ::Integer],
         ?skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
         ?skip_record_validation_percents_by_type: ::Hash[::String, ::Float],
+        ?conflict_retries: ::Integer,
+        ?conflict_retries_by_type: ::Hash[::String, ::Integer],
         ?extension_modules: ::Array[::Module]) -> void
 
       def with: (
         ?latency_slo_thresholds_by_timestamp_in_ms: ::Hash[::String, ::Integer],
         ?skip_derived_indexing_type_updates: ::Hash[::String, ::Set[::String]],
         ?skip_record_validation_percents_by_type: ::Hash[::String, ::Float],
+        ?conflict_retries: ::Integer,
+        ?conflict_retries_by_type: ::Hash[::String, ::Integer],
         ?extension_modules: ::Array[::Module]) -> Config
 
       def self.members: () -> ::Array[::Symbol]
     end
 
     class Config < ConfigSupertype
+      def conflict_retries_for: (::String) -> ::Integer
+
       private
 
       def convert_values: (
         latency_slo_thresholds_by_timestamp_in_ms: untyped,
         skip_derived_indexing_type_updates: untyped,
         skip_record_validation_percents_by_type: untyped,
+        conflict_retries: untyped,
+        conflict_retries_by_type: untyped,
         extension_modules: untyped
       ) -> ::Hash[::Symbol, untyped]
 

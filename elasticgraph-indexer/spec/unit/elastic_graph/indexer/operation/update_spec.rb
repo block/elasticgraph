@@ -73,7 +73,7 @@ module ElasticGraph
 
             expect(operations.size).to eq(1)
             expect(operations.flat_map(&:to_datastore_bulk)).to eq [
-              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: 5}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => ["thing1"]},
@@ -104,7 +104,7 @@ module ElasticGraph
             ))
 
             expect(operation.to_datastore_bulk).to eq [
-              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: 5}},
               {
                 script: {id: INDEX_DATA_UPDATE_SCRIPT_ID, params: {
                   "topLevelFields" => {"name" => "thing1"},
@@ -137,7 +137,7 @@ module ElasticGraph
 
             expect(operations.size).to eq(1)
             expect(operations.first.to_datastore_bulk).to eq [
-              {update: {_id: "team1", _index: "teams", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {update: {_id: "team1", _index: "teams", retry_on_conflict: 5}},
               {
                 script: {id: INDEX_DATA_UPDATE_SCRIPT_ID, params: {
                   "topLevelFields" => {},
@@ -200,7 +200,7 @@ module ElasticGraph
 
             expect(operations.size).to eq(1)
             expect(operations.flat_map(&:to_datastore_bulk)).to eq [
-              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: 5}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => []},
@@ -214,6 +214,20 @@ module ElasticGraph
             ]
           end
 
+          it "uses the configured `conflict_retries` for `retry_on_conflict`" do
+            indexer = indexer_with_widget_workspace_index_definition(config_overrides: {conflict_retries: 15}) do |index|
+              # no customization
+            end
+
+            operations = operations_for_indexer(indexer)
+
+            expect(operations.flat_map(&:to_datastore_bulk).first).to eq({update: {
+              _id: "17",
+              _index: "widget_workspaces",
+              retry_on_conflict: 15
+            }})
+          end
+
           it "supports a nested id_source field" do
             indexer = indexer_with_widget_workspace_index_definition(id_source: "embedded_values.workspace_id") do |index|
               # no customization
@@ -223,7 +237,7 @@ module ElasticGraph
 
             expect(operations.size).to eq(1)
             expect(operations.flat_map(&:to_datastore_bulk)).to eq [
-              {update: {_id: "embedded_workspace_id", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {update: {_id: "embedded_workspace_id", _index: "widget_workspaces", retry_on_conflict: 5}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => ["thing1"]},
@@ -250,7 +264,7 @@ module ElasticGraph
               "name" => dynamic_param_with(source_path: "some_field_that_is_not_in_record", cardinality: :one)
             }))
             expect(operation.to_datastore_bulk).to eq [
-              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: 5}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"embedded_values.missing_field" => [], "name" => nil},
@@ -279,7 +293,7 @@ module ElasticGraph
             }))
 
             expect(operation.to_datastore_bulk).to eq [
-              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: 5}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {
@@ -312,7 +326,7 @@ module ElasticGraph
 
             expect(operations.size).to eq(1)
             expect(operations.flat_map(&:to_datastore_bulk)).to match [
-              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: 5}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   # Float-typed integer values are coerced to true ints before indexing
@@ -336,7 +350,7 @@ module ElasticGraph
 
             expect(operations.size).to eq(3)
             expect(operations.flat_map(&:to_datastore_bulk)).to eq [
-              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {update: {_id: "17", _index: "widget_workspaces", retry_on_conflict: 5}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => ["thing1"]},
@@ -347,7 +361,7 @@ module ElasticGraph
                 scripted_upsert: true,
                 upsert: {}
               },
-              {update: {_id: "18", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {update: {_id: "18", _index: "widget_workspaces", retry_on_conflict: 5}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => ["thing1"]},
@@ -358,7 +372,7 @@ module ElasticGraph
                 scripted_upsert: true,
                 upsert: {}
               },
-              {update: {_id: "19", _index: "widget_workspaces", retry_on_conflict: Update::CONFLICT_RETRIES}},
+              {update: {_id: "19", _index: "widget_workspaces", retry_on_conflict: 5}},
               {
                 script: {id: operations.first.update_target.script_id, params: {
                   "topLevelFields" => {"name" => ["thing1"]},
@@ -390,7 +404,7 @@ module ElasticGraph
               expect(operations.flat_map(&:to_datastore_bulk).first).to eq({update: {
                 _id: "17",
                 _index: "widget_workspaces_rollover__1995",
-                retry_on_conflict: Update::CONFLICT_RETRIES
+                retry_on_conflict: 5
               }})
             end
           end
@@ -414,7 +428,7 @@ module ElasticGraph
                 _id: "17",
                 _index: "widget_workspaces",
                 routing: "embedded_name",
-                retry_on_conflict: Update::CONFLICT_RETRIES
+                retry_on_conflict: 5
               }})
             end
 
@@ -429,7 +443,7 @@ module ElasticGraph
                 _id: "17",
                 _index: "widget_workspaces",
                 routing: "3",
-                retry_on_conflict: Update::CONFLICT_RETRIES
+                retry_on_conflict: 5
               }})
             end
 
@@ -452,7 +466,7 @@ module ElasticGraph
                 _id: "17",
                 _index: "widget_workspaces",
                 routing: "17",
-                retry_on_conflict: Update::CONFLICT_RETRIES
+                retry_on_conflict: 5
               }})
             end
           end
@@ -467,7 +481,8 @@ module ElasticGraph
               destination_index_def: index_defs_by_name.fetch(destination_index),
               record_preparer: latest_json_record_preparer_for(indexer),
               update_target: update_target,
-              destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(destination_index)
+              destination_index_mapping: indexer.schema_artifacts.index_mappings_by_index_def_name.fetch(destination_index),
+              conflict_retries: indexer.config.conflict_retries_for(destination_type)
             )
           end
 
@@ -629,7 +644,8 @@ module ElasticGraph
             destination_index_def: nil,
             update_target: update_target,
             doc_id: doc_id,
-            destination_index_mapping: {}
+            destination_index_mapping: {},
+            conflict_retries: 5
           )
         end
       end
