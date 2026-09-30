@@ -5,6 +5,10 @@ module ElasticGraph
         def implements: (*::String) -> void
         attr_reader implemented_interfaces: ::Array[SchemaElements::TypeReference]
         def verify_graphql_correctness!: () -> void
+
+        private
+
+        def recursively_resolve_interface_supertypes: () -> ::Array[SchemaElements::InterfaceType]
       end
     end
   end

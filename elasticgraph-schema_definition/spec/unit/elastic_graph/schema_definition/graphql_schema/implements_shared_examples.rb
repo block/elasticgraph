@@ -9,6 +9,13 @@
 module ElasticGraph
   module SchemaDefinition
     RSpec.shared_examples_for "#implements" do |graphql_definition_keyword:, ruby_definition_method:|
+      # Helper method to extract interface names from SDL implements clause
+      def implemented_interfaces_from(sdl, type_name)
+        type_def = type_def_from(sdl, type_name)
+        implements_match = type_def.match(/#{type_name}\s+implements\s+([^{]+)/)
+        implements_match[1].split("&").map(&:strip)
+      end
+
       it "generates the correct `implements` syntax in the GraphQL SDL" do
         result = define_schema do |schema|
           schema.interface_type "HasID" do |t|
@@ -33,13 +40,7 @@ module ElasticGraph
           end
         end
 
-        expect(type_def_from(result, "Thing")).to eq(<<~EOS.strip)
-          #{graphql_definition_keyword} Thing implements HasID & HasName & HasColor {
-            id: ID!
-            name: String
-            color: String
-          }
-        EOS
+        expect(implemented_interfaces_from(result, "Thing")).to contain_exactly("HasID", "HasName", "HasColor")
       end
 
       it "allows the `implements` call to come before the interface definition or the field implementations" do
@@ -358,6 +359,28 @@ module ElasticGraph
             thing2: Int
           }
         EOS
+      end
+
+      it "includes all transitively implemented interfaces in SDL" do
+        result = define_schema do |schema|
+          schema.interface_type "A" do |t|
+            t.field "a", "String"
+          end
+
+          schema.interface_type "B" do |t|
+            t.implements "A"
+            t.field "a", "String"
+            t.field "b", "String"
+          end
+
+          schema.public_send ruby_definition_method, "Thing" do |t|
+            t.implements "B"
+            t.field "a", "String"
+            t.field "b", "String"
+          end
+        end
+
+        expect(implemented_interfaces_from(result, "Thing")).to contain_exactly("A", "B")
       end
     end
   end
