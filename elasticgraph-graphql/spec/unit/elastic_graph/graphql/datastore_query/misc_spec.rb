@@ -1,4 +1,4 @@
-# Copyright 2024 - 2025 Block, Inc.
+# Copyright 2024 - 2026 Block, Inc.
 #
 # Use of this source code is governed by an MIT-style
 # license that can be found in the LICENSE file or at
@@ -22,7 +22,7 @@ module ElasticGraph
       end
 
       it "inspects nicely, but redacts filters since they could contain PII" do
-        expect(new_query(filter: {"ssn" => {"equal_to_any_of" => ["123-45-6789"]}}, individual_docs_needed: true).inspect).to eq(inspect_output_of(<<~EOS.strip))
+        expect(new_query(filter: {"ssn" => {"equal_to_any_of" => ["123-45-6789"]}}, individual_docs_needed: true).inspect).to eq(inspect_output_of(<<~EOS.strip)) # sadscan:disable sq.pii.ssn -- fake SSN used to verify PII redaction
           #<ElasticGraph::GraphQL::DatastoreQuery index="widgets_rollover__*" size=#{default_page_size + 1} sort=[{"id" => {"order" => "asc", "missing" => "_first"}}] track_total_hits=false query=<REDACTED> _source=false>
         EOS
       end
