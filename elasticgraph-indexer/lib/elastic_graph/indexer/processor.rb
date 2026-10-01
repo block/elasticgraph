@@ -44,6 +44,12 @@ module ElasticGraph
         factory_results_by_event = events.to_h { |event| [event, @operation_factory.build(event)] }
 
         factory_results = factory_results_by_event.values
+        # Adapters may replace a native record or resolve an abstract type during validation.
+        # Datastore results refer to that normalized operation event, not the original input.
+        factory_results_by_operation_event = {} # : ::Hash[event, Operation::Factory::BuildResult]
+        factory_results.each do |factory_result|
+          factory_result.operations.each { |operation| factory_results_by_operation_event[operation.event] = factory_result }
+        end
 
         log_skipped_record_validations(factory_results)
 
@@ -55,7 +61,7 @@ module ElasticGraph
         all_failures =
           factory_results.filter_map(&:failed_event_error) +
           bulk_result.failure_results.map do |result|
-            all_operations_for_event = factory_results_by_event.fetch(result.event).operations
+            all_operations_for_event = factory_results_by_operation_event.fetch(result.event).operations
             FailedEventError.from_failed_operation_result(result, all_operations_for_event.to_set)
           end
 

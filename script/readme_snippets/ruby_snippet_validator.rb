@@ -91,6 +91,9 @@ class RubySnippetValidator < SnippetValidator
   end
 
   def dump_artifacts
+    # Each snippet configures an unpublished prototype, not a migration of the previous snippet's
+    # protobuf contract. No payloads or consumers depend on this scratch project's field numbers.
+    FileUtils.rm_f("config/proto_field_numbers.yaml")
     output = `bundle exec rake schema_artifacts:dump 2>&1`
     [$?.success?, output]
   end

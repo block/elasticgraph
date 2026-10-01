@@ -84,7 +84,10 @@ module ElasticGraph
           end
 
           old = define_proto_schema_results { |schema| define_types.call(schema, ["Apple", "Pear"]) }
-          current = define_proto_schema_results(old) { |schema| define_types.call(schema, ["Pear"]) }
+          current = define_proto_schema_results(old) do |schema|
+            schema.deleted_type "Apple"
+            define_types.call(schema, ["Pear"])
+          end
           expect(current.proto_schema).to include("reserved 5; // Previously used by apple.", "pear = 6;")
 
           restored = define_proto_schema_results(current) { |schema| define_types.call(schema, ["Pear", "Apple"]) }

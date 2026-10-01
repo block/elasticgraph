@@ -10,6 +10,7 @@ require "elastic_graph/proto_ingestion/schema_definition/results_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_artifact_manager_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/enum_type_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/enum_value_extension"
+require "elastic_graph/proto_ingestion/schema_definition/schema_elements/field_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/object_interface_and_union_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/scalar_type_extension"
 
@@ -40,6 +41,15 @@ module ElasticGraph
           super(name, original_name) do |value|
             extended_value = value.extend(SchemaElements::EnumValueExtension) # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & SchemaElements::EnumValueExtension
             yield extended_value if block_given?
+          end
+        end
+
+        # Creates a field with an independently configurable protobuf source name.
+        # @return [ElasticGraph::SchemaDefinition::SchemaElements::Field]
+        def new_field(**kwargs, &block)
+          super(**kwargs) do |field|
+            field.extend(SchemaElements::FieldExtension)
+            block&.call(field)
           end
         end
 

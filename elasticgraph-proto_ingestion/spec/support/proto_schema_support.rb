@@ -8,18 +8,25 @@
 
 require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/test_support"
+require "elastic_graph/spec_support/protoc"
 require "open3"
-require "rbconfig"
 require "tempfile"
 
 module ElasticGraph
   module ProtoIngestion
     module SchemaSupport
       include ElasticGraph::SchemaDefinition::TestSupport
+      include SpecSupport::Protoc
 
       def envelope_field_number_mapping(record_name)
         {
-          "fields" => {"op" => 1, "id" => 2, "version" => 3, "latency_timestamps" => 4, record_name => 5},
+          "fields" => {
+            "op" => {"field_number" => 1, "proto_type" => "string", "list_depth" => 0},
+            "id" => {"field_number" => 2, "proto_type" => "string", "list_depth" => 0},
+            "version" => {"field_number" => 3, "proto_type" => "int64", "list_depth" => 0},
+            "latency_timestamps" => {"field_number" => 4, "proto_type" => "map<string, google.protobuf.Timestamp>", "list_depth" => 1},
+            record_name => {"field_number" => 5, "proto_type" => ".elasticgraph.#{Support::Casing.to_title(record_name)}", "list_depth" => 0}
+          },
           "next_number" => 6
         }
       end
@@ -54,33 +61,6 @@ module ElasticGraph
         results
       end
 
-      # The `grpc-tools` gem vendors precompiled `protoc` binaries under `bin/<arch>-<os>/`.
-      # Locate the binary directly because its Ruby wrapper conflicts with JRuby's `PLATFORM` constant.
-      # simplecov:disable -- only one platform's branches can execute in any given run.
-      PROTOC_BINARY = begin
-        arch =
-          if RbConfig::CONFIG["host_os"].match?(/darwin/)
-            "x86_64" # Apple Silicon uses the x86_64 binary under Rosetta; the gem ships no arm64 build.
-          elsif RbConfig::CONFIG["host_cpu"].match?(/x86_64|amd64/)
-            "x86_64"
-          else
-            "x86"
-          end
-
-        os =
-          case RbConfig::CONFIG["host_os"]
-          when /darwin/ then "macos"
-          when /mswin|mingw|cygwin/ then "windows"
-          else "linux"
-          end
-
-        bin_dir = ::File.expand_path("bin/#{arch}-#{os}", Gem.loaded_specs.fetch("grpc-tools").full_gem_path)
-        ::File.join(bin_dir, "protoc#{RbConfig::CONFIG["EXEEXT"]}").tap do |binary|
-          raise "`grpc-tools` ships no `protoc` for #{arch}-#{os}; expected it at #{binary}." unless ::File.exist?(binary)
-        end
-      end
-      # simplecov:enable
-
       def run_protoc(proto_schema, operation, input)
         Tempfile.create(["schema", ".proto"]) do |schema_file|
           schema_file.write(proto_schema)
@@ -108,16 +88,7 @@ module ElasticGraph
       def proto_type_def_from(proto, type)
         lines = proto.lines
         definition_start = /^(?:enum|message) #{Regexp.escape(type)} \{/
-        start_indices = lines.each_index.select { |index| definition_start.match?(lines.fetch(index)) }
-
-        if start_indices.size >= 2
-          # simplecov:disable -- only executed when a mistake has been made; causes a failing test.
-          raise Errors::SchemaError,
-            "Expected to find 0 or 1 proto type definition for #{type}, but found #{start_indices.size}."
-          # simplecov:enable
-        end
-
-        definition_start_index = start_indices.first
+        definition_start_index = lines.index { |line| definition_start.match?(line) }
         return nil unless definition_start_index
 
         brace_depth = 0
