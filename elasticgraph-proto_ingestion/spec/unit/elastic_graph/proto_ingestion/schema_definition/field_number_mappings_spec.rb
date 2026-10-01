@@ -53,6 +53,29 @@ module ElasticGraph
               ))
             end
 
+            it "rejects historical public aliases assigned to more than one message identity" do
+              expect {
+                FieldNumberMappings.from_parsed_yaml({"messages" => {
+                  "Account" => {"fields" => {}, "next_number" => 1, "previous_names" => ["Customer"]},
+                  "Customer" => {"fields" => {}, "next_number" => 1}
+                }})
+              }.to raise_error(Errors::SchemaError, a_string_including("name collision", "Customer", "both `Account` and `Customer`"))
+            end
+
+            it "validates numbers and wire names across active fields and retired incarnations without collapsing equal keys" do
+              contract = {"field_number" => 2, "proto_type" => "int32", "list_depth" => 0, "proto_name" => "score"}
+              expect {
+                FieldNumberMappings.from_parsed_yaml({"messages" => {"Account" => {
+                  "fields" => {"score" => contract}, "retired_fields" => {"score" => contract.merge("deleted" => true)}, "next_number" => 3
+                }}})
+              }.to raise_error(Errors::SchemaError, a_string_including("mapping collision", "number 2"))
+              expect {
+                FieldNumberMappings.from_parsed_yaml({"messages" => {"Account" => {
+                  "fields" => {"score" => contract}, "retired_fields" => {"score" => contract.merge("field_number" => 3, "deleted" => true)}, "next_number" => 4
+                }}})
+              }.to raise_error(Errors::SchemaError, a_string_including("name collision", "score", "both numbers 2 and 3"))
+            end
+
             it "validates that each `next_number` is greater than every mapped number" do
               expect {
                 FieldNumberMappings.from_parsed_yaml({
@@ -86,7 +109,9 @@ module ElasticGraph
                 }, "next_number" => FieldNumberMappings::MAX_ENUM_VALUE_NUMBER + 1}}
               }
 
-              expect(FieldNumberMappings.from_parsed_yaml(artifact).to_dumpable_hash).to eq(artifact)
+              parsed = FieldNumberMappings.from_parsed_yaml(artifact).to_dumpable_hash
+              expect(parsed.dig("messages", "Account", "fields", "id", "field_number")).to eq(FieldNumberMappings::MAX_FIELD_NUMBER)
+              expect(parsed.dig("enums", "Status", "values", "INACTIVE", "value_number")).to eq(19_005)
             end
           end
         end
@@ -109,13 +134,60 @@ module ElasticGraph
             mappings = FieldNumberMappings.from_yaml_file("proto_field_numbers.yaml")
 
             expect(mappings.to_dumpable_hash).to eq({
-              "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => 8}},
-              "enums" => {"Status" => {"values" => {"ACTIVE" => 3}, "next_number" => 8}}
+              "messages" => {"Account" => {"fields" => {"id" => {"field_number" => 7}}, "next_number" => 8}},
+              "enums" => {"Status" => {"values" => {"ACTIVE" => {"value_number" => 3}}, "next_number" => 8}}
             })
           end
         end
 
-        describe "#field_number_for" do
+        describe "#type_contract_for" do
+          it "rejects changing a retained message identity into an enum or vice versa" do
+            [["messages", "enums"], ["enums", "messages"]].each do |original, replacement|
+              mappings = FieldNumberMappings.from_parsed_yaml(nil)
+              mappings.type_contract_for(section: original, public_name: "Status")
+              expect {
+                mappings.type_contract_for(section: replacement, public_name: "Status")
+              }.to raise_error(Errors::SchemaError, a_string_including("between a message and an enum", "fresh type name"))
+            end
+          end
+
+          it "rejects reuse of a message's retained public alias after a rename" do
+            mappings = FieldNumberMappings.from_parsed_yaml(nil)
+            mappings.type_contract_for(section: "messages", public_name: "Account")
+            mappings.type_contract_for(section: "messages", public_name: "Customer", previous_names: ["Account"])
+            expect {
+              mappings.type_contract_for(section: "messages", public_name: "Account")
+            }.to raise_error(Errors::SchemaError, a_string_including("already retained by `Customer`", "different public name"))
+          end
+        end
+
+        describe "#field_contract_for" do
+          it "restores a retired-only historical contract recorded by hand without an active incarnation" do
+            mappings = FieldNumberMappings.from_parsed_yaml({"messages" => {"Account" => {
+              "fields" => {},
+              "retired_fields" => {"score" => {
+                "field_number" => 2, "proto_type" => "int32", "list_depth" => 0,
+                "proto_name" => "score", "previous_names" => ["score"], "deleted" => true
+              }}, "next_number" => 3
+            }}})
+            restored = mappings.field_contract_for(message_name: "Account", public_field_name: "score", proto_type: "int32")
+            expect(restored).to include("field_number" => 2, "proto_type" => "int32")
+            expect(restored).not_to have_key("deleted")
+            expect(mappings.to_dumpable_hash.dig("messages", "Account", "retired_fields")).to eq({})
+            expect(mappings.next_field_number_for("Account")).to eq(3)
+          end
+
+          it "skips the reserved field-number range without changing the caller's history" do
+            input = {"messages" => {"Account" => {"fields" => {"id" => 18_998}, "next_number" => 18_999}}}
+            original = Marshal.load(Marshal.dump(input))
+            mappings = FieldNumberMappings.from_parsed_yaml(input)
+            first = mappings.field_contract_for(message_name: "Account", public_field_name: "first", proto_type: "string")
+            second = mappings.field_contract_for(message_name: "Account", public_field_name: "second", proto_type: "string")
+
+            expect([first.fetch("field_number"), second.fetch("field_number")]).to eq([18_999, 20_000])
+            expect(input).to eq(original)
+          end
+
           it "raises a clear error when multiple previous field names have mappings" do
             mappings = FieldNumberMappings.from_parsed_yaml({
               "messages" => {"Account" => {
@@ -125,15 +197,15 @@ module ElasticGraph
             })
 
             expect {
-              mappings.field_number_for(
+              mappings.field_contract_for(
                 message_name: "Account",
                 public_field_name: "name",
-                previous_field_names: ["last_name", "first_name"]
+                previous_field_names: ["last_name", "first_name"], proto_type: "string"
               )
             }.to raise_error(Errors::SchemaError, a_string_including(
-              "Cannot preserve a protobuf field number for `Account.name`",
-              "multiple previous field names have mappings (`first_name` and `last_name`)",
-              "use `renamed_from` for the name whose number should carry over and `deleted_field` for the others"
+              "Cannot preserve a protobuf field in `Account` identity for `name`",
+              "multiple previous names have mappings (first_name, last_name)",
+              "Use `renamed_from` for only the original identity"
             ))
           end
 
@@ -146,7 +218,7 @@ module ElasticGraph
             })
 
             expect {
-              mappings.field_number_for(message_name: "Account", public_field_name: "name", previous_field_names: [])
+              mappings.field_contract_for(message_name: "Account", public_field_name: "name", previous_field_names: [], proto_type: "string")
             }.to raise_error(Errors::SchemaError, a_string_including(
               "Cannot allocate another protobuf field number for message `Account`",
               "maximum field number (#{FieldNumberMappings::MAX_FIELD_NUMBER}) has been reached"
@@ -158,7 +230,7 @@ module ElasticGraph
           it "returns stored cursors, defaulting to 1 for unmapped messages and enums" do
             mappings = FieldNumberMappings.from_parsed_yaml({
               "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => 10}},
-              "enums" => {"Status" => {"values" => {"ACTIVE" => 3}, "next_number" => 8}}
+              "enums" => {"Status" => {"values" => {"ACTIVE" => {"value_number" => 3}}, "next_number" => 8}}
             })
 
             expect(mappings.next_field_number_for("Account")).to eq(10)
@@ -168,21 +240,20 @@ module ElasticGraph
           end
         end
 
-        describe "#enum_value_numbers_for" do
+        describe "#enum_value_contract_for" do
           it "allocates from the saved cursor without filling gaps" do
             mappings = FieldNumberMappings.from_parsed_yaml({
               "enums" => {"Status" => {"values" => {"ACTIVE" => 3}, "next_number" => 10}}
             })
 
-            expect(mappings.enum_value_numbers_for("Status", ["ARCHIVED", "ACTIVE", "DELETED"])).to eq({
-              "ARCHIVED" => 10,
-              "ACTIVE" => 3,
-              "DELETED" => 11
-            })
+            numbers = %w[ARCHIVED ACTIVE DELETED].to_h do |name|
+              [name, mappings.enum_value_contract_for(enum_name: "Status", public_name: name, proto_name: "STATUS_#{name}").fetch("value_number")]
+            end
+            expect(numbers).to eq({"ARCHIVED" => 10, "ACTIVE" => 3, "DELETED" => 11})
             expect(mappings.to_dumpable_hash.dig("enums", "Status", "values")).to eq({
-              "ACTIVE" => 3,
-              "ARCHIVED" => 10,
-              "DELETED" => 11
+              "ACTIVE" => {"value_number" => 3, "proto_name" => "STATUS_ACTIVE"},
+              "ARCHIVED" => {"value_number" => 10, "proto_name" => "STATUS_ARCHIVED"},
+              "DELETED" => {"value_number" => 11, "proto_name" => "STATUS_DELETED"}
             })
             expect(mappings.next_enum_value_number_for("Status")).to eq(12)
           end
@@ -196,7 +267,7 @@ module ElasticGraph
             })
 
             expect {
-              mappings.enum_value_numbers_for("Status", ["ACTIVE", "INACTIVE"])
+              mappings.enum_value_contract_for(enum_name: "Status", public_name: "INACTIVE", proto_name: "STATUS_INACTIVE")
             }.to raise_error(Errors::SchemaError, a_string_including(
               "Cannot allocate another protobuf enum value number for enum `Status`",
               "maximum enum value number (#{FieldNumberMappings::MAX_ENUM_VALUE_NUMBER}) has been reached"

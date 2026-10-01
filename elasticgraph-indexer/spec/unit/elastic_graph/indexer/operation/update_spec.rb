@@ -161,14 +161,39 @@ module ElasticGraph
             ]
           end
 
-          it "returns no datastore bulk actions if the source document lacks the id field of the update target" do
+          it "returns no datastore bulk actions if the source document omits or nulls the id field of the update target" do
             indexer = indexer_with_widget_workspace_index_definition do |index|
               # no customization
             end
 
-            operations = operations_for_indexer(indexer, event: event.with(record: event.record.merge("workspace_id" => nil)))
+            [event.record.except("workspace_id"), event.record.merge("workspace_id" => nil)].each do |record|
+              expect(operations_for_indexer(indexer, event: event.with(record: record))).to eq []
+            end
+          end
 
-            expect(operations).to eq []
+          it "returns no datastore bulk actions if a nested id's parent or leaf is absent or null" do
+            indexer = indexer_with_widget_workspace_index_definition(id_source: "embedded_values.workspace_id") do |index|
+              # no customization
+            end
+            records = [
+              event.record.except("embedded_values"),
+              event.record.merge("embedded_values" => nil),
+              event.record.merge("embedded_values" => {"name" => "embedded_name"}),
+              event.record.merge("embedded_values" => {"workspace_id" => nil})
+            ]
+
+            records.each do |record|
+              expect(operations_for_indexer(indexer, event: event.with(record: record))).to eq []
+            end
+          end
+
+          it "still raises if a nested id's parent has a malformed non-object shape" do
+            indexer = indexer_with_widget_workspace_index_definition(id_source: "embedded_values.workspace_id") do |index|
+              # no customization
+            end
+            malformed = event.with(record: event.record.merge("embedded_values" => "not an object"))
+
+            expect { operations_for_indexer(indexer, event: malformed) }.to raise_error(KeyError, /not a `Hash`/)
           end
 
           it "returns no datastore bulk actions if the source document has an empty string for the id field of the update target" do

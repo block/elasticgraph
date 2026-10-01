@@ -35,7 +35,7 @@ module ElasticGraph
           )
 
           Support::HashUtil
-            .fetch_leaf_values_at_path(prepared_record, update_target.id_source.split("."))
+            .fetch_leaf_values_at_path(prepared_record, update_target.id_source.split(".")) { [] }
             .reject { |id| id.to_s.strip.empty? }
             .uniq
             .map { |doc_id| new(event, prepared_record, destination_index_def, update_target, doc_id, destination_index_mapping, conflict_retries) }

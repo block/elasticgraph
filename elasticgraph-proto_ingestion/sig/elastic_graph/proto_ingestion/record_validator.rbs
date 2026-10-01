@@ -1,0 +1,17 @@
+module ElasticGraph
+  module ProtoIngestion
+    class RecordValidator
+      SCALAR_CHECKS: ::Hash[::String, ^(untyped) -> bool]
+      VALIDATED_SCALARS: ::Array[::String]
+
+      @types: Hash[String, untyped]
+      @time_zones: ::Set[::String]
+      def self.valid_date?: (untyped) -> bool
+      def self.valid_timestamp?: (untyped) -> bool
+      def initialize: (Hash[String, untyped], ::Array[::String]) -> void
+      def error_for: (String, untyped, ?String, ?wire_contract_only: bool) -> String?
+      private
+      def valid_scalar?: (String, String, untyped) -> bool
+    end
+  end
+end

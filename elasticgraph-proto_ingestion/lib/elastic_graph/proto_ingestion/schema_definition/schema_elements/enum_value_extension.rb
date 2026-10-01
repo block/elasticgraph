@@ -20,7 +20,25 @@ module ElasticGraph
           # @param enum_value_prefix [String] normalized prefix of the containing enum
           # @return [String]
           def proto_name(enum_value_prefix)
-            "#{enum_value_prefix}_#{Support::Casing.to_upper_snake(name)}"
+            @protobuf_contract&.fetch("proto_name") || "#{enum_value_prefix}_#{Support::Casing.to_upper_snake(name)}"
+          end
+
+          # @return [Hash<String, Object>, nil] historical value identity
+          # @dynamic protobuf_contract, protobuf_contract=
+          attr_accessor :protobuf_contract
+
+          # Preserves this value's number and protobuf source name across a public rename.
+          # @param old_name [String]
+          # @return [void]
+          def renamed_from(old_name)
+            @protobuf_previous_names ||= [] # : ::Array[::String]
+            names = @protobuf_previous_names # : ::Array[::String]
+            names << old_name
+          end
+
+          # @return [Array<String>] old public names declared for this value
+          def protobuf_previous_names
+            @protobuf_previous_names || []
           end
 
           # Renders this value's protobuf definition.
