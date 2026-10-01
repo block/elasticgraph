@@ -6,14 +6,17 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/admin"
 require "elastic_graph/indexer"
 require "elastic_graph/indexer/event"
 require "elastic_graph/schema_definition/rake_tasks"
 
 module ElasticGraph
   RSpec.describe "Indexing schema evolution", :factories, :capture_logs, :in_temp_dir, :rake_task do
-    for_each_ingestion_format do
+    for_each_ingestion_format do |format|
       let(:path_to_schema) { "config/schema.rb" }
+      let(:proto_syntax) { :proto3 }
+      let(:isolated_address_index) { false }
 
       before do
         ::FileUtils.mkdir_p "config"
@@ -35,10 +38,11 @@ module ElasticGraph
           indexer_with_geo_location = boot_indexer
           process_indexing_events([address_2_event], via: indexer_with_geo_location)
 
-          expect(search_for_ids("addresses")).to contain_exactly(
-            address_1_event.id,
-            address_2_event.id
+          expect(search_for_ids("addresses")).to contain_exactly(address_1_event.id, address_2_event.id)
+          expect(source_for("addresses", address_2_event.id)).to include(
+            "full_address" => address_2_event.record.fetch("full_address")
           )
+          expect(source_for("addresses", address_2_event.id)["geo_location"]).to be_nil
         end
 
         def build_address_event_without_geolocation
@@ -82,19 +86,26 @@ module ElasticGraph
           dump_artifacts
 
           v1_event = build_widget(json_schema_version: 1) do |widget|
-            widget.slice("id", "name", "created_at")
+            widget.slice("id", "name").merge("created_at" => "2019-06-02T12:00:00Z")
           end
 
           v2_event = build_widget(json_schema_version: 2) do |widget|
             widget.slice("id").merge(
               "name2" => widget.fetch("name"),
-              "created_at2" => widget.fetch("created_at")
+              "created_at2" => "2020-10-02T12:00:00Z"
             )
           end
 
-          expect {
-            process_indexing_events([v1_event, v2_event], via: boot_indexer)
-          }.not_to raise_error
+          process_indexing_events([v1_event, v2_event], via: boot_indexer)
+
+          [v1_event, v2_event].each do |event|
+            created_at = event.record["created_at"] || event.record.fetch("created_at2")
+            name = event.record["name"] || event.record.fetch("name2")
+            hit = search("widgets").find { |result| result.fetch("_id") == event.id }
+            expect(hit.fetch("_index")).to end_with(created_at[0, 4])
+            expect(hit.fetch("_routing")).to eq(name)
+            expect(hit.fetch("_source")).to include("name" => name, "created_at" => ::Time.iso8601(created_at).iso8601(3))
+          end
         end
 
         def build_widget(json_schema_version:)
@@ -110,9 +121,7 @@ module ElasticGraph
 
           # Attempt to drop the field; ElasticGraph should give us an error due to it still existing in the old JSON schema version.
           write_address_schema_def(json_schema_version: 2)
-          expect { dump_artifacts }.to abort_with a_string_including(
-            "The `Address.deprecated` field (which existed in JSON schema version 1) no longer exists in the current schema definition."
-          )
+          expect { dump_artifacts }.to schema_dump_failure(missing_field_message("Address.deprecated"))
 
           # Try again after indicating the field has been deleted.
           write_address_schema_def(json_schema_version: 2, address_extras: "t.deleted_field 'deprecated'")
@@ -172,9 +181,17 @@ module ElasticGraph
             .then { |json| json.gsub("TeamSeason", "SeasonOfATeam") }
             .then { |json| Indexer::Event.from_validated_hash(::JSON.parse(json)) }
 
-          expect {
-            process_indexing_events([v1_event, v2_event], via: boot_indexer)
-          }.not_to raise_error
+          process_indexing_events([v1_event, v2_event], via: boot_indexer)
+
+          [v1_event, v2_event].each do |event|
+            source = source_for("teams", event.id)
+            expect(source.fetch("seasons_nested").map { |season| season.fetch("year") }).to eq(
+              event.record.fetch("seasons_nested").map { |season| season.fetch("year") }
+            )
+            expect(source.fetch("seasons_nested").map { |season| season.fetch("the_record").fetch("win_count") }).to eq(
+              event.record.fetch("seasons_nested").map { |season| season.fetch("record").fetch("wins") }
+            )
+          end
         end
       end
 
@@ -205,9 +222,15 @@ module ElasticGraph
             v1_event = build_upsert_event(:team, __json_schema_version: 1)
             v2_event = build_upsert_event(:team, __json_schema_version: 2)
 
-            expect {
-              process_indexing_events([v1_event, v2_event], via: boot_indexer)
-            }.not_to raise_error
+            process_indexing_events([v1_event, v2_event], via: boot_indexer)
+
+            [v1_event, v2_event].each do |event|
+              records = source_for("teams", event.id).fetch("seasons_nested").map { |season| season.fetch("the_record") }
+              expect(records.map { |record| record.fetch("win_count") }).to eq(
+                event.record.fetch("seasons_nested").map { |season| season.fetch("record").fetch("wins") }
+              )
+              expect(records).to all(exclude("wins"))
+            end
           end
         end
 
@@ -229,9 +252,7 @@ module ElasticGraph
               expect(team_def).to include 't.field "name", "String"'
               team_def
             end
-            expect { dump_artifacts }.to abort_with a_string_including(
-              "The `Player.full_name` field (which existed in JSON schema version 1) no longer exists in the current schema definition."
-            )
+            expect { dump_artifacts }.to schema_dump_failure(missing_field_message("Player.full_name"))
 
             write_teams_schema_def(json_schema_version: 2) do |team_def|
               safe_replace(
@@ -250,9 +271,15 @@ module ElasticGraph
             v1_event = Indexer::Event.from_validated_hash(::JSON.parse(::JSON.generate(v1_event).gsub('"name":', '"full_name":')))
             v2_event = build_upsert_event(:team, __json_schema_version: 2)
 
-            expect {
-              process_indexing_events([v1_event, v2_event], via: boot_indexer)
-            }.not_to raise_error
+            process_indexing_events([v1_event, v2_event], via: boot_indexer)
+
+            [v1_event, v2_event].each do |event|
+              players = source_for("teams", event.id).fetch("current_players_nested")
+              expect(players.map { |player| player.fetch("name") }).to eq(
+                event.record.fetch("current_players_nested").map { |player| player["full_name"] || player.fetch("name") }
+              )
+              expect(players).to all(exclude("full_name"))
+            end
           end
         end
 
@@ -276,10 +303,7 @@ module ElasticGraph
             end
             expect {
               dump_artifacts
-            }.to abort_with a_string_including(
-              "The `Team.details` field (which existed in JSON schema version 1) no longer exists in the current schema definition.",
-              "The `TeamDetails` type (which existed in JSON schema version 1) no longer exists in the current schema definition."
-            )
+            }.to schema_dump_failure(*((format == :json) ? [missing_field_message("Team.details"), missing_type_message("TeamDetails")] : [missing_type_message("TeamDetails")]))
 
             write_teams_schema_def(json_schema_version: 2) do |team_def|
               safe_replace(
@@ -292,9 +316,8 @@ module ElasticGraph
 
             v1_event = build_upsert_event(:team, __json_schema_version: 1)
 
-            expect {
-              process_indexing_events([v1_event], via: boot_indexer)
-            }.not_to raise_error
+            process_indexing_events([v1_event], via: boot_indexer)
+            expect(source_for("teams", v1_event.id)).to include("current_name" => v1_event.record.fetch("current_name")).and exclude("details")
           end
         end
 
@@ -318,9 +341,7 @@ module ElasticGraph
             write_address_schema_def(json_schema_version: 2)
             expect {
               dump_artifacts
-            }.to abort_with a_string_including(
-              "The `Team` type (which existed in JSON schema version 1) no longer exists in the current schema definition."
-            )
+            }.to schema_dump_failure(missing_type_message("Team"))
 
             write_address_schema_def(json_schema_version: 2, schema_extras: 'schema.deleted_type "Team"')
             dump_artifacts
@@ -333,7 +354,176 @@ module ElasticGraph
         end
       end
 
+      [:proto2, :proto3].each do |syntax|
+        context "with #{syntax} contract evolution", if: format == :proto do
+          let(:proto_syntax) { syntax }
+          let(:isolated_address_index) { true }
+          it "keeps message and field identities after rename declarations are removed" do
+            write_proto_schema_def(1, <<~RUBY)
+              schema.object_type "Address" do |t|
+                t.field "id", "ID!"
+                t.field "full_address", "String!"
+                t.field "rank", "Int"
+                t.index "addresses"
+              end
+            RUBY
+            dump_artifacts
+            old_event = build_upsert_event(:address, id: "old", full_address: "Old Street", rank: 17)
+
+            write_proto_schema_def(2, <<~RUBY)
+              schema.object_type "PostalAddress" do |t|
+                t.renamed_from "Address"
+                t.field "rank", "Int"
+                t.field "street", "String!", name_in_index: "full_address" do |f|
+                  f.renamed_from "full_address"
+                end
+                t.field "id", "ID!"
+                t.index "addresses"
+              end
+            RUBY
+            dump_artifacts
+            renamed_event = build_upsert_event(:address, id: "renamed", __json_schema_version: 2)
+              .with(type: "PostalAddress", record: {"street" => "New Street", "rank" => 29})
+
+            write_proto_schema_def(3, <<~RUBY)
+              schema.object_type "PostalAddress" do |t|
+                t.field "rank", "Int"
+                t.field "street", "String!", name_in_index: "full_address"
+                t.field "id", "ID!"
+                t.index "addresses"
+              end
+            RUBY
+            dump_artifacts
+            latest_event = renamed_event.with(id: "latest", schema_version: 3, record: {"street" => "Latest Street", "rank" => 31})
+
+            process_indexing_events([old_event, renamed_event, latest_event], via: boot_indexer)
+
+            expect(source_for("addresses", "old")).to include("full_address" => "Old Street", "rank" => 17)
+            expect(source_for("addresses", "renamed")).to include("full_address" => "New Street", "rank" => 29)
+            expect(source_for("addresses", "latest")).to include("full_address" => "Latest Street", "rank" => 31)
+            expect(::File.read("config/schema/artifacts/schema.proto")).to include("message Address", "full_address = 2;").and exclude("message PostalAddress")
+          end
+
+          it "rejects out-of-range historical values after narrowing, even with validation sampled out" do
+            write_address_schema_def(json_schema_version: 1, address_extras: <<~RUBY)
+              t.field "tally", "JsonSafeLong"
+              t.field "matrix", "[[JsonSafeLong]]"
+            RUBY
+            dump_artifacts
+            valid = build_upsert_event(:address, id: "valid", tally: 2**31 - 1, matrix: [[-(2**31), 2**31 - 1], []])
+            too_large = build_upsert_event(:address, id: "too-large", tally: 2**31, matrix: [])
+            nested_too_large = build_upsert_event(:address, id: "nested-too-large", tally: 1, matrix: [[2**31]])
+
+            write_address_schema_def(json_schema_version: 2, address_extras: <<~RUBY)
+              t.field "tally", "Int", name_in_index: "small_tally"
+              t.field "matrix", "[[Int]]", name_in_index: "small_matrix"
+            RUBY
+            dump_artifacts
+
+            indexer = boot_indexer(skip_record_validation_percents_by_type: {"Address" => 100})
+            process_indexing_events([valid], via: indexer)
+            expect {
+              process_indexing_events([too_large, nested_too_large], via: indexer)
+            }.to raise_error Indexer::IndexingFailuresError, a_string_including("too-large", "nested-too-large")
+
+            expect(search_for_ids("addresses")).to contain_exactly("valid")
+            expect(source_for("addresses", "valid")).to include(
+              "small_tally" => 2**31 - 1,
+              "small_matrix" => [[-(2**31), 2**31 - 1], []]
+            )
+          end
+
+          it "rotates an incompatible field instead of misreading historical bytes" do
+            write_address_schema_def(json_schema_version: 1, address_extras: 't.field "wins", "Int"')
+            dump_artifacts
+            old_event = build_upsert_event(:address, id: "old", wins: 17)
+
+            write_address_schema_def(json_schema_version: 2, address_extras: 't.field "wins", "String", name_in_index: "wins_text"')
+            expect { dump_artifacts }.to schema_dump_failure("wins", "protobuf", "name:")
+
+            write_address_schema_def(json_schema_version: 2, address_extras: <<~RUBY)
+              t.field "wins", "String", name_in_index: "wins_text" do |f|
+                f.protobuf name: "wins_str"
+              end
+            RUBY
+            dump_artifacts
+            current_event = build_upsert_event(:address, id: "current", wins: "seventeen", __json_schema_version: 2)
+            process_indexing_events([old_event, current_event], via: boot_indexer)
+
+            expect(source_for("addresses", "old")["wins_text"]).to be_nil
+            expect(source_for("addresses", "current")).to include("wins_text" => "seventeen")
+            expect(::File.read("config/schema/artifacts/schema.proto")).to include("reserved 3", "wins_str = 4;")
+          end
+
+          it "drops only retired enum values from historical publishers" do
+            write_proto_schema_def(1, <<~RUBY)
+              schema.enum_type "State" do |t|
+                t.values "OPEN", "CLOSED"
+              end
+              schema.object_type "Address" do |t|
+                t.field "id", "ID!"
+                t.field "full_address", "String!"
+                t.field "state", "State"
+                t.field "states", "[State]"
+                t.index "addresses"
+              end
+            RUBY
+            dump_artifacts
+            retired = build_upsert_event(:address, id: "retired", state: "CLOSED", states: ["OPEN", "CLOSED"])
+            active = build_upsert_event(:address, id: "active", state: "OPEN", states: ["OPEN"])
+
+            write_proto_schema_def(2, <<~RUBY)
+              schema.enum_type "State" do |t|
+                t.values "OPEN"
+              end
+              schema.object_type "Address" do |t|
+                t.field "id", "ID!"
+                t.field "full_address", "String!"
+                t.field "state", "State"
+                t.field "states", "[State]"
+                t.index "addresses"
+              end
+            RUBY
+            dump_artifacts
+            process_indexing_events([retired, active], via: boot_indexer)
+
+            expect(source_for("addresses", "retired")["state"]).to be_nil
+            expect(source_for("addresses", "retired").fetch("states")).to eq(["OPEN", nil])
+            expect(source_for("addresses", "active")).to include("state" => "OPEN", "states" => ["OPEN"])
+          end
+
+          def write_proto_schema_def(version, body)
+            @publisher_schema_version = version
+            body = body.gsub('t.index "addresses"', "t.index #{address_index_name.inspect}")
+            ::File.write(path_to_schema, "ElasticGraph.define_schema do |schema|\n#{proto_schema_configuration}\n#{body}\nend\n")
+          end
+        end
+      end
+
+      def proto_schema_configuration
+        "schema.proto_schema_artifacts package_name: 'elasticgraph', syntax: :#{proto_syntax}" if ingestion_format == :proto
+      end
+
+      def schema_dump_failure(*messages)
+        if ingestion_format == :proto
+          raise_error(Errors::SchemaError, a_string_including(*messages))
+        else
+          abort_with(a_string_including(*messages))
+        end
+      end
+
+      def missing_field_message(field)
+        history = (ingestion_format == :json) ? " (which existed in JSON schema version 1)" : ""
+        "The `#{field}` field#{history} no longer exists in the current schema definition."
+      end
+
+      def missing_type_message(type)
+        history = (ingestion_format == :json) ? " (which existed in JSON schema version 1)" : ""
+        "The `#{type}` type#{history} no longer exists in the current schema definition."
+      end
+
       def write_teams_schema_def(json_schema_version:)
+        @publisher_schema_version = json_schema_version
         # Comment out some lines that lead to schema dump warnings (we don't want the warnings in the output).
         schema_def_contents = existing_team_schema_def.gsub(/^\s+t\.field schema\.state.schema_elements.count/, "#")
         schema_def_contents = yield schema_def_contents
@@ -341,6 +531,7 @@ module ElasticGraph
         ::File.write(path_to_schema, <<~EOS)
           ElasticGraph.define_schema do |schema|
             schema.json_schema_version #{json_schema_version} if schema.respond_to?(:json_schema_version)
+            #{proto_schema_configuration}
 
             # Money is referenced by the team schema but is defined in the widgets schema so we have duplicate it here.
             schema.object_type "Money" do |t|
@@ -354,16 +545,18 @@ module ElasticGraph
       end
 
       def write_address_schema_def(json_schema_version:, address_extras: "", schema_extras: "")
+        @publisher_schema_version = json_schema_version
         # This is a pared down schema definition of our normal test schema `Address` type.
         ::File.write(path_to_schema, <<~EOS)
           ElasticGraph.define_schema do |schema|
             schema.json_schema_version #{json_schema_version} if schema.respond_to?(:json_schema_version)
+            #{proto_schema_configuration}
 
             schema.object_type "Address" do |t|
               t.field "id", "ID!"
               t.field "full_address", "String!"
               #{address_extras}
-              t.index "addresses"
+              t.index "#{address_index_name}"
             end
 
             #{schema_extras}
@@ -372,10 +565,12 @@ module ElasticGraph
       end
 
       def write_widget_schema_def(json_schema_version:, widget_extras: "", widgets_index_config: "")
+        @publisher_schema_version = json_schema_version
         # This is a pared down schema definition of our normal test schema `Address` type.
         ::File.write(path_to_schema, <<~EOS)
           ElasticGraph.define_schema do |schema|
             schema.json_schema_version #{json_schema_version} if schema.respond_to?(:json_schema_version)
+            #{proto_schema_configuration}
 
             schema.object_type "Widget" do |t|
               t.field "id", "ID!"
@@ -410,13 +605,35 @@ module ElasticGraph
             output: output
           )
         end
+        if ingestion_format == :proto
+          capture_proto_publisher(@publisher_schema_version, SchemaArtifacts::FromDisk.new("config/schema/artifacts"))
+        end
       end
 
-      def boot_indexer
+      def boot_indexer(skip_record_validation_percents_by_type: {})
         settings = CommonSpecHelpers.parsed_test_settings_yaml
-        settings = Support::HashUtil.deep_merge(settings, {"schema_artifacts" => {"directory" => "config/schema/artifacts"}})
+        settings = Support::HashUtil.deep_merge(settings, {
+          "schema_artifacts" => {"directory" => "config/schema/artifacts"},
+          "indexer" => {"skip_record_validation_percents_by_type" => skip_record_validation_percents_by_type}
+        })
 
-        Indexer.from_parsed_yaml(settings)
+        settings["datastore"]["clusters"].each_value { |cluster| cluster["backend"] = datastore_backend.to_s }
+        if isolated_address_index
+          settings["datastore"]["index_definitions"][address_index_name] = settings.fetch("datastore").fetch("index_definitions").fetch("addresses")
+        end
+        Indexer.from_parsed_yaml(settings).tap do |indexer|
+          if isolated_address_index
+            Admin.new(datastore_core: indexer.datastore_core).cluster_configurator.configure_cluster(::StringIO.new)
+          end
+        end
+      end
+
+      def address_index_name
+        isolated_address_index ? unique_index_name : "addresses"
+      end
+
+      def source_for(index_prefix, id)
+        search(index_prefix).find { |hit| hit.fetch("_id") == id }.fetch("_source")
       end
 
       def search_for_ids(index_prefix)
@@ -424,6 +641,7 @@ module ElasticGraph
       end
 
       def search(index_prefix)
+        index_prefix = address_index_name if index_prefix == "addresses"
         main_datastore_client
           .msearch(body: [{index: "#{index_prefix}*"}, {}])
           .dig("responses", 0, "hits", "hits")

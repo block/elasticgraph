@@ -84,8 +84,8 @@ module ElasticGraph
             "messages" => {
               "Account" => {
                 "fields" => {
-                  "id" => 1,
-                  "name" => 2
+                  "id" => {"field_number" => 1, "proto_type" => "string", "list_depth" => 0},
+                  "name" => {"field_number" => 2, "proto_type" => "string", "list_depth" => 0}
                 },
                 "next_number" => 3
               },
@@ -110,6 +110,7 @@ module ElasticGraph
             s.object_type "Account" do |t|
               t.field "id", "ID"
               t.field "name", "String"
+              t.deleted_field "legacy_field"
               t.index "accounts"
             end
           end
@@ -123,9 +124,9 @@ module ElasticGraph
             "messages" => {
               "Account" => {
                 "fields" => {
-                  "id" => 1,
-                  "legacy_field" => 2,
-                  "name" => 3
+                  "id" => {"field_number" => 1, "proto_type" => "string", "list_depth" => 0},
+                  "legacy_field" => {"field_number" => 2, "proto_type" => "string", "list_depth" => 0, "deleted" => true},
+                  "name" => {"field_number" => 3, "proto_type" => "string", "list_depth" => 0}
                 },
                 "next_number" => 4
               },
@@ -147,7 +148,7 @@ module ElasticGraph
             "string id = 1;", "string legacy_field = 2;", "string name = 3;", "// Next field number: 4"
           )
           expect(results3.proto_schema).not_to include("reserved 2;")
-          expect(results3.proto_field_number_mappings).to eq(results2.proto_field_number_mappings)
+          expect(results3.proto_field_number_mappings.dig("messages", "Account", "fields", "legacy_field")).to eq({"field_number" => 2, "proto_type" => "string", "list_depth" => 0})
         end
 
         it "keeps index field names out of the protobuf schema and field-number mappings" do
@@ -172,8 +173,8 @@ module ElasticGraph
           expect(results2.proto_schema).to eq(results1.proto_schema)
 
           expect(results2.proto_field_number_mappings.dig("messages", "Widget", "fields")).to eq({
-            "id" => 1,
-            "display_name" => 2
+            "id" => {"field_number" => 1, "proto_type" => "string", "list_depth" => 0},
+            "display_name" => {"field_number" => 2, "proto_type" => "string", "list_depth" => 0}
           })
         end
 
@@ -198,15 +199,15 @@ module ElasticGraph
             end
           end
 
-          expect(results2.proto_schema).to include("string id = 2;", "string display_name = 1;")
+          expect(results2.proto_schema).to include("string id = 2;", "string full_name = 1;", "Public GraphQL field: display_name.")
           expect(results2.proto_schema).not_to include("reserved 1;")
           expect(results2.proto_field_number_mappings).to eq({
             "enums" => {},
             "messages" => {
               "Account" => {
                 "fields" => {
-                  "id" => 2,
-                  "display_name" => 1
+                  "id" => {"field_number" => 2, "proto_type" => "string", "list_depth" => 0},
+                  "display_name" => {"field_number" => 1, "proto_type" => "string", "list_depth" => 0, "proto_name" => "full_name", "previous_names" => ["full_name"]}
                 },
                 "next_number" => 3
               },
@@ -260,10 +261,10 @@ module ElasticGraph
           expect(results2.proto_field_number_mappings.fetch("enums")).to eq({
             "Status" => {
               "values" => {
-                "ACTIVE" => 1,
-                "PAUSED" => 2,
-                "INACTIVE" => 3,
-                "ARCHIVED" => 4
+                "ACTIVE" => {"value_number" => 1, "proto_name" => "STATUS_ACTIVE"},
+                "PAUSED" => {"value_number" => 2, "proto_name" => "STATUS_PAUSED", "deleted" => true},
+                "INACTIVE" => {"value_number" => 3, "proto_name" => "STATUS_INACTIVE"},
+                "ARCHIVED" => {"value_number" => 4, "proto_name" => "STATUS_ARCHIVED"}
               },
               "next_number" => 5
             }
@@ -290,6 +291,7 @@ module ElasticGraph
 
           # `Truck` has been removed and `Scooter` added since the mappings were dumped.
           results2 = define_proto_schema_results(results1) do |s|
+            s.deleted_type "Truck"
             ["Car", "Bike", "Scooter"].each do |type_name|
               s.object_type type_name do |t|
                 t.field "id", "ID"
@@ -313,10 +315,10 @@ module ElasticGraph
           # `truck` keeps its number reserved in the artifact so it is never reused.
           expect(results2.proto_field_number_mappings.fetch("messages").fetch("Vehicle")).to eq({
             "fields" => {
-              "truck" => 1,
-              "car" => 2,
-              "bike" => 3,
-              "scooter" => 4
+              "truck" => {"field_number" => 1, "proto_type" => ".elasticgraph.Truck", "list_depth" => 0, "deleted" => true},
+              "car" => {"field_number" => 2, "proto_type" => ".elasticgraph.Car", "list_depth" => 0},
+              "bike" => {"field_number" => 3, "proto_type" => ".elasticgraph.Bike", "list_depth" => 0},
+              "scooter" => {"field_number" => 4, "proto_type" => ".elasticgraph.Scooter", "list_depth" => 0}
             },
             "next_number" => 5
           })

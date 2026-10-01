@@ -11,6 +11,7 @@ module ElasticGraph
         def self.validate_syntax: ((::Symbol | ::String)) -> ::String
         def self.validate_header_lines: (::Array[::String]) -> ::Array[::String]
 
+        @contracts_resolved: bool?
         @syntax: ::String
         @header_lines: ::Array[::String]
         @state: ::ElasticGraph::SchemaDefinition::State
@@ -27,6 +28,7 @@ module ElasticGraph
           ingestible_types_by_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::indexableType]
         ) -> void
 
+        def ingestion_metadata: () -> Hash[String, untyped]
         def to_proto: () -> ::String
         def field_number_mappings_for_artifact: () -> ::Hash[::String, untyped]
         def field_number_for: (
@@ -43,6 +45,10 @@ module ElasticGraph
 
         private
 
+        def retained_type_entries: () -> FieldNumberMappings::contracts
+        def public_type_name: (::String) -> ::String
+        def resolve_contracts: () -> void
+        def resolve_message_fields: (untyped) -> void
         def envelope_definitions: () -> ::Hash[::String, ::String]
         def envelope_record_fields: () -> ::Hash[::String, ::String]
         def render_envelope_fields: (::Hash[::String, ::String], indent: ::String) -> ::String

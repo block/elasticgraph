@@ -1,9 +1,9 @@
 # ElasticGraph::ProtoIngestion
 
 An ElasticGraph extension that supports ingesting Protocol Buffer data into ElasticGraph.
-Currently it generates Protocol Buffers schema artifacts from ElasticGraph schemas: it emits
-`proto3` by default and can emit `proto2`, and supports arbitrary file-level header lines (such
-as `option` declarations).
+It generates Protocol Buffers schema artifacts from ElasticGraph schemas and decodes and validates
+protobuf events for the shared indexing pipeline. It emits `proto3` by default, can emit `proto2`,
+and supports arbitrary file-level header lines (such as `option` declarations).
 
 ## Dependency Diagram
 
@@ -14,9 +14,16 @@ graph LR;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-proto_ingestion["elasticgraph-proto_ingestion"];
     class elasticgraph-proto_ingestion targetGemStyle;
+    elasticgraph-indexer["elasticgraph-indexer"];
+    elasticgraph-proto_ingestion --> elasticgraph-indexer;
+    class elasticgraph-indexer otherEgGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-proto_ingestion --> elasticgraph-support;
     class elasticgraph-support otherEgGemStyle;
+    google-protobuf["google-protobuf"];
+    elasticgraph-proto_ingestion --> google-protobuf;
+    class google-protobuf externalGemStyle;
+    click google-protobuf href "https://rubygems.org/gems/google-protobuf" "Open on RubyGems.org" _blank;
 ```
 
 ## Usage
@@ -76,6 +83,27 @@ end
 
 After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate a `schema.proto`
 schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside your schema definition.
+
+## Decoding and Validation
+
+Compile the deployed `schema.proto` into a descriptor set with imports included (`schema.pb`).
+The decoder's `descriptor_set_file` configuration points to that file; its descriptors and runtime
+metadata must come from the same schema dump. Publisher binaries may use older compatible contracts.
+
+`format: envelope` (the default) accepts an `ElasticGraphEventBatch` of envelopes with operation,
+ID, version, latency timestamps, and one record alternative. `format: raw` accepts a domain message
+and transport metadata: `eg_op`, `eg_type`, `eg_id`, and `eg_version` by default. `metadata_fields`
+can rename those transport properties. `encoding` is `binary` by default or `base64` for text transports;
+protobuf JSON and text encodings are not accepted.
+
+The decoder and registered ingestion adapter build unversioned indexing events without selecting a
+JSON schema. Runtime metadata supplies only rules descriptors cannot express, such as current public
+names, private index destinations, scalar validation, and known deletions. General GraphQL non-null
+constraints are not enforced, but retained-wire range checks still run when record validation is sampled out.
+
+Events naming a known deleted type are ignored in raw and envelope formats. Unknown or ambiguous
+record alternatives fail rather than disappearing silently. Known messages can still contain unknown
+added fields, which protobuf discards: deploy the indexer before publishers when adding fields or types.
 
 ## Schema Definition API
 
@@ -250,6 +278,11 @@ Additionally:
 - List types become `repeated` fields.
 - Nested lists use generated wrapper messages with a repeated `values` field at each inner level.
 - Singular fields use `optional` in proto2 and proto3, preserving explicit zero, false, and empty string values.
+  Absent singular fields are omitted from the converted record; explicit unspecified or retired proto3 enum values become `nil`.
+  The generator does not emit proto2 `required` fields. Versionless ingestion cannot distinguish an old
+  publisher omitting a newly added field from a new publisher forgetting it, so GraphQL non-null (`!`)
+  constraints are not enforced. Envelope ID/version are required; rollover needs its timestamp, routing
+  follows the shared indexer's rules, and missing derived IDs can yield no derived operation.
 - Repeated fields cannot distinguish a null list from an empty list or represent null elements. An empty wrapper represents an empty inner list.
 - Enum types generate `enum` definitions whose values are prefixed with the enum type name in `UPPER_SNAKE_CASE`, including a zero-valued `*_UNSPECIFIED` entry.
 
@@ -265,8 +298,14 @@ cursor are never filled:
 messages:
   Widget:
     fields:
-      id: 1
-      display_name: 2
+      id:
+        field_number: 1
+        proto_type: string
+        list_depth: 0
+      display_name:
+        field_number: 2
+        proto_type: string
+        list_depth: 0
     next_number: 3
 ```
 
@@ -287,17 +326,56 @@ Alternatives inside generated interface and union `oneof` blocks use the same st
 message-field mappings, so adding or removing a concrete subtype does not renumber the
 remaining alternatives.
 
-Removed fields and `oneof` alternatives remain in the sidecar. Their numbers are explicitly
-reserved in `schema.proto`, with comments recording the prior names, while every generated
-message includes a comment identifying its next field number. If a removed field or alternative
-is restored under the same name, it reuses its original number and is no longer reserved.
+Removed fields and `oneof` alternatives remain in the sidecar, and their numbers are reserved in
+`schema.proto`. Dropping a generated field or type requires `deleted_field` or `deleted_type`;
+the successful dump persists its deletion state. Restoring the compatible original can reclaim
+its number, but an unrelated field cannot claim its reserved protobuf name or reinterpret its bytes.
 
-Both `schema.proto` and the sidecar use public GraphQL field names. Index field names,
-including `name_in_index` overrides, are not part of the protobuf wire schema or its
-stable-numbering state.
+A public rename with `field.renamed_from` retains both the number and the old protobuf name.
+Type renames likewise keep the message name, its numbers, and its envelope/`oneof` alternatives.
+The sidecar persists the public-to-protobuf association, so later dropping `renamed_from` does not
+change the protobuf contract. Projects also using JSON must keep declarations while historical
+JSON schemas still need them. Nested-list wrappers derive from stable protobuf names too.
 
-If a field is renamed with `field.renamed_from`, `elasticgraph-proto_ingestion` reuses the
-existing field number under the new public field name.
+Index field names, including `name_in_index`, are private runtime metadata, never part of the public
+protobuf contract or the sidecar. Both historical JSON and protobuf events write to the current
+index destination; already-indexed documents still need a backfill after a destination change.
+
+### Type Changes and Field Rotation
+
+The dump preserves old-publisher values rather than merely checking whether wire types can parse
+one another. It permits `int32` → `int64`, `sint32` → `sint64`, and `uint32` → `uint64`, and reports
+those as source-breaking changes for recompiled consumers. New values outside the old range need
+upgraded downstream readers. The reverse changes retain the wider wire type; current scalar range
+checks reject out-of-range values even when general record validation is sampled out.
+
+Other type or field-shape changes require a new protobuf field name:
+
+```ruby
+# in config/schema/team.rb
+
+ElasticGraph.define_schema do |schema|
+  schema.object_type "Team" do |t|
+    t.field "id", "ID!"
+    t.field "wins", "String" do |f|
+      f.protobuf name: "wins_str"
+    end
+    t.index "teams"
+  end
+end
+```
+
+An incompatible change with a fresh name gets a fresh number and retires the prior incarnation.
+Its old number is reserved, and values from old publishers on that number are intentionally dropped.
+An explicit name change with a compatible type and shape keeps the number instead: it is a
+source-breaking rename, not a rotation. The dump rejects active/retired name or number collisions.
+
+Legacy integer-only mappings seed current fields from their current definitions. Dump them before
+making any type or shape changes: integer entries alone cannot prove the old contract. Already-removed
+legacy fields remain tombstones without an invented type, and cannot be restored until their historical
+`proto_type` and `list_depth` are supplied explicitly. Scalar types use names such as `int64`; message
+and enum types use fully qualified names such as `.elasticgraph.Widget`. Do not guess or reset
+production history.
 
 ## Stable Enum Value Numbers
 
@@ -306,13 +384,21 @@ values keep their numbers when other values are added or removed, new values cla
 `next_number`, and removed values keep their numbers reserved so they are never reused
 (number `0` is always the generated `*_UNSPECIFIED` value). `schema.proto` explicitly reserves
 each removed value number, includes a comment recording its prior name, and identifies the next
-value number for each enum:
+value number for each enum. Enum types and values can use `renamed_from` to retain their protobuf names
+and numbers across public renames. Known retired proto3 enum numbers convert to `nil`; genuinely unknown
+numbers fail validation. The current Ruby decoder exposes these numbers under both syntaxes, including
+`nil` slots in repeated fields. Other proto2 consumers may instead treat retired singular values as absent
+and omit retired repeated elements:
 
 ```yaml
 enums:
   WidgetColor:
     values:
-      RED: 1
-      BLUE: 2
+      RED:
+        value_number: 1
+        proto_name: WIDGET_COLOR_RED
+      BLUE:
+        value_number: 2
+        proto_name: WIDGET_COLOR_BLUE
     next_number: 3
 ```

@@ -1,0 +1,36 @@
+module ElasticGraph
+  module ProtoIngestion
+    class RuntimeSchema
+      DEFAULT_SCALARS_BY_PROTO_TYPE: ::Hash[::String, ::String]
+
+      attr_reader types: ::Hash[::String, untyped]
+      attr_reader package_name: ::String
+      attr_reader time_zones: ::Array[::String]
+      def initialize: (schemaArtifacts) -> void
+      def register: (::Google::Protobuf::Descriptor) -> ::String
+      def public_type_name_for: (::String) -> ::String
+      def proto_type_name_for: (::String) -> ::String
+      def deleted_type?: (::String) -> bool
+      attr_reader reserved_envelope_fields: ::Hash[::String, ::String]
+
+      @public_names: ::Hash[::String, ::String]
+      @proto_names: ::Hash[::String, ::String]
+      @deleted_types: ::Set[::String]
+      @retired_enum_values: ::Hash[::String, ::Array[::Integer]]
+
+      @record_preparer: ::ElasticGraph::Indexer::RecordPreparer?
+      def record_preparer: () -> ::ElasticGraph::Indexer::RecordPreparer
+
+      private
+
+      @field_overrides: ::Hash[::String, ::Hash[::String, ::Hash[::String, ::String]]]
+      @enum_value_overrides: ::Hash[::String, ::Hash[::String, ::String]]
+      @indexing_preparers: ::Hash[::String, SchemaArtifacts::RuntimeMetadata::extensionClass?]
+
+      def field_type_for: (::Google::Protobuf::Descriptor, ::Google::Protobuf::FieldDescriptor, ::Hash[::String, ::String]) -> ::String
+      def base_type_for: (::Google::Protobuf::FieldDescriptor, ::Hash[::String, ::String]) -> ::String
+      def register_enum: (::Google::Protobuf::EnumDescriptor) -> ::String
+      def proto_type_of: (::Google::Protobuf::FieldDescriptor) -> ::String
+    end
+  end
+end

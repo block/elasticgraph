@@ -3,6 +3,11 @@ module ElasticGraph
     module SchemaDefinition
       module SchemaElements
         module EnumValueExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue
+          @protobuf_contract: FieldNumberMappings::contract?
+          attr_accessor protobuf_contract: FieldNumberMappings::contract?
+          @protobuf_previous_names: ::Array[::String]?
+          def renamed_from: (::String) -> void
+          def protobuf_previous_names: () -> ::Array[::String]
           def proto_name: (::String enum_value_prefix) -> ::String
           def to_proto: (::Integer number, proto_enum_value_prefix: ::String) -> ::String
         end

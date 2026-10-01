@@ -112,7 +112,7 @@ module ElasticGraph
           # for real on these operations, anyway.
           #
           # Building operations for an event we already know is malformed can itself fail--for example, when the
-          # record omits a field an update target derives its id from. Reporting what was malformed matters more
+          # record uses a scalar where an update target expects an object. Reporting what was malformed matters more
           # than reporting the operations we would have run, and `FailedEventError#operations` is documented to
           # sometimes be empty for exactly this reason, so we fall back to no operations rather than let a second
           # failure mask the first.
