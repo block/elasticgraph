@@ -96,6 +96,37 @@ module ElasticGraph
           end
         end
 
+        it "associates datastore failures with all operations for an adapter-normalized event, without conflating versions" do
+          original = build_upsert_event(:widget, id: "same-id", __version: 1)
+          newer = original.with(version: 2)
+          adapter = indexer.ingestion_adapters_by_format.fetch("json")
+          allow(adapter).to receive(:validate_event).and_wrap_original do |method, event, **options|
+            result = method.call(event, **options)
+            IngestionAdapter::ValidationResult.valid(
+              result.event.with(record: result.event.record.merge("normalized" => true)), result.record_preparer
+            )
+          end
+          operation_groups = nil
+          allow(datastore_router).to receive(:bulk) do |operations, **|
+            operation_groups = operations.group_by(&:event)
+            DatastoreIndexingRouter::BulkResult.new({"main" => operations.map do |operation|
+              result = if operation.event.version == 1
+                Operation::Result.failure_of(operation, "failed normalized event")
+              else
+                Operation::Result.success_of(operation)
+              end
+              [operation, result]
+            end})
+          end
+
+          failures = process_returning_failures([original, newer])
+          expect(failures).not_to be_empty
+          expect(failures.map(&:version).uniq).to eq([1])
+          expect(failures.map(&:event)).to all have_attributes(record: a_hash_including("normalized" => true))
+          expect(failures.map(&:operations).uniq).to eq([operation_groups.find { |event, _| event.version == 1 }.last.to_set])
+          expect(failures.flat_map { |failure| failure.operations.to_a }.map(&:event)).to all have_attributes(version: 1)
+        end
+
         describe "latency metrics" do
           it "extracts latency metrics from events" do
             component = upsert_event_with_latency_timestamps(:component, 36, 72)
