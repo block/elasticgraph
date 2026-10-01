@@ -7,15 +7,47 @@
 # frozen_string_literal: true
 
 require "elastic_graph/proto_ingestion"
+require "elastic_graph/proto_ingestion/indexer"
 require "elastic_graph/proto_ingestion/schema_definition/api_extension"
+require "elastic_graph/schema_artifacts/from_disk"
 require "elastic_graph/schema_definition/rake_tasks"
+require "elastic_graph/spec_support/compiled_proto_support"
 require "yaml"
 
 module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       RSpec.describe "Protobuf RakeTasks", :rake_task, :in_temp_dir do
+        include CompiledProtoSupport
+
         describe "schema_artifacts:dump" do
+          it "loads the dumped runtime metadata and decodes records using the compiled public contract" do
+            write_proto_schema(table_defs: <<~EOS)
+              s.object_type "Product" do |t|
+                t.field "id", "ID!"
+                t.field "displayName", "String", name_in_index: "private_name"
+                t.index "products"
+              end
+            EOS
+            run_rake_with_proto("schema_artifacts:dump")
+            artifacts = SchemaArtifacts::FromDisk.new("config/schema/artifacts")
+            expect(artifacts.available_json_schema_versions).to be_empty
+            compile_proto_files("config/schema/artifacts") do |pool, path|
+              indexer = ProtoIngestion::Indexer.from_parsed_yaml(parsed_test_settings_yaml.merge(
+                "schema_artifacts" => {"directory" => "config/schema/artifacts"},
+                "proto_ingestion" => {"descriptor_set_file" => path, "format" => "raw"}
+              ))
+              product = pool.lookup("elasticgraph.Product").msgclass
+              event = indexer.decode(product.encode(product.new(displayName: "from disk")),
+                metadata: {"eg_op" => "upsert", "eg_type" => "Product", "eg_id" => "p1", "eg_version" => "1"}).fetch(0)
+              adapter = IngestionAdapter.new(schema_artifacts: artifacts)
+              result = adapter.validate_event(adapter.events_from([event]).first.fetch(0))
+              expect(result.failure).to be_nil
+              expect(result.record_preparer.prepare_for_index("Product", result.event.record, nil))
+                .to eq("id" => "p1", "private_name" => "from disk")
+            end
+          end
+
           it "dumps proto artifact when indexed types are defined" do
             write_proto_schema(table_defs: <<~EOS)
               s.object_type "Product" do |t|
