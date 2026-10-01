@@ -61,9 +61,9 @@ module ElasticGraph
         end
 
         expect(yielded_header_body_tuples_by_query).to match({
-          query0 => [{index: "widgets_rollover__*"}, a_hash_including(query: {bool: {filter: [{terms: {"age" => [0]}}]}})],
-          query1 => [{index: "widgets_rollover__*"}, a_hash_including(query: {bool: {filter: [{terms: {"age" => [10]}}]}})],
-          query2 => [{index: "components"}, a_hash_including(query: {bool: {filter: [{terms: {"age" => [20]}}]}})]
+          query0 => [{index: "widgets_rollover__*", ignore_unavailable: true}, a_hash_including(query: {bool: {filter: [{terms: {"age" => [0]}}]}})],
+          query1 => [{index: "widgets_rollover__*", ignore_unavailable: true}, a_hash_including(query: {bool: {filter: [{terms: {"age" => [10]}}]}})],
+          query2 => [{index: "components", ignore_unavailable: true}, a_hash_including(query: {bool: {filter: [{terms: {"age" => [20]}}]}})]
         })
 
         expect(responses.values).to all be_a DatastoreResponse::SearchResponse

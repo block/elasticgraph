@@ -620,7 +620,7 @@ module ElasticGraph
         end
 
         def have_total_widget_searches(count)
-          eq([{"index" => "widgets_rollover__*"}] * count)
+          eq([{"index" => "widgets_rollover__*", "ignore_unavailable" => true}] * count)
         end
       end
     end

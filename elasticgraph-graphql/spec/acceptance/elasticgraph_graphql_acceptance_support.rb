@@ -53,13 +53,6 @@ module ElasticGraph
       pre_cache_index_state(graphql)
     end
 
-    def expect_indices_not_configured_error
-      expect {
-        response = yield
-        expect(response.dig("errors").first).to include({"message" => GraphQL::DatastoreSearchRouter::INDICES_NOT_CONFIGURED_MESSAGE})
-      }.to log_warning(a_string_including(GraphQL::DatastoreSearchRouter::INDICES_NOT_CONFIGURED_MESSAGE))
-    end
-
     def self.with_both_casing_forms(&block)
       context "with a snake_case schema" do
         include SnakeCaseGraphQLAcceptanceAdapter
