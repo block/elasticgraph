@@ -7,8 +7,11 @@
 # frozen_string_literal: true
 
 ElasticGraph.define_schema do |schema|
-  schema.json_schema_version 1
-  schema.enforce_json_schema_version false
+  # Specs also load this schema with only the protobuf ingestion extension, which does not define these methods.
+  if schema.respond_to?(:json_schema_version)
+    schema.json_schema_version 1
+    schema.enforce_json_schema_version false
+  end
 end
 
 # Note: anytime you add a file to load here, you'll also have to update the list here:

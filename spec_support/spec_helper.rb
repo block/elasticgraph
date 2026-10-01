@@ -372,8 +372,7 @@ module ElasticGraph
       require "stringio"
 
       unless block_given?
-        # When no block is given we load the repository's main test schema (`config/schema.rb`),
-        # which uses the JSON ingestion schema definition DSL, so it requires this extension.
+        # When no block is given we load the repository's main test schema (`config/schema.rb`) for JSON ingestion.
         require "elastic_graph/json_ingestion/schema_definition/api_extension"
         extension_modules += [JSONIngestion::SchemaDefinition::APIExtension]
       end
@@ -444,6 +443,11 @@ end
 RSpec.configure do |c|
   c.define_derived_metadata(:ingests_json_data) do |m|
     m[:json_ingestion_support] = true
+    m[:uses_datastore] = true
+    m[:builds_indexer] = true
+  end
+
+  c.define_derived_metadata(:ingests_proto_data) do |m|
     m[:uses_datastore] = true
     m[:builds_indexer] = true
   end
