@@ -14,13 +14,13 @@ group :development do
   # graphql-c_parser is no longer a hard dependency, but we include it here for faster CI tests
   gem "graphql-c_parser", "~> 1.1", ">= 1.1.4", platforms: :ruby
   # Vendors precompiled `protoc` binaries, so neither CI nor contributors need a system `protoc` install.
-  gem "grpc-tools", "~> 1.83"
+  gem "grpc-tools", "~> 1.84"
   gem "benchmark-ips", "~> 2.15", ">= 2.15.1"
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.6"
   gem "faker", "~> 3.8"
   gem "flatware-rspec", "~> 2.4", platforms: :ruby
-  gem "httpx", "~> 1.8", ">= 1.8.3"
+  gem "httpx", "~> 1.8"
   gem "memory_profiler", "~> 1.1"
   gem "nokogiri", "~> 1.19", ">= 1.19.4"
   gem "method_source", "~> 1.1"
@@ -36,7 +36,7 @@ group :development do
   # We are waiting to upgrade to >= 3.5 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
   gem "rubocop-rspec", "~> 3.10.2"
-  gem "simplecov", "~> 1.1", ">= 1.1.1"
+  gem "simplecov", "~> 1.3"
   gem "simplecov-console", "~> 0.9", ">= 0.9.5"
   gem "standard", "~> 1.56.0"
   gem "steep", "~> 2.1.0", platforms: :ruby

@@ -82,7 +82,7 @@ PATH
   remote: elasticgraph-indexer_autoscaler_lambda
   specs:
     elasticgraph-indexer_autoscaler_lambda (1.2.1.pre)
-      aws-sdk-cloudwatch (~> 1.146.0)
+      aws-sdk-cloudwatch (>= 1.146, < 1.150)
       aws-sdk-lambda (~> 1.193)
       aws-sdk-sqs (~> 1.117)
       elasticgraph-datastore_core (= 1.2.1.pre)
@@ -221,7 +221,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     Ascii85 (2.0.1)
-    activesupport (8.1.3.1)
+    activesupport (8.1.4)
       base64
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.3.1)
@@ -242,17 +242,17 @@ GEM
       google-protobuf (< 5)
       graphql
     ast (2.4.3)
-    async (2.45.0)
+    async (2.46.0)
       console (~> 1.29)
       fiber-annotation
       io-event (~> 1.21)
     attr_extras (7.1.0)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1282.0)
-    aws-sdk-cloudwatch (1.146.0)
-      aws-sdk-core (~> 3, >= 3.254.0)
+    aws-partitions (1.1290.0)
+    aws-sdk-cloudwatch (1.149.0)
+      aws-sdk-core (~> 3, >= 3.256.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-core (3.254.1)
+    aws-sdk-core (3.257.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -260,18 +260,19 @@ GEM
       bigdecimal
       jmespath (~> 1, >= 1.6.1)
       logger
-    aws-sdk-kms (1.130.0)
-      aws-sdk-core (~> 3, >= 3.254.0)
+      rexml (~> 3.4, >= 3.4.2)
+    aws-sdk-kms (1.132.0)
+      aws-sdk-core (~> 3, >= 3.256.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-lambda (1.193.0)
-      aws-sdk-core (~> 3, >= 3.254.0)
+    aws-sdk-lambda (1.196.0)
+      aws-sdk-core (~> 3, >= 3.256.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.229.0)
-      aws-sdk-core (~> 3, >= 3.254.1)
+    aws-sdk-s3 (1.232.1)
+      aws-sdk-core (~> 3, >= 3.256.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
-    aws-sdk-sqs (1.117.0)
-      aws-sdk-core (~> 3, >= 3.254.0)
+    aws-sdk-sqs (1.119.0)
+      aws-sdk-core (~> 3, >= 3.256.0)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.1)
       aws-eventstream (~> 1, >= 1.0.2)
@@ -280,13 +281,13 @@ GEM
     base64 (0.3.0)
     benchmark (0.5.0)
     benchmark-ips (2.15.1)
-    bigdecimal (4.1.2)
-    bigdecimal (4.1.2-java)
+    bigdecimal (4.1.3)
+    bigdecimal (4.1.3-java)
     coderay (1.1.3)
     colorator (1.1.0)
     concurrent-ruby (1.3.8)
     connection_pool (3.0.2)
-    console (1.37.0)
+    console (1.38.0)
       fiber-annotation
       fiber-local (~> 1.1)
       json
@@ -316,7 +317,7 @@ GEM
       activesupport (>= 6.1.0)
     faker (3.8.0)
       i18n (>= 1.8.11, < 2)
-    faraday (2.14.3)
+    faraday (2.14.4)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -353,13 +354,13 @@ GEM
       flatware (= 2.4.0)
       rspec (>= 3.8)
     forwardable-extended (2.6.0)
-    google-protobuf (4.36.0)
+    google-protobuf (4.36.2)
       bigdecimal
       rake (~> 13.3)
-    google-protobuf (4.36.0-arm64-darwin)
+    google-protobuf (4.36.2-arm64-darwin)
       bigdecimal
       rake (~> 13.3)
-    google-protobuf (4.36.0-java)
+    google-protobuf (4.36.2-java)
       bigdecimal
       ffi (~> 1)
       ffi-compiler (~> 1)
@@ -370,7 +371,7 @@ GEM
       logger
     graphql-c_parser (1.1.4)
       graphql (>= 2.2.10)
-    grpc-tools (1.83.1)
+    grpc-tools (1.84.0)
     hana (1.3.7)
     hashdiff (1.2.1)
     hashery (2.1.2)
@@ -384,15 +385,15 @@ GEM
       typhoeus (~> 1.3)
       yell (~> 2.0)
       zeitwerk (~> 2.5)
-    http-2 (1.2.2)
+    http-2 (1.2.3)
     http_parser.rb (0.8.1)
-    httpx (1.8.3)
+    httpx (1.8.4)
       http-2 (>= 1.2.0)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
-    io-console (0.9.2)
-    io-console (0.9.2-java)
-    io-event (1.21.1)
+    io-console (0.9.4)
+    io-console (0.9.4-java)
+    io-event (1.22.1)
     irb (1.18.0)
       pp (>= 0.6.0)
       prism (>= 1.3.0)
@@ -450,8 +451,8 @@ GEM
       drb (~> 2.0)
       prism (~> 1.5)
     module_methods (1.0.0)
-    multi_json (1.21.1)
-    multi_json (1.21.1-java)
+    multi_json (1.21.2)
+    multi_json (1.21.2-java)
       concurrent-ruby (~> 1.2)
     net-http (0.9.1)
       uri (>= 0.11.1)
@@ -470,7 +471,7 @@ GEM
       faraday (>= 1.0, < 3)
       multi_json (>= 1.0)
     optimist (3.2.1)
-    parallel (2.1.0)
+    parallel (2.2.0)
     parser (3.3.12.0)
       ast (~> 2.4.1)
       racc
@@ -515,7 +516,7 @@ GEM
       rbs (>= 4.0.0)
       tsort
     redcarpet (3.6.1)
-    regexp_parser (2.12.0)
+    regexp_parser (2.13.0)
     reline (0.7.0)
       io-console (~> 0.5)
     rexml (3.4.4)
@@ -563,36 +564,36 @@ GEM
       rubocop (~> 1.86, >= 1.86.2)
     ruby-progressbar (1.13.0)
     safe_yaml (1.0.5)
-    sass-embedded (1.103.1)
+    sass-embedded (1.105.0)
       google-protobuf (~> 4.31)
-      rake (>= 13)
-    sass-embedded (1.103.1-aarch64-linux-android)
+      rake (~> 13.3)
+    sass-embedded (1.105.0-aarch64-linux-android)
       google-protobuf (~> 4.31)
-    sass-embedded (1.103.1-aarch64-mingw-ucrt)
+    sass-embedded (1.105.0-aarch64-mingw-ucrt)
       google-protobuf (~> 4.31)
-    sass-embedded (1.103.1-arm-linux-androideabi)
+    sass-embedded (1.105.0-arm-linux-androideabi)
       google-protobuf (~> 4.31)
-    sass-embedded (1.103.1-arm-linux-gnueabihf)
+    sass-embedded (1.105.0-arm-linux-gnueabihf)
       google-protobuf (~> 4.31)
-    sass-embedded (1.103.1-arm-linux-musleabihf)
+    sass-embedded (1.105.0-arm-linux-musleabihf)
       google-protobuf (~> 4.31)
-    sass-embedded (1.103.1-arm64-darwin)
+    sass-embedded (1.105.0-arm64-darwin)
       google-protobuf (~> 4.31)
-    sass-embedded (1.103.1-riscv64-linux-android)
+    sass-embedded (1.105.0-riscv64-linux-android)
       google-protobuf (~> 4.31)
-    sass-embedded (1.103.1-riscv64-linux-gnu)
+    sass-embedded (1.105.0-riscv64-linux-gnu)
       google-protobuf (~> 4.31)
-    sass-embedded (1.103.1-riscv64-linux-musl)
+    sass-embedded (1.105.0-riscv64-linux-musl)
       google-protobuf (~> 4.31)
-    sass-embedded (1.103.1-x86_64-linux-android)
+    sass-embedded (1.105.0-x86_64-linux-android)
       google-protobuf (~> 4.31)
     securerandom (0.4.1)
-    simplecov (1.1.1)
+    simplecov (1.3.1)
     simplecov-console (0.9.5)
       ansi
       simplecov
       terminal-table
-    simpleidn (0.2.3)
+    simpleidn (0.3.0)
     standard (1.56.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -706,9 +707,9 @@ DEPENDENCIES
   filewatcher (~> 3.0, >= 3.0.1)
   flatware-rspec (~> 2.4)
   graphql-c_parser (~> 1.1, >= 1.1.4)
-  grpc-tools (~> 1.83)
+  grpc-tools (~> 1.84)
   html-proofer (~> 5.2, >= 5.2.2)
-  httpx (~> 1.8, >= 1.8.3)
+  httpx (~> 1.8)
   irb (~> 1.18)
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)
@@ -722,7 +723,7 @@ DEPENDENCIES
   rubocop-factory_bot (~> 2.28.0)
   rubocop-rake (~> 0.6.0)
   rubocop-rspec (~> 3.10.2)
-  simplecov (~> 1.1, >= 1.1.1)
+  simplecov (~> 1.3)
   simplecov-console (~> 0.9, >= 0.9.5)
   standard (~> 1.56.0)
   steep (~> 2.1.0)
@@ -734,35 +735,35 @@ DEPENDENCIES
 
 CHECKSUMS
   Ascii85 (2.0.1) sha256=15cb5d941808543cbb9e7e6aea3c8ec3877f154c3461e8b3673e97f7ecedbe5a
-  activesupport (8.1.3.1) sha256=85458765f25ea48b9019c46b6bb3fa5683197bf4280d9f06710a6e8d7a831376
+  activesupport (8.1.4) sha256=891dd3fe43c4fc8391934b237b1189bb1f661c932a84a840043db9d46a4e80df
   addressable (2.9.0) sha256=7fdf6ac3660f7f4e867a0838be3f6cf722ace541dd97767fa42bc6cfa980c7af
   afm (1.0.0) sha256=5bd4d6f6241e7014ef090985ec6f4c3e9745f6de0828ddd58bc1efdd138f4545
   ansi (1.6.0) sha256=ac9ea0c0ea8d32fb4e271348e609963ac78882f34b73836c2a02b3622e666658
   apollo-federation (3.10.3) sha256=61e6d8e1fd695ee45bab5d84f86f586d99c296ad77a86c6f1e7b964ac17be3d7
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
-  async (2.45.0) sha256=333a62c3ecc5257af630c3f7dc6c51f04c5e3276079377a5f3a89aaaa7f4379c
+  async (2.46.0) sha256=34f984733dbf63a997376346451ec995e858cacc3105e86ccfeaf8877b4f490b
   attr_extras (7.1.0) sha256=d96fc9a9dd5d85ba2d37762440a816f840093959ae26bb90da994c2d9f1fc827
   aws-eventstream (1.4.0) sha256=116bf85c436200d1060811e6f5d2d40c88f65448f2125bc77ffce5121e6e183b
-  aws-partitions (1.1282.0) sha256=d6c7c4ad2e4f8cd4ca56445bfbb3958fec0deecd959c1e2bcd3a83c9aa308c18
-  aws-sdk-cloudwatch (1.146.0) sha256=eff9acdd71fefbf8da495373cf2378e9daf3f4411438aed6d9abe67df4b04738
-  aws-sdk-core (3.254.1) sha256=518089e32134c3478cd4ec63d07fb966546a45e9e4cbf5f80d2cf16d5699d29b
-  aws-sdk-kms (1.130.0) sha256=a2e83662ca31b77a2a19c9aa2f40a98165a67270c18c718fe1c70d0cbd7cd749
-  aws-sdk-lambda (1.193.0) sha256=ab7e4f0cf41447eac9ae380cec40d8077e9d5ac8eec4006f8fbc3382240100af
-  aws-sdk-s3 (1.229.0) sha256=7dd11a111875b3505d2ec0a0a383a6aab6c1badb3d4e94e7fbb958a24451f596
-  aws-sdk-sqs (1.117.0) sha256=cdfebf190a26f1ccb7396ad3edfa23253909d1b8961676b4b58a953d78424472
+  aws-partitions (1.1290.0) sha256=44613571eda66decddca594c10c9cee354ce819842b5724ca4fb5115e2f06811
+  aws-sdk-cloudwatch (1.149.0) sha256=7be4d12528c775f2d717268530205df82e0383b05c2fa109c84007f37caa1050
+  aws-sdk-core (3.257.0) sha256=a92ad19c7ff668cec6688ee3200ee562da80647a3bbeed9fda02e8b0ca6492c6
+  aws-sdk-kms (1.132.0) sha256=094b0097bb3be9d5c1ac87e971ca7f5aebb746801dfb5f0f576480bf98dca69c
+  aws-sdk-lambda (1.196.0) sha256=2522a614f5948fde365c02dca0bdcbf9eae07618939ed8bb87080248a3b341de
+  aws-sdk-s3 (1.232.1) sha256=124440f3a44fbc28cc3a2dec6eaeeea2a236bfc33772005010a19baa62654870
+  aws-sdk-sqs (1.119.0) sha256=62d4d505303879e6e416a7346d35e6f93d0b794f2555f37ed6535b48c133795e
   aws-sigv4 (1.12.1) sha256=6973ff95cb0fd0dc58ba26e90e9510a2219525d07620c8babeb70ef831826c00
   aws_lambda_ric (3.2.0) sha256=fdab2c637bf0aa47b1de795d6fe7244572e9f743ac74eb47e1386e3c4c17c269
   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
   benchmark (0.5.0) sha256=465df122341aedcb81a2a24b4d3bd19b6c67c1530713fd533f3ff034e419236c
   benchmark-ips (2.15.1) sha256=07a1a9f3c6105ecaf68c174fc3fbcddd71a0e9ada6236ae03093a0dcfd812d59
-  bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
-  bigdecimal (4.1.2-java) sha256=ccc836eab720a525529f70ed0de26a206fdbc9a9e8ac67b3b4ac7318b03e114d
+  bigdecimal (4.1.3) sha256=61ebe1e5e559bdc3cc6f2c0ee7f427321fc838f59611c294356eb04d6e21cf66
+  bigdecimal (4.1.3-java) sha256=9a6a1fa67723a27ab1b3a6d5526322d8c82170af03199da7c915b8d9a1770532
   bundler (4.0.13) sha256=19f08be7f27022cf0b89f27da0b044ae075e8270a9ef44ad248a932614e1ca3b
   coderay (1.1.3) sha256=dc530018a4684512f8f38143cd2a096c9f02a1fc2459edcfe534787a7fc77d4b
   colorator (1.1.0) sha256=e2f85daf57af47d740db2a32191d1bdfb0f6503a0dfbc8327d0c9154d5ddfc38
   concurrent-ruby (1.3.8) sha256=b2f1be836e968ccc78ccfce277ea79c72a88633f22306782c16ff23fb415d1e1
   connection_pool (3.0.2) sha256=33fff5ba71a12d2aa26cb72b1db8bba2a1a01823559fb01d29eb74c286e62e0a
-  console (1.37.0) sha256=8093b286c2595a063849c098594fee5155ecc7967d36f3aa8cbe7569c8f3efd7
+  console (1.38.0) sha256=35b82f59130e95e9be6b832d9e539c8b3988fc192e4a8e9a86ab4922f44ad5de
   csv (3.3.6) sha256=aba61e7e507a66f03d45cb1f3c4b6359861c3504038b422962875dce099e4456
   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
@@ -803,7 +804,7 @@ CHECKSUMS
   eventmachine (1.2.7-java) sha256=11ab7af3505f53ed7565d6a13fe73568fe0d6fac647c8816430e9c3171c8c58f
   factory_bot (6.6.0) sha256=1fc1b3b5620ec980a6a27aec1b6ec8c250ca82962e970e8a40f93e8d388d4b89
   faker (3.8.0) sha256=c147b308df73a90f27a4fc84f18d4c22ef0ad9c2a64b2b61c86fd0ca71753efc
-  faraday (2.14.3) sha256=1882247e6766615c8220b4392bf1d27f6ebb63d8e28267587cef1fb0bf37f278
+  faraday (2.14.4) sha256=9bb4408c44621b0dbaaaa39e5dbfc4dbe58cc6751b6eb94d16ae9e1f2f2fab6e
   faraday-net_http (3.4.4) sha256=0e78af151747ed1b00f33e25973b4bc220d7f16c00c39676817c8b12331eb588
   faraday-retry (2.4.0) sha256=7b79c48fb7e56526faf247b12d94a680071ff40c9fda7cf1ec1549439ad11ebe
   faraday_middleware-aws-sigv4 (1.0.1) sha256=a001ea4f687ca1c60bad8f2a627196905ce3dbf285e461dc153240e92eaabe8f
@@ -822,23 +823,23 @@ CHECKSUMS
   flatware (2.4.0) sha256=67623b700d53b2ce1d1ef98bef938600a136c804630fb2e74eade69c67e04559
   flatware-rspec (2.4.0) sha256=5c7494fab9bdddd3edd7348cccaf6ec2a483bbe473998700f086add713182938
   forwardable-extended (2.6.0) sha256=1bec948c469bbddfadeb3bd90eb8c85f6e627a412a3e852acfd7eaedbac3ec97
-  google-protobuf (4.36.0) sha256=2132fb002366b85a57fbb796333e2cb1f969126e05f9af32149709ba3fd397b5
-  google-protobuf (4.36.0-arm64-darwin) sha256=be182aac1cf55ccbbd27ec5a94d5b012069075f5c879d65423d33e6b2dec86f5
-  google-protobuf (4.36.0-java) sha256=fb5afe7a4a48ba082d7e7c557a2298b6a9a6cecadfd56e604c22060ba0d28f24
+  google-protobuf (4.36.2) sha256=2f8daff50ae14aad36ab0ccdcf284065fa71d726c444efe114e6db82ffe62494
+  google-protobuf (4.36.2-arm64-darwin) sha256=f70d810e6bbab9d8ad9c1d5fd685a21de4c10ad3ad32efb9455e17e5b1286917
+  google-protobuf (4.36.2-java) sha256=bca01a7ea84973f5b7296862dcf16e347b53aeda75d4c13d19b2d186b589bf3a
   graphql (2.6.9) sha256=afe7bc03164f1a61abc66a415744ffd315c5aca116c9f3438c57391a431e4fe5
   graphql-c_parser (1.1.4) sha256=8d3bf769ae935373ada877fe003036892b45be98c2fbcc6731dd82af2c3e0656
-  grpc-tools (1.83.1) sha256=d523499333d1b589520c16d3cec4e0527cd87d70de359d25c4261b5bdb032469
+  grpc-tools (1.84.0) sha256=f54767ec65e22553768d38a20d021ca2241c33ae2e96d51336152bbcc62578a8
   hana (1.3.7) sha256=5425db42d651fea08859811c29d20446f16af196308162894db208cac5ce9b0d
   hashdiff (1.2.1) sha256=9c079dbc513dfc8833ab59c0c2d8f230fa28499cc5efb4b8dd276cf931457cd1
   hashery (2.1.2) sha256=d239cc2310401903f6b79d458c2bbef5bf74c46f3f974ae9c1061fb74a404862
   html-proofer (5.2.2) sha256=6e5e63c89ef9413246eeffaeba8dd03db62546992d7a2b85d166ac2a5903a241
-  http-2 (1.2.2) sha256=81b5d45f50fd4cd5f8c5d09651184bec9401e3ef169c3eb3e5b003d5614a92b9
+  http-2 (1.2.3) sha256=f4e3a7000e9a8ab97595f09eac44c6ec10a2aa438360758124df0ca5bcb280d4
   http_parser.rb (0.8.1) sha256=9ae8df145b39aa5398b2f90090d651c67bd8e2ebfe4507c966579f641e11097a
-  httpx (1.8.3) sha256=cb88f2285c4ef17164d803a640dc393d28722cba7f282ad0e7f9f926cd02dc47
+  httpx (1.8.4) sha256=1782ecde81eb4e961ad8735ec74a6fec8e60efeaa4592c6b2f55d72e19aaeca8
   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
-  io-console (0.9.2) sha256=efa74f891dd03c0939a931dfc6e74c2813d904763d456ea9762b0525e748db08
-  io-console (0.9.2-java) sha256=929c09163ad227cda17f5dc57861b995dbecf69c7ca2ce7b0c5f941f1f3da7d3
-  io-event (1.21.1) sha256=b3088f89ad67edf9be9fc2f48a5fae0790e92862487551eeb337b49098eb99e6
+  io-console (0.9.4) sha256=a403304f32928ee85e56d457b4612ca43f2703b561a3258844992bd24085fbb1
+  io-console (0.9.4-java) sha256=789188c38b937fc2d04400e35fd3b2838ffdf061e846571e51524036bc1bc185
+  io-event (1.22.1) sha256=0dd054cefe4a29f1b8286604f332c14f3208d75f54902961e91e94d45e5e1600
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   jar-dependencies (0.5.7) sha256=013ce5f4639414ac8cf1169cdbe763da164b81e2d2c983d11042b5ff7bfcce80
   jekyll (4.4.1) sha256=4c1144d857a5b2b80d45b8cf5138289579a9f8136aadfa6dd684b31fe2bc18c1
@@ -861,8 +862,8 @@ CHECKSUMS
   mini_portile2 (2.8.9) sha256=0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289
   minitest (6.0.6) sha256=153ea36d1d987a62942382b61075745042a2b3123b1cd48f4c3675af9cc7d6f1
   module_methods (1.0.0) sha256=92f28a9254b8c1a7f4e68aa52242ecabdac3343ce41909aac3fcc3bf2ac8ec5e
-  multi_json (1.21.1) sha256=e6126a31808e3b4d19f483c775ceac34df190dffa62adfb63a165ee14ba68080
-  multi_json (1.21.1-java) sha256=45d4895647d645a64bea1fa510b50e645af1f94ec6738497127de38d40f6d968
+  multi_json (1.21.2) sha256=245531eaf54bdba57aba515ff08b4503505c5e09911daa89c5a561e2f85bea8e
+  multi_json (1.21.2-java) sha256=143420c19317446b3679e853e835625e06bbc4e61e89f6894e0e217ca7dc0e36
   net-http (0.9.1) sha256=25ba0b67c63e89df626ed8fac771d0ad24ad151a858af2cc8e6a716ca4336996
   nokogiri (1.19.4) sha256=50c951611c92bca05c51411aef45f1cbc50f2821c4802758c5c6d34696533ab5
   nokogiri (1.19.4-arm-linux-gnu) sha256=a301313e38bb065d68239e79734bcd6f56fb6efaacebde29e9abf2a4735340ca
@@ -871,7 +872,7 @@ CHECKSUMS
   nokogiri (1.19.4-java) sha256=ce04b9e268c9626852231a48b49128ed52034f1ccb39484a6da3875491cd709e
   opensearch-ruby (3.4.0) sha256=0a8621686bed3c59b4c23e08cbaef873685a3fe4568e9d2703155ca92b8ca05d
   optimist (3.2.1) sha256=8cf8a0fd69f3aa24ab48885d3a666717c27bc3d9edd6e976e18b9d771e72e34e
-  parallel (2.1.0) sha256=b35258865c2e31134c5ecb708beaaf6772adf9d5efae28e93e99260877b09356
+  parallel (2.2.0) sha256=e1059c5fd7b649558a0aec38a769f06a42942bdb40503d005a59c352fe011cd8
   parser (3.3.12.0) sha256=21a6d7f755d5a24dfbdc6e6b772e4e879a52e7631a88bc5a3a134606052c9828
   pathutil (0.16.2) sha256=e43b74365631cab4f6d5e4228f812927efc9cb2c71e62976edcb252ee948d589
   patience_diff (1.2.0) sha256=f492094486af02fff4a80070fa6b4d0ebbcf4d42fb38bba29d095eef43f6822c
@@ -893,7 +894,7 @@ CHECKSUMS
   rbs (4.2.0-java) sha256=a19282d89c307dd6d33c6a72cc60f75b10d6d35a5996796e864789c903cddb3c
   rdoc (8.0.0) sha256=03bf8c08a9639658855a0cfd77c0abca8325c227693f7f33f82957811348c469
   redcarpet (3.6.1) sha256=d444910e6aa55480c6bcdc0cdb057626e8a32c054c29e793fa642ba2f155f445
-  regexp_parser (2.12.0) sha256=35a916a1d63190ab5c9009457136ae5f3c0c7512d60291d0d1378ba18ce08ebb
+  regexp_parser (2.13.0) sha256=d105d95d2138954e73914d2fbfb3d0a8f8605a49a3e89864c32e78b9107cb770
   reline (0.7.0) sha256=5b012d8e55dbf9d450f12bde2cf7d15ff546ae80b3f8f3b30e570d431815583d
   rexml (3.4.4) sha256=19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142
   rouge (4.6.0)
@@ -911,21 +912,21 @@ CHECKSUMS
   rubocop-rspec (3.10.2) sha256=0b3e2ecc592cd10ecbf0095bb58d1e357905276e069643523cc19eb7495f65e2
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   safe_yaml (1.0.5) sha256=a6ac2d64b7eb027bdeeca1851fe7e7af0d668e133e8a88066a0c6f7087d9f848
-  sass-embedded (1.103.1) sha256=a47bdc1dc3de2a8181c68f8da1396748eb8776dde71df08daa080dccc38f5cf0
-  sass-embedded (1.103.1-aarch64-linux-android) sha256=5905fb8567192c8b391e5aa2db8d3db9f7e866c5eff32ec3be96ac79a389085d
-  sass-embedded (1.103.1-aarch64-mingw-ucrt) sha256=d2a46c4a30ed40c6c0640c346746a5e9caf72323c10a18429cecdf7e415e8565
-  sass-embedded (1.103.1-arm-linux-androideabi) sha256=a2edbc498e324c51fc5b3b7a4168b75295d33cc95e49cb1dbf2aeea7e4150752
-  sass-embedded (1.103.1-arm-linux-gnueabihf) sha256=1388f692fd7c76d3fe03fb8d79a45ca89586a1fa19a8718faf875f457bed4169
-  sass-embedded (1.103.1-arm-linux-musleabihf) sha256=9e2a3cf86576d96fd16ebd1fbd4333e72c3df6b1990e5273d5a3b4d2e1eec4ac
-  sass-embedded (1.103.1-arm64-darwin) sha256=b4afa0515a8bdb9949675bc85a3625b676bd11080b4d5b5134282729762a2261
-  sass-embedded (1.103.1-riscv64-linux-android) sha256=3de9d13ba48e93fd8c361c576cbadbc89d60b98223cbb932bf5b7ce4167ebd03
-  sass-embedded (1.103.1-riscv64-linux-gnu) sha256=291f37e6d7317dc9fc07e264b8f86a7d156d68e2d3ef55b9014bb2d88d0b5234
-  sass-embedded (1.103.1-riscv64-linux-musl) sha256=49f72d4b31d668f0b90f8c02e507840078a66a91fbc96570254a9a3b3163b2b9
-  sass-embedded (1.103.1-x86_64-linux-android) sha256=23e4545427223ceb3c9b293e10e5eaf60f2499151d2abdc647897a086e410775
+  sass-embedded (1.105.0) sha256=322f46df344e5d974fc808fa2a6fe973a02932c21545402a25ac5b7aee62ff5f
+  sass-embedded (1.105.0-aarch64-linux-android) sha256=1153c80152059a0c7b9c1a1f2fed7c527f2d06d6c7ffd2a5b2212283ef5cf3e5
+  sass-embedded (1.105.0-aarch64-mingw-ucrt) sha256=29fcda1caae01ef820fa73dbb68c82c8989325ed799222d4b1cd51c8e4857d22
+  sass-embedded (1.105.0-arm-linux-androideabi) sha256=6ccb0ed5710098a6d3df68567d270c04d659a9c69233cc6455fbb7d0aa399d89
+  sass-embedded (1.105.0-arm-linux-gnueabihf) sha256=32562783fcddcb83f1530b079c2920acffea40affc7bbbde4e0434fb5eb44b1b
+  sass-embedded (1.105.0-arm-linux-musleabihf) sha256=b1e766f2d95a8e08446640013fa00d8b006fe1679c7adabc54f3e9cd09aaa6a0
+  sass-embedded (1.105.0-arm64-darwin) sha256=c9a7bdcf976b03c7a420df25de1ce39255cc8c9776117ea20bcf0fe7cbadee3f
+  sass-embedded (1.105.0-riscv64-linux-android) sha256=7b1f3ba3b2eab5ee45dc028f892685481f18c05e04eb2e0e107f28eee068c03e
+  sass-embedded (1.105.0-riscv64-linux-gnu) sha256=d0ac6793b8af67c43a7b9976d5c42869fd728b7300d212718b263437ff724e5d
+  sass-embedded (1.105.0-riscv64-linux-musl) sha256=1874212cd688b52726d4bad085794ba348c230187761807d18fa381eb3b13f14
+  sass-embedded (1.105.0-x86_64-linux-android) sha256=893c960a3456645dc8d810266577eb5410e2665460617146ab63d4bdcda14de9
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
-  simplecov (1.1.1) sha256=25825ef13f0b2e74694d769817dad6ab8e90131dabdaa666e522fea105521e78
+  simplecov (1.3.1) sha256=b326d38e819053499aa2ebe35d544d8bd780eba143a50f48a624b450ad87feec
   simplecov-console (0.9.5) sha256=b1108bcfff5f210143e2b8301698c367b01586f20d25a73e95475a5df6fc6ff6
-  simpleidn (0.2.3) sha256=08ce96f03fa1605286be22651ba0fc9c0b2d6272c9b27a260bc88be05b0d2c29
+  simpleidn (0.3.0) sha256=12ca730bed2f3db04d11e9bfd1bca3e11fb37f55b21eb2e9793fb5814bf54d03
   standard (1.56.0) sha256=ae2af4d9669589162ac69ed5ef59dcf9f346d4afc81f7e62b84339310dfcb787
   standard-custom (1.0.2) sha256=424adc84179a074f1a2a309bb9cf7cd6bfdb2b6541f20c6bf9436c0ba22a652b
   standard-performance (1.9.0) sha256=49483d31be448292951d80e5e67cdcb576c2502103c7b40aec6f1b6e9c88e3f2
