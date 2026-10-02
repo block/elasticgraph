@@ -122,8 +122,8 @@ module ElasticGraph
           )
         end
 
-        def index_field_with(source: SELF_RELATIONSHIP_NAME)
-          IndexField.new(source: source)
+        def index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: false)
+          IndexField.new(source: source, doc_values_eligible: doc_values_eligible)
         end
 
         def enum_type_with(values_by_name: {})

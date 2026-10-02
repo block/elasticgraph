@@ -389,6 +389,19 @@ properties:
         - 100
         - 500
         - 1000
+      experimental_field_retrieval:
+        description: Experimental retrieval policy. automatic uses doc values for
+          eligible source-free scalar selections. Keep source stored, validate existing
+          index mappings, and retain the default doc-value search limit (at least
+          100) before opting in.
+        type: string
+        enum:
+        - source
+        - automatic
+        examples:
+        - source
+        - automatic
+        default: source
       slow_query_latency_warning_threshold_in_ms:
         description: Queries that take longer than this configured threshold will
           have a sanitized version logged so that they can be investigated.

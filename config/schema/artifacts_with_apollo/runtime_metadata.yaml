@@ -1886,14 +1886,17 @@ index_definitions_by_name:
       __counts.shapes|type:
         source: __self
       full_address:
+        doc_values_eligible: true
         source: __self
       geo_location.lat:
         source: __self
       geo_location.lon:
         source: __self
       id:
+        doc_values_eligible: true
         source: __self
       manufacturer_id:
+        doc_values_eligible: true
         source: __self
       shapes.coordinates:
         source: __self
@@ -1922,12 +1925,16 @@ index_definitions_by_name:
       created_at:
         source: __self
       designer_name:
+        doc_values_eligible: true
         source: design
       id:
+        doc_values_eligible: true
         source: __self
       name:
+        doc_values_eligible: true
         source: __self
       owner_id:
+        doc_values_eligible: true
         source: __self
       owner_ids:
         source: __self
@@ -1944,12 +1951,15 @@ index_definitions_by_name:
       widget_cost.currency:
         source: widget
       widget_name:
+        doc_values_eligible: true
         source: widget
       widget_size:
+        doc_values_eligible: true
         source: widget
       widget_tags:
         source: widget
       widget_workspace_id3:
+        doc_values_eligible: true
         source: widget
     has_had_multiple_sources: true
     route_with: id
@@ -1958,12 +1968,15 @@ index_definitions_by_name:
     - __self
     fields_by_path:
       active:
+        doc_values_eligible: true
         source: __self
       established_on:
         source: __self
       id:
+        doc_values_eligible: true
         source: __self
       name:
+        doc_values_eligible: true
         source: __self
     route_with: id
   electrical_parts:
@@ -1976,12 +1989,16 @@ index_definitions_by_name:
       created_at:
         source: __self
       id:
+        doc_values_eligible: true
         source: __self
       manufacturer_id:
+        doc_values_eligible: true
         source: __self
       name:
+        doc_values_eligible: true
         source: __self
       voltage:
+        doc_values_eligible: true
         source: __self
     route_with: id
   manufacturers:
@@ -2000,8 +2017,10 @@ index_definitions_by_name:
       created_at:
         source: __self
       id:
+        doc_values_eligible: true
         source: __self
       name:
+        doc_values_eligible: true
         source: __self
     route_with: id
   mechanical_parts:
@@ -2014,12 +2033,16 @@ index_definitions_by_name:
       created_at:
         source: __self
       id:
+        doc_values_eligible: true
         source: __self
       manufacturer_id:
+        doc_values_eligible: true
         source: __self
       material:
+        doc_values_eligible: true
         source: __self
       name:
+        doc_values_eligible: true
         source: __self
     route_with: id
   named_inventors:
@@ -2027,12 +2050,16 @@ index_definitions_by_name:
     - __self
     fields_by_path:
       id:
+        doc_values_eligible: true
         source: __self
       name:
+        doc_values_eligible: true
         source: __self
       nationality:
+        doc_values_eligible: true
         source: __self
       stock_ticker:
+        doc_values_eligible: true
         source: __self
     route_with: id
   physical_stores:
@@ -2040,10 +2067,12 @@ index_definitions_by_name:
     - __self
     fields_by_path:
       active:
+        doc_values_eligible: true
         source: __self
       established_on:
         source: __self
       id:
+        doc_values_eligible: true
         source: __self
     route_with: id
   sponsors:
@@ -2051,8 +2080,10 @@ index_definitions_by_name:
     - __self
     fields_by_path:
       id:
+        doc_values_eligible: true
         source: __self
       name:
+        doc_values_eligible: true
         source: __self
     route_with: id
   teams:
@@ -2181,8 +2212,10 @@ index_definitions_by_name:
       __counts.won_championships_at:
         source: __self
       country_code:
+        doc_values_eligible: true
         source: __self
       current_name:
+        doc_values_eligible: true
         source: __self
       current_players_nested.__counts.affiliations|sponsorships_nested:
         source: __self
@@ -2285,8 +2318,10 @@ index_definitions_by_name:
       formed_on:
         source: __self
       id:
+        doc_values_eligible: true
         source: __self
       league:
+        doc_values_eligible: true
         source: __self
       nested_fields2.current_players.__counts.affiliations|sponsorships_nested:
         source: __self
@@ -2980,18 +3015,22 @@ index_definitions_by_name:
       details.unit:
         source: __self
       id:
+        doc_values_eligible: true
         source: __self
       introduced_on:
         source: __self
       max_weight_in_ng:
+        doc_values_eligible: true
         source: __self
       name:
+        doc_values_eligible: true
         source: __self
       nested_fields.max_widget_cost:
         source: __self
       oldest_widget_created_at:
         source: __self
       primary_continent:
+        doc_values_eligible: true
         source: __self
       widget_fee_currencies:
         source: __self
@@ -3012,8 +3051,10 @@ index_definitions_by_name:
     - __self
     fields_by_path:
       id:
+        doc_values_eligible: true
         source: __self
       name:
+        doc_values_eligible: true
         source: __self
       widget.created_at:
         source: __self
@@ -3045,6 +3086,7 @@ index_definitions_by_name:
       __counts.tags:
         source: __self
       amount_cents:
+        doc_values_eligible: true
         source: __self
       amounts:
         source: __self
@@ -3057,12 +3099,16 @@ index_definitions_by_name:
       cost_currency_introduced_on:
         source: __self
       cost_currency_name:
+        doc_values_eligible: true
         source: __self
       cost_currency_primary_continent:
+        doc_values_eligible: true
         source: __self
       cost_currency_symbol:
+        doc_values_eligible: true
         source: __self
       cost_currency_unit:
+        doc_values_eligible: true
         source: __self
       created_at:
         source: __self
@@ -3077,6 +3123,7 @@ index_definitions_by_name:
       fees.currency:
         source: __self
       id:
+        doc_values_eligible: true
         source: __self
       internal_details.name:
         source: __self
@@ -3097,6 +3144,7 @@ index_definitions_by_name:
       metadata:
         source: __self
       name:
+        doc_values_eligible: true
         source: __self
       name_text:
         source: __self
@@ -3131,12 +3179,15 @@ index_definitions_by_name:
       the_opts.the_sighs:
         source: __self
       weight_in_ng:
+        doc_values_eligible: true
         source: __self
       weight_in_ng_str:
         source: __self
       workspace_id2:
+        doc_values_eligible: true
         source: __self
       workspace_name:
+        doc_values_eligible: true
         source: workspace
     has_had_multiple_sources: true
     rollover:

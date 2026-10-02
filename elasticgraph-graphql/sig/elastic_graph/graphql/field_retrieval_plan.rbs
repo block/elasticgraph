@@ -1,0 +1,19 @@
+module ElasticGraph
+  class GraphQL
+    class FieldRetrievalPlanSupertype
+      attr_reader source: bool | Hash[Symbol, Array[String]]
+      attr_reader docvalue_fields: Array[String]
+      attr_reader reason: String
+
+      def initialize: (source: bool | Hash[Symbol, Array[String]], docvalue_fields: Array[String], reason: String) -> void
+    end
+
+    class FieldRetrievalPlan < FieldRetrievalPlanSupertype
+      SOURCE: FieldRetrievalPlan
+
+      def with: (?reason: String) -> FieldRetrievalPlan
+      def to_datastore_body: () -> Hash[Symbol, untyped]
+      def decode: (Hash[String, untyped]) -> Hash[String, untyped]
+    end
+  end
+end

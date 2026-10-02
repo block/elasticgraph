@@ -15,6 +15,12 @@ module ElasticGraph
       RSpec.describe IndexField do
         include RuntimeMetadataSupport
 
+        it "round-trips eligibility while omitting it from older metadata" do
+          eligible = index_field_with(doc_values_eligible: true)
+          expect(IndexField.from_hash(eligible.to_dumpable_hash)).to eq eligible
+          expect(index_field_with.to_dumpable_hash).not_to have_key("doc_values_eligible")
+        end
+
         it "builds from a minimal hash" do
           field = IndexField.from_hash({})
 
