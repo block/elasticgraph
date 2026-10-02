@@ -161,30 +161,58 @@ module ElasticGraph
             ]
           end
 
-          it "returns no datastore bulk actions if the source document omits or nulls the id field of the update target" do
+          it "returns no datastore bulk actions if the source document omits the id field of the update target" do
             indexer = indexer_with_widget_workspace_index_definition do |index|
               # no customization
             end
+            record = event.record.except("workspace_id")
 
-            [event.record.except("workspace_id"), event.record.merge("workspace_id" => nil)].each do |record|
-              expect(operations_for_indexer(indexer, event: event.with(record: record))).to eq []
-            end
+            expect(operations_for_indexer(indexer, event: event.with(record: record))).to eq []
           end
 
-          it "returns no datastore bulk actions if a nested id's parent or leaf is absent or null" do
+          it "returns no datastore bulk actions if the source document nulls the id field of the update target" do
+            indexer = indexer_with_widget_workspace_index_definition do |index|
+              # no customization
+            end
+            record = event.record.merge("workspace_id" => nil)
+
+            expect(operations_for_indexer(indexer, event: event.with(record: record))).to eq []
+          end
+
+          it "returns no datastore bulk actions if a nested id's parent is absent" do
             indexer = indexer_with_widget_workspace_index_definition(id_source: "embedded_values.workspace_id") do |index|
               # no customization
             end
-            records = [
-              event.record.except("embedded_values"),
-              event.record.merge("embedded_values" => nil),
-              event.record.merge("embedded_values" => {"name" => "embedded_name"}),
-              event.record.merge("embedded_values" => {"workspace_id" => nil})
-            ]
+            record = event.record.except("embedded_values")
 
-            records.each do |record|
-              expect(operations_for_indexer(indexer, event: event.with(record: record))).to eq []
+            expect(operations_for_indexer(indexer, event: event.with(record: record))).to eq []
+          end
+
+          it "returns no datastore bulk actions if a nested id's parent is null" do
+            indexer = indexer_with_widget_workspace_index_definition(id_source: "embedded_values.workspace_id") do |index|
+              # no customization
             end
+            record = event.record.merge("embedded_values" => nil)
+
+            expect(operations_for_indexer(indexer, event: event.with(record: record))).to eq []
+          end
+
+          it "returns no datastore bulk actions if a nested id's leaf is absent" do
+            indexer = indexer_with_widget_workspace_index_definition(id_source: "embedded_values.workspace_id") do |index|
+              # no customization
+            end
+            record = event.record.merge("embedded_values" => {"name" => "embedded_name"})
+
+            expect(operations_for_indexer(indexer, event: event.with(record: record))).to eq []
+          end
+
+          it "returns no datastore bulk actions if a nested id's leaf is null" do
+            indexer = indexer_with_widget_workspace_index_definition(id_source: "embedded_values.workspace_id") do |index|
+              # no customization
+            end
+            record = event.record.merge("embedded_values" => {"workspace_id" => nil})
+
+            expect(operations_for_indexer(indexer, event: event.with(record: record))).to eq []
           end
 
           it "still raises if a nested id's parent has a malformed non-object shape" do
