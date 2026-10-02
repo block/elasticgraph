@@ -5,61 +5,53 @@ module ElasticGraph
         extend _BuildableFromParsedYaml[FieldNumberMappings]
         extend Support::FromYamlFile[FieldNumberMappings]
 
+        type contract = ::Hash[::String, untyped]
+        type contracts = ::Hash[::String, contract]
         type fieldNumbersByName = ::Hash[::String, ::Integer]
-
-        class MessageMapping
-          attr_reader field_numbers_by_name: fieldNumbersByName
-          attr_reader next_number: ::Integer
-
-          def self.new: (field_numbers_by_name: fieldNumbersByName, next_number: ::Integer) -> instance
-          def with: (?field_numbers_by_name: fieldNumbersByName, ?next_number: ::Integer) -> instance
-        end
-
-        class EnumMapping
-          attr_reader value_numbers_by_name: fieldNumbersByName
-          attr_reader next_number: ::Integer
-
-          def self.new: (value_numbers_by_name: fieldNumbersByName, next_number: ::Integer) -> instance
-          def with: (?value_numbers_by_name: fieldNumbersByName, ?next_number: ::Integer) -> instance
-        end
 
         MAX_FIELD_NUMBER: ::Integer
         RESERVED_FIELD_NUMBER_RANGE: ::Range[::Integer]
         MAX_ENUM_VALUE_NUMBER: ::Integer
+        INTEGER_WIDENINGS: ::Hash[::String, ::String]
         JSON_SCHEMA: ::Hash[::String, untyped]
         VALIDATOR: Support::JSONSchema::Validator
 
-        @message_mappings_by_name: ::Hash[::String, MessageMapping]
-        @enum_mappings_by_name: ::Hash[::String, EnumMapping]
+        @mappings: ::Hash[::String, contracts]
+        @warnings: ::Array[::String]
+        attr_reader warnings: ::Array[::String]
 
-        def self.parse_messages: (::Hash[::String, untyped]) -> ::Hash[::String, MessageMapping]
-        def self.parse_enums: (::Hash[::String, untyped]) -> ::Hash[::String, EnumMapping]
-        def self.verify_next_number_is_after_mapped_numbers: (::String, ::Integer, fieldNumbersByName) -> void
-        def self.verify_no_number_collisions: (::Hash[::String, ::Integer], ::String) -> void
-
-        def initialize: (
-          message_mappings_by_name: ::Hash[::String, MessageMapping],
-          enum_mappings_by_name: ::Hash[::String, EnumMapping]
-        ) -> void
-
-        def field_number_for: (
-          message_name: ::String,
-          public_field_name: ::String,
-          previous_field_names: ::Array[::String]
-        ) -> ::Integer
+        def initialize: (::Hash[::String, untyped]) -> void
+        def type_contract_for: (section: ::String, public_name: ::String, ?previous_names: ::Array[::String]) -> contract
+        def field_contract_for: (
+          message_name: ::String, public_field_name: ::String,
+          ?previous_field_names: ::Array[::String], proto_type: ::String,
+          ?list_depth: ::Integer, ?proto_name: ::String?
+        ) -> contract
+        def retire_fields: (::String, ::Array[::String], ?deleted_names: ::Array[::String], ?synthetic: bool) -> void
+        def retire_types: (::Array[::String], ::Array[::String]) -> void
+        def enum_value_contract_for: (enum_name: ::String, public_name: ::String, proto_name: ::String, ?previous_names: ::Array[::String]) -> contract
+        def retire_enum_values: (::String, ::Array[::String]) -> void
+        def messages: () -> contracts
+        def enums: () -> contracts
         def next_field_number_for: (::String) -> ::Integer
-        def reserved_field_numbers_for: (::String, ::Array[::String]) -> fieldNumbersByName
-        def enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
         def next_enum_value_number_for: (::String) -> ::Integer
-        def reserved_enum_value_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]
+        def reserved_field_numbers_for: (::String, ::Array[::String]) -> fieldNumbersByName
+        def reserved_enum_value_numbers_for: (::String, ::Array[::String]) -> fieldNumbersByName
         def to_dumpable_hash: () -> ::Hash[::String, untyped]
 
         private
 
-        def message_mapping_for: (::String) -> MessageMapping
-        def enum_mapping_for: (::String) -> EnumMapping
-        def reserved_numbers_by_name: (fieldNumbersByName, ::Array[::String]) -> fieldNumbersByName
-        def allocate_field_number: (::String, ::String, MessageMapping) -> MessageMapping
+        def message_mapping_for: (::String) -> contract
+        def enum_mapping_for: (::String) -> contract
+        def migrate_identity: (contracts, ::String, ::Array[::String], ::String) -> contract?
+        def identity_names: (::String, contract) -> ::Array[::String]
+        def compatible_type: (::String?, ::String, ::Integer, ::Integer) -> ::String?
+        def ensure_wire_name_available: (contract, ::String, ?except: contract?) -> void
+        def ensure_value_name_available: (contracts, ::String, ::String) -> void
+        def allocate_field_contract: (::String, contract, ::String, ::Integer) -> contract
+        def verify_numbers: (::String, ::Integer, fieldNumbersByName, ::String) -> void
+        def verify_wire_names: (::String, ::Array[[::String, contract]]) -> void
+        def verify_names: (::String, contracts) -> void
       end
     end
   end

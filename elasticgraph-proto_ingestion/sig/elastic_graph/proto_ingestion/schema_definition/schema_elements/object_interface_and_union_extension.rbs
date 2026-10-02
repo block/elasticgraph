@@ -4,10 +4,17 @@ module ElasticGraph
       module SchemaElements
         module ObjectInterfaceAndUnionExtension : ::ElasticGraph::SchemaDefinition::SchemaElements::ObjectType
           @proto_fields: ::Array[[
-            ::ElasticGraph::SchemaDefinition::SchemaElements::Field,
+            ::ElasticGraph::SchemaDefinition::SchemaElements::Field & FieldExtension,
             ::ElasticGraph::SchemaDefinition::Indexing::Field
           ]]?
 
+          def proto_field_overrides: () -> ::Hash[::String, ::Hash[::String, ::String]]
+          def self.proto_scalar_overrides_for: (
+            ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & ScalarTypeExtension, ?proto_type: ::String
+          ) -> ::Hash[::String, ::String]
+          @protobuf_contract: FieldNumberMappings::contract?
+          attr_accessor protobuf_contract: FieldNumberMappings::contract?
+          def renamed_from: (::String) -> void
           def proto_name: () -> ::String
           def proto_type_reference: (::String package_name) -> ::String
           def protobuf_import: () -> nil
@@ -18,21 +25,23 @@ module ElasticGraph
             ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference
           ) -> [::Integer, ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference]
 
+          def proto_fields: () -> ::Array[[
+            ::ElasticGraph::SchemaDefinition::SchemaElements::Field & FieldExtension,
+            ::ElasticGraph::SchemaDefinition::Indexing::Field
+          ]]
+
           private
 
           def render_proto_message: (Schema schema, ::String message_name, ::String package_name) -> ::String
           def render_proto_oneof: (Schema schema, ::String message_name, ::String package_name) -> ::String
-          def proto_fields: () -> ::Array[[
-            ::ElasticGraph::SchemaDefinition::SchemaElements::Field,
-            ::ElasticGraph::SchemaDefinition::Indexing::Field
-          ]]
           def field_comment_lines_for: (::String? doc_comment, ::String? field_comment) -> ::Array[::String]
           def proto_list_wrapper_name: (String, Integer, Integer) -> String
           def proto_list_wrapper_definitions: (String) -> Array[String]
           def proto_field_type_for: (
             ::ElasticGraph::SchemaDefinition::SchemaElements::TypeReference,
             package_name: ::String,
-            context_field_name: ::String
+            context_field_name: ::String,
+            proto_base_type: ::String
           ) -> [bool, ::String, ::String?]
         end
       end

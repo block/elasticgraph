@@ -273,14 +273,14 @@ module ElasticGraph
           end
 
           context "when an event is malformed in a way that also breaks building its operations", :expect_warning_logging do
-            # `Widget` requires `cost`, and its derived `WidgetCurrency` update target sources its id
-            # from `cost.currency`, so a `Widget` with no `cost` both fails validation and breaks
+            # `Widget` requires an object for `cost`, and its derived `WidgetCurrency` update target
+            # sources its id from `cost.currency`, so a scalar `cost` both fails validation and breaks
             # building the operations we attach to the `FailedEventError`. Reporting the malformation
             # matters more than reporting operations we are never going to run, and
             # `FailedEventError#operations` is documented as sometimes being empty for this reason.
             let(:event) do
               event = build_upsert_event(:widget, id: "1", __version: 1)
-              event.with(record: event.record.except("cost"))
+              event.with(record: event.record.merge("cost" => "not an object"))
             end
 
             it "still reports what was malformed instead of letting the second failure mask the first" do

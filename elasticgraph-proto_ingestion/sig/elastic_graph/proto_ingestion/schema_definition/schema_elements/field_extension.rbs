@@ -1,0 +1,15 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      module SchemaElements
+        module FieldExtension : ::ElasticGraph::SchemaDefinition::SchemaElements::Field
+          def protobuf: (name: ::String) -> void
+          @protobuf_name: ::String?
+          attr_reader protobuf_name: ::String?
+          @protobuf_contract: FieldNumberMappings::contract?
+          attr_accessor protobuf_contract: FieldNumberMappings::contract?
+        end
+      end
+    end
+  end
+end

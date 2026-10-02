@@ -57,7 +57,18 @@ module ElasticGraph
           #
           # @return [String]
           def proto_name
-            name
+            @protobuf_contract&.fetch("proto_name", name) || name
+          end
+
+          # @return [Hash<String, Object>, nil] historical enum identity
+          # @dynamic protobuf_contract, protobuf_contract=
+          attr_accessor :protobuf_contract
+
+          # Preserves this enum's protobuf identity across a public GraphQL rename.
+          # @param old_name [String]
+          # @return [void]
+          def renamed_from(old_name)
+            schema_def_state.register_renamed_type(name, from: old_name, defined_at: caller_locations(1, 1).to_a.fetch(0), defined_via: %(type.renamed_from "#{old_name}"))
           end
 
           # Returns the fully qualified name used to reference this enum from protobuf fields.
@@ -86,7 +97,19 @@ module ElasticGraph
           #
           # @return [String]
           def proto_enum_value_prefix
-            @proto_enum_value_prefix ||= Support::Casing.to_upper_snake(name)
+            Support::Casing.to_upper_snake(proto_name)
+          end
+
+          # Returns the values whose names can't be recovered by removing {#proto_enum_value_prefix}
+          # from their protobuf names, because upper-snake-casing changed them (e.g. `inStock`).
+          #
+          # @return [Hash<String, String>] value names, keyed by protobuf value name
+          def proto_enum_value_name_overrides
+            values_by_name.values.filter_map do |raw_value|
+              value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
+              proto_name = value.proto_name(proto_enum_value_prefix)
+              [proto_name, value.name] unless proto_name == "#{proto_enum_value_prefix}_#{value.name}"
+            end.to_h
           end
 
           # @private

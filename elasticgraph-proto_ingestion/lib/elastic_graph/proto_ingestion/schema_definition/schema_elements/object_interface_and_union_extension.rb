@@ -7,7 +7,10 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/proto_ingestion/record_validator"
+require "elastic_graph/proto_ingestion/runtime_schema"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/proto_documentation"
+require "elastic_graph/schema_artifacts/runtime_metadata/scalar_type"
 require "elastic_graph/support/casing"
 
 module ElasticGraph
@@ -56,7 +59,19 @@ module ElasticGraph
           #
           # @return [String]
           def proto_name
-            name
+            @protobuf_contract&.fetch("proto_name", name) || name
+          end
+
+          # @return [Hash<String, Object>, nil] resolved historical message identity
+          # @dynamic protobuf_contract, protobuf_contract=
+          attr_accessor :protobuf_contract
+
+          # Preserves this message's protobuf identity across a public GraphQL rename.
+          # Available on unions as well as the object/interface types that expose it in core.
+          # @param old_name [String]
+          # @return [void]
+          def renamed_from(old_name)
+            schema_def_state.register_renamed_type(name, from: old_name, defined_at: caller_locations(1, 1).to_a.fetch(0), defined_via: %(type.renamed_from "#{old_name}"))
           end
 
           # Returns the fully qualified name used to reference this message from protobuf fields.
@@ -81,6 +96,69 @@ module ElasticGraph
             nil
           end
 
+          # Ingestion facts about this type's fields that its protobuf message cannot express: a private
+          # `name_in_index`, and a scalar whose ingestion rules differ from those of its wire type's
+          # default scalar. Kept out of the public wire schema.
+          #
+          # @return [Hash<String, Hash<String, String>>] overrides keyed by field name; fields without any are omitted
+          def proto_field_overrides
+            return {} if abstract?
+
+            proto_fields.filter_map do |schema_field, field|
+              overrides = {} # : ::Hash[::String, ::String]
+              contract = schema_field.protobuf_contract # : FieldNumberMappings::contract
+              wire_name = contract.fetch("proto_name", schema_field.name)
+              overrides["public_name"] = schema_field.name unless wire_name == schema_field.name
+              overrides["name_in_index"] = field.name_in_index unless field.name_in_index == schema_field.name
+
+              base_type = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(field.type).last.resolved
+              if base_type.is_a?(::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType)
+                overrides.merge!(ObjectInterfaceAndUnionExtension.proto_scalar_overrides_for(_ = base_type, proto_type: contract.fetch("proto_type")))
+              end
+
+              [wire_name, overrides] unless overrides.empty?
+            end.to_h
+          end
+
+          # Returns how a field of the given scalar type must name its scalar, or an empty hash when
+          # ingesting it as its wire type's default scalar behaves the same. `string` scalars without
+          # validation rules or an indexing preparer (`ID`, `Cursor`, most custom scalars) behave like `String`.
+          #
+          # @param scalar [ElasticGraph::SchemaDefinition::SchemaElements::ScalarType]
+          # @return [Hash<String, String>]
+          def self.proto_scalar_overrides_for(scalar, proto_type: scalar.proto_name)
+            proto_type = proto_type.delete_prefix(".")
+            return {} if scalar.name == RuntimeSchema::DEFAULT_SCALARS_BY_PROTO_TYPE[proto_type]
+
+            scalar_name = scalar.type_ref.with_reverted_override.name
+            plain_string = proto_type == "string" &&
+              !RecordValidator::VALIDATED_SCALARS.include?(scalar_name) &&
+              scalar.runtime_metadata.indexing_preparer_ref == SchemaArtifacts::RuntimeMetadata::ScalarType::DEFAULT_INDEXING_PREPARER_REF
+            return {} if plain_string
+
+            overrides = {"type" => scalar.name}
+            overrides["scalar"] = scalar_name unless scalar_name == scalar.name
+            overrides
+          end
+
+          # Indexing fields used to reconcile the message's historical wire contract.
+          # @return [Array]
+          def proto_fields
+            @proto_fields ||= begin
+              unless schema_def_state.user_definition_complete
+                raise Errors::SchemaError, "Cannot access `proto_fields` until the schema definition is complete."
+              end
+
+              indexing_fields_by_name_in_index.values.filter_map do |raw_field|
+                schema_field = raw_field # : ::ElasticGraph::SchemaDefinition::SchemaElements::Field & FieldExtension
+                next if schema_field.name == "__typename"
+
+                indexing_field = schema_field.to_indexing_field # : ElasticGraph::SchemaDefinition::Indexing::Field
+                [schema_field, indexing_field] # : [::ElasticGraph::SchemaDefinition::SchemaElements::Field & FieldExtension, ::ElasticGraph::SchemaDefinition::Indexing::Field]
+              end
+            end
+          end
+
           private
 
           def render_proto_message(schema, message_name, package_name)
@@ -88,12 +166,15 @@ module ElasticGraph
 
             fields = proto_fields
             active_field_names = fields.map { |schema_field, _| schema_field.name }
-            documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
+            comments = [doc_comment, ("Public GraphQL type: #{name}." unless proto_name == name)].compact.join("\n")
+            documentation = ProtoDocumentation.comment_lines_for(comments).map { |line| "#{line}\n" }.join
             field_definitions = fields.map do |schema_field, field|
+              contract = schema_field.protobuf_contract # : FieldNumberMappings::contract
               repeated, field_type, field_comment = proto_field_type_for(
                 field.type,
                 package_name: package_name,
-                context_field_name: schema_field.name
+                context_field_name: contract.fetch("proto_name", schema_field.name),
+                proto_base_type: contract.fetch("proto_type")
               )
               field_number = schema.field_number_for(
                 message_name: message_name,
@@ -101,8 +182,14 @@ module ElasticGraph
                 public_field_name: schema_field.name
               )
               label = schema.field_label_prefix(repeated: repeated)
-              line = "  #{label}#{field_type} #{schema_field.name} = #{field_number};"
-              comment_lines = field_comment_lines_for(schema_field.doc_comment, field_comment)
+              wire_name = contract.fetch("proto_name", schema_field.name)
+              line = "  #{label}#{field_type} #{wire_name} = #{field_number};"
+              field_comments = [field_comment]
+              field_comments << "Public GraphQL field: #{schema_field.name}." unless wire_name == schema_field.name
+              if contract.fetch("proto_type") == "int64" && field.type.fully_unwrapped.name == "Int"
+                field_comments << "Accepted range: -2147483648 to 2147483647. Values outside this range are rejected."
+              end
+              comment_lines = field_comment_lines_for(schema_field.doc_comment, field_comments.compact.join("\n").then { |comment| comment.empty? ? nil : comment })
 
               [*comment_lines, line].join("\n")
             end
@@ -122,7 +209,8 @@ module ElasticGraph
           def render_proto_oneof(schema, message_name, package_name)
             # @type var abstract_type: ::ElasticGraph::SchemaDefinition::Mixins::HasSubtypes
             abstract_type = _ = self
-            documentation = ProtoDocumentation.comment_lines_for(doc_comment).map { |line| "#{line}\n" }.join
+            comments = [doc_comment, ("Public GraphQL type: #{name}." unless proto_name == name)].compact.join("\n")
+            documentation = ProtoDocumentation.comment_lines_for(comments).map { |line| "#{line}\n" }.join
             active_field_names = [] # : ::Array[::String]
             alternatives = abstract_type.recursively_resolve_subtypes.map do |subtype|
               proto_subtype = _ = subtype
@@ -148,21 +236,6 @@ module ElasticGraph
             PROTO
           end
 
-          def proto_fields
-            @proto_fields ||= begin
-              unless schema_def_state.user_definition_complete
-                raise Errors::SchemaError, "Cannot access `proto_fields` until the schema definition is complete."
-              end
-
-              indexing_fields_by_name_in_index.values.filter_map do |schema_field|
-                next if schema_field.name == "__typename"
-
-                indexing_field = schema_field.to_indexing_field # : ElasticGraph::SchemaDefinition::Indexing::Field
-                [schema_field, indexing_field] # : [::ElasticGraph::SchemaDefinition::SchemaElements::Field, ::ElasticGraph::SchemaDefinition::Indexing::Field]
-              end
-            end
-          end
-
           # Renders a field's documentation and its type's format comment as the `//` lines that go
           # above the field. Proto compilers attach these leading comments to the code they generate
           # for the field, whereas a trailing comment on the field line is usually discarded.
@@ -183,16 +256,17 @@ module ElasticGraph
 
           def proto_list_wrapper_definitions(package_name)
             proto_fields.flat_map do |schema_field, field|
-              depth, base_type = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(field.type)
+              depth, = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(field.type)
+              contract = schema_field.protobuf_contract # : FieldNumberMappings::contract
+              wire_name = contract.fetch("proto_name", schema_field.name)
               (1...depth).map do |level|
-                proto_base_type = _ = base_type.resolved
                 element_type = if level == depth - 1
-                  proto_base_type.proto_type_reference(package_name)
+                  contract.fetch("proto_type")
                 else
-                  ".#{package_name}.#{proto_name}.#{proto_list_wrapper_name(schema_field.name, level + 1, depth)}"
+                  ".#{package_name}.#{proto_name}.#{proto_list_wrapper_name(wire_name, level + 1, depth)}"
                 end
                 [
-                  "  message #{proto_list_wrapper_name(schema_field.name, level, depth)} {",
+                  "  message #{proto_list_wrapper_name(wire_name, level, depth)} {",
                   "    repeated #{element_type} values = 1;",
                   "  }"
                 ].join("\n")
@@ -200,14 +274,14 @@ module ElasticGraph
             end
           end
 
-          def proto_field_type_for(type_ref, package_name:, context_field_name:)
+          def proto_field_type_for(type_ref, package_name:, context_field_name:, proto_base_type:)
             list_depth, base_type_ref = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(type_ref)
 
             proto_type = _ = base_type_ref.resolved
             field_type = if list_depth > 1
               ".#{package_name}.#{proto_name}.#{proto_list_wrapper_name(context_field_name, 1, list_depth)}"
             else
-              proto_type.proto_type_reference(package_name)
+              proto_base_type
             end
             [list_depth >= 1, field_type, proto_type.protobuf_field_comment]
           end
