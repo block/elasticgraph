@@ -17,9 +17,19 @@ module ElasticGraph
     module SchemaSupport
       include ElasticGraph::SchemaDefinition::TestSupport
 
+      def proto_field_contract(number, proto_type = "string", list_depth: 0)
+        {"field_number" => number, "proto_type" => proto_type, "list_depth" => list_depth}
+      end
+
       def envelope_field_number_mapping(record_name)
         {
-          "fields" => {"op" => 1, "id" => 2, "version" => 3, "latency_timestamps" => 4, record_name => 5},
+          "fields" => {
+            "op" => proto_field_contract(1),
+            "id" => proto_field_contract(2),
+            "version" => proto_field_contract(3, "int64"),
+            "latency_timestamps" => proto_field_contract(4, "map<string, google.protobuf.Timestamp>", list_depth: 1),
+            record_name => proto_field_contract(5, ".elasticgraph.#{Support::Casing.to_title(record_name)}")
+          },
           "next_number" => 6
         }
       end
