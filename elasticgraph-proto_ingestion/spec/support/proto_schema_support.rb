@@ -28,8 +28,8 @@ module ElasticGraph
         define_proto_schema_results(**options, &block).proto_schema
       end
 
-      # Defines a schema, verifies its proto compiles, and returns its `Results`.
-      # Pass the results of a previous
+      # Defines a schema and returns its `Results`. When `VALIDATE_SCHEMA_ARTIFACTS` is set
+      # when this file loads, also verifies that its proto compiles. Pass the results of a previous
       # `define_proto_schema_results` call as `prior_results` to seed the new schema with the
       # field-number mappings the previous one generated, standing in for the
       # `proto_field_numbers.yaml` file that `schema_artifacts:dump` would have written between
@@ -49,8 +49,7 @@ module ElasticGraph
           block.call(schema)
         end
 
-        proto = results.proto_schema
-        run_protoc(proto, "--descriptor_set_out=#{::File::NULL}", "") unless proto.empty?
+        results.proto_schema
         results
       end
 
@@ -96,6 +95,9 @@ module ElasticGraph
             binmode: true,
             chdir: directory
           )
+          # simplecov:disable -- custom failure messages are only used during opt-in schema validation.
+          errors = yield(errors) if block_given?
+          # simplecov:enable
           expect(status.success?).to be(true), errors
           output
         end
@@ -131,6 +133,32 @@ module ElasticGraph
         result_lines.join.strip
       end
     end
+
+    # simplecov:disable -- only enabled for opt-in schema validation.
+    if ENV["VALIDATE_SCHEMA_ARTIFACTS"]
+      module ValidateProtoSchemas
+        def define_proto_schema_results(...)
+          super.tap do |results|
+            proto = results.proto_schema
+            next if proto.empty?
+
+            run_protoc(proto, "--descriptor_set_out=#{::File::NULL}", "") do |errors|
+              <<~EOS
+                This test generated a protobuf schema that can't be compiled by protoc. The error[^1] is shown below.
+                Note that the extra protobuf compilation validation is not applied by default when you run tests locally.
+                The extra validation runs on CI (where we are OK with the slow down that produces), and you can opt into
+                it by passing `VALIDATE_SCHEMA_ARTIFACTS=1` when running your tests.
+
+                [^1]: #{errors}
+              EOS
+            end
+          end
+        end
+
+        SchemaSupport.prepend(self)
+      end
+    end
+    # simplecov:enable
 
     RSpec.configure do |config|
       config.include SchemaSupport, :proto_schema

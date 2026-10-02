@@ -14,11 +14,11 @@
 # Here we define a method that uses the GraphQL gem to enforce the validity of our generated
 # schemas. However, parsing all our test schemas makes our tests 2-3 times slower. We don't
 # want to slow down every local test run to add this validation, so it's something that you can
-# opt in to via the `VALIDATE_GRAPHQL_SCHEMAS` env var. We also pass this env var from our CI
+# opt in to via the `VALIDATE_SCHEMA_ARTIFACTS` env var. We also pass this env var from our CI
 # build where it's ok if the test suite is slower.
 #
 # simplecov:disable -- only one of the two branches gets run on any test run.
-return unless ENV["VALIDATE_GRAPHQL_SCHEMAS"]
+return unless ENV["VALIDATE_SCHEMA_ARTIFACTS"]
 
 require "elastic_graph/schema_definition/test_support"
 require "graphql"
@@ -48,7 +48,7 @@ module ElasticGraph
         This test generated SDL that can't be parsed by the GraphQL gem. The error[^1] is shown below.
         Note that the extra GraphQL gem parsing validation is not applied by default when you run tests locally.
         The extra validation runs on CI (where we are OK with the slow down that produces), and you can opt into
-        it by passing `VALIDATE_GRAPHQL_SCHEMAS=1` when running your tests.
+        it by passing `VALIDATE_SCHEMA_ARTIFACTS=1` when running your tests.
 
         [^1]: #{e.message}
       EOS

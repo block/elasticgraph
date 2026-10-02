@@ -43,7 +43,7 @@ module ElasticGraph
             })
           end
 
-          # `:dont_validate_graphql_schema` matters here: with `VALIDATE_GRAPHQL_SCHEMAS=1` (as on CI), the
+          # `:dont_validate_graphql_schema` matters here: with `VALIDATE_SCHEMA_ARTIFACTS=1` (as on CI), the
           # eager SDL validation would raise this error during GraphQL schema generation, before the JSON
           # schema generation path exercises the wrapped `FieldReference#resolve` nil return that this
           # example exists to cover.
