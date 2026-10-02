@@ -100,15 +100,19 @@ module ElasticGraph
           original = build_upsert_event(:widget, id: "same-id", __version: 1)
           newer = original.with(version: 2)
           adapter = indexer.ingestion_adapters_by_format.fetch("json")
+          operation_groups = nil
+
           allow(adapter).to receive(:validate_event).and_wrap_original do |method, event, **options|
             result = method.call(event, **options)
-            IngestionAdapter::ValidationResult.valid(
-              result.event.with(record: result.event.record.merge("normalized" => true)), result.record_preparer
-            )
+            # Merge in an update to `event` to represent the adapter normalizing the event in some fashion.
+
+            event = result.event.with(record: result.event.record.merge("normalized" => true))
+            IngestionAdapter::ValidationResult.valid(event, result.record_preparer)
           end
-          operation_groups = nil
+
           allow(datastore_router).to receive(:bulk) do |operations, **|
             operation_groups = operations.group_by(&:event)
+
             DatastoreIndexingRouter::BulkResult.new({"main" => operations.map do |operation|
               result = if operation.event.version == 1
                 Operation::Result.failure_of(operation, "failed normalized event")
@@ -120,6 +124,7 @@ module ElasticGraph
           end
 
           failures = process_returning_failures([original, newer])
+
           expect(failures).not_to be_empty
           expect(failures.map(&:version).uniq).to eq([1])
           expect(failures.map(&:event)).to all have_attributes(record: a_hash_including("normalized" => true))
