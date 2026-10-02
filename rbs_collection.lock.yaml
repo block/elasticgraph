@@ -34,27 +34,27 @@ gems:
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: aws-sdk-cloudwatch
-  version: 1.146.0
+  version: 1.149.0
   source:
     type: rubygems
 - name: aws-sdk-core
-  version: 3.254.1
+  version: 3.257.0
   source:
     type: rubygems
 - name: aws-sdk-kms
-  version: 1.130.0
+  version: 1.132.0
   source:
     type: rubygems
 - name: aws-sdk-lambda
-  version: 1.193.0
+  version: 1.196.0
   source:
     type: rubygems
 - name: aws-sdk-s3
-  version: 1.229.0
+  version: 1.232.1
   source:
     type: rubygems
 - name: aws-sdk-sqs
-  version: 1.117.0
+  version: 1.119.0
   source:
     type: rubygems
 - name: base64
@@ -66,7 +66,7 @@ gems:
   source:
     type: stdlib
 - name: bigdecimal
-  version: 4.1.2
+  version: 4.1.3
   source:
     type: rubygems
 - name: cgi
@@ -342,7 +342,7 @@ gems:
   source:
     type: stdlib
 - name: simplecov
-  version: 1.1.1
+  version: 1.3.1
   source:
     type: rubygems
 - name: singleton
