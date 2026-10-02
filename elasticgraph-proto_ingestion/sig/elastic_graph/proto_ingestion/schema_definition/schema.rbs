@@ -32,7 +32,9 @@ module ElasticGraph
         def field_number_for: (
           message_name: ::String,
           type_name: ::String,
-          public_field_name: ::String
+          public_field_name: ::String,
+          proto_type: ::String,
+          list_depth: ::Integer
         ) -> ::Integer
         def next_field_number_for: (::String) -> ::Integer
         def reserved_field_numbers_for: (::String, ::Array[::String]) -> ::Hash[::String, ::Integer]

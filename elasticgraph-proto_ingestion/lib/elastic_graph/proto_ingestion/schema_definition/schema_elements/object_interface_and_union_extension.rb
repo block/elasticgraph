@@ -95,10 +95,14 @@ module ElasticGraph
                 package_name: package_name,
                 context_field_name: schema_field.name
               )
+              list_depth, base_type = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(field.type)
+              proto_base_type = _ = base_type.resolved
               field_number = schema.field_number_for(
                 message_name: message_name,
                 type_name: name,
-                public_field_name: schema_field.name
+                public_field_name: schema_field.name,
+                proto_type: proto_base_type.proto_type_reference(package_name),
+                list_depth: list_depth
               )
               label = schema.field_label_prefix(repeated: repeated)
               line = "  #{label}#{field_type} #{schema_field.name} = #{field_number};"
@@ -131,7 +135,9 @@ module ElasticGraph
               field_number = schema.field_number_for(
                 message_name: message_name,
                 type_name: name,
-                public_field_name: field_name
+                public_field_name: field_name,
+                proto_type: proto_subtype.proto_type_reference(package_name),
+                list_depth: 0
               )
               "    #{proto_subtype.proto_type_reference(package_name)} #{field_name} = #{field_number};"
             end

@@ -34,11 +34,32 @@ module ElasticGraph
             end
           end
 
+          it "requires complete field contracts and rejects the number-only format" do
+            invalid_contracts = [
+              1,
+              proto_field_contract(1).except("proto_type"),
+              proto_field_contract(1).except("list_depth"),
+              proto_field_contract(1, ""),
+              proto_field_contract(1, list_depth: -1),
+              proto_field_contract(1, list_depth: 1.5),
+              proto_field_contract(0),
+              proto_field_contract(19_000),
+              proto_field_contract(1).merge("unknown" => true)
+            ]
+            invalid_contracts.each do |contract|
+              expect {
+                FieldNumberMappings.from_parsed_yaml({
+                  "messages" => {"Account" => {"fields" => {"id" => contract}, "next_number" => 2}}
+                })
+              }.to raise_error(Errors::SchemaError, /Invalid protobuf field-number mappings/)
+            end
+          end
+
           describe "mapping consistency validation" do
             it "raises clear errors when fields or enum values collide" do
               expect {
                 FieldNumberMappings.from_parsed_yaml({
-                  "messages" => {"Account" => {"fields" => {"id" => 1, "name" => 1}, "next_number" => 2}}
+                  "messages" => {"Account" => {"fields" => {"id" => proto_field_contract(1), "name" => proto_field_contract(1)}, "next_number" => 2}}
                 })
               }.to raise_error(Errors::SchemaError, a_string_including(
                 "field-number mapping collision in message `Account`", "`id` and `name`", "number 1"
@@ -56,7 +77,7 @@ module ElasticGraph
             it "validates that each `next_number` is greater than every mapped number" do
               expect {
                 FieldNumberMappings.from_parsed_yaml({
-                  "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => 7}}
+                  "messages" => {"Account" => {"fields" => {"id" => proto_field_contract(7)}, "next_number" => 7}}
                 })
               }.to raise_error(Errors::SchemaError, a_string_including(
                 "`next_number` for message `Account`", "greater than every mapped number", "maximum: 7", "got: 7"
@@ -76,7 +97,7 @@ module ElasticGraph
             it "accepts maximum numbers while allowing enum values in the field-reserved range" do
               artifact = {
                 "messages" => {"Account" => {
-                  "fields" => {"id" => FieldNumberMappings::MAX_FIELD_NUMBER},
+                  "fields" => {"id" => proto_field_contract(FieldNumberMappings::MAX_FIELD_NUMBER)},
                   "next_number" => FieldNumberMappings::MAX_FIELD_NUMBER + 1
                 }},
                 # Enum value numbers have no protobuf-reserved range, so 19000-19999 is fine here.
@@ -97,7 +118,10 @@ module ElasticGraph
               messages:
                 Account:
                   fields:
-                    id: 7
+                    id:
+                      field_number: 7
+                      proto_type: string
+                      list_depth: 0
                   next_number: 8
               enums:
                 Status:
@@ -109,17 +133,50 @@ module ElasticGraph
             mappings = FieldNumberMappings.from_yaml_file("proto_field_numbers.yaml")
 
             expect(mappings.to_dumpable_hash).to eq({
-              "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => 8}},
+              "messages" => {"Account" => {"fields" => {"id" => proto_field_contract(7)}, "next_number" => 8}},
               "enums" => {"Status" => {"values" => {"ACTIVE" => 3}, "next_number" => 8}}
             })
           end
         end
 
         describe "#field_number_for" do
+          it "retains a nested-list contract through serialization without changing the input" do
+            artifact = {"messages" => {"Account" => {
+              "fields" => {"scores" => proto_field_contract(7, "int64", list_depth: 2)}, "next_number" => 10
+            }}}
+            original = Marshal.load(Marshal.dump(artifact))
+            mappings = FieldNumberMappings.from_parsed_yaml(artifact)
+            expect(mappings.field_number_for(message_name: "Account", public_field_name: "scores", previous_field_names: [], proto_type: "int64", list_depth: 2)).to eq(7)
+            expect(mappings.field_number_for(message_name: "Account", public_field_name: "name", previous_field_names: [], proto_type: "string", list_depth: 0)).to eq(10)
+            expect(artifact).to eq(original)
+            dumped = mappings.to_dumpable_hash
+            expect(dumped.dig("messages", "Account", "fields", "scores")).to eq(proto_field_contract(7, "int64", list_depth: 2))
+            expect(FieldNumberMappings.from_parsed_yaml(dumped).to_dumpable_hash).to eq(dumped)
+          end
+
+          it "rejects type and list-depth changes before renaming or allocating a number" do
+            mappings = FieldNumberMappings.from_parsed_yaml({"messages" => {"Account" => {
+              "fields" => {"score" => proto_field_contract(1, "int32")}, "next_number" => 2
+            }}})
+            original = mappings.to_dumpable_hash
+            [["score", [], "int64", 0], ["score", [], "int32", 1], ["points", ["score"], "string", 0]].each do |name, previous_names, proto_type, depth|
+              expect {
+                mappings.field_number_for(message_name: "Account", public_field_name: name, previous_field_names: previous_names, proto_type: proto_type, list_depth: depth)
+              }.to raise_error(Errors::SchemaError, a_string_including("Incompatible protobuf change", "retained int32", "Use a new field name"))
+              expect(mappings.to_dumpable_hash).to eq(original)
+            end
+          end
+
+          it "allocates past protobuf's reserved field-number range" do
+            mappings = FieldNumberMappings.from_parsed_yaml({"messages" => {"Account" => {"fields" => {}, "next_number" => 18_999}}})
+            expect(mappings.field_number_for(message_name: "Account", public_field_name: "id", previous_field_names: [], proto_type: "string", list_depth: 0)).to eq(18_999)
+            expect(mappings.next_field_number_for("Account")).to eq(20_000)
+          end
+
           it "raises a clear error when multiple previous field names have mappings" do
             mappings = FieldNumberMappings.from_parsed_yaml({
               "messages" => {"Account" => {
-                "fields" => {"first_name" => 1, "last_name" => 2},
+                "fields" => {"first_name" => proto_field_contract(1), "last_name" => proto_field_contract(2)},
                 "next_number" => 3
               }}
             })
@@ -128,7 +185,9 @@ module ElasticGraph
               mappings.field_number_for(
                 message_name: "Account",
                 public_field_name: "name",
-                previous_field_names: ["last_name", "first_name"]
+                previous_field_names: ["last_name", "first_name"],
+                proto_type: "string",
+                list_depth: 0
               )
             }.to raise_error(Errors::SchemaError, a_string_including(
               "Cannot preserve a protobuf field number for `Account.name`",
@@ -140,13 +199,13 @@ module ElasticGraph
           it "raises a clear error when the field-number range has been exhausted" do
             mappings = FieldNumberMappings.from_parsed_yaml({
               "messages" => {"Account" => {
-                "fields" => {"id" => FieldNumberMappings::MAX_FIELD_NUMBER},
+                "fields" => {"id" => proto_field_contract(FieldNumberMappings::MAX_FIELD_NUMBER)},
                 "next_number" => FieldNumberMappings::MAX_FIELD_NUMBER + 1
               }}
             })
 
             expect {
-              mappings.field_number_for(message_name: "Account", public_field_name: "name", previous_field_names: [])
+              mappings.field_number_for(message_name: "Account", public_field_name: "name", previous_field_names: [], proto_type: "string", list_depth: 0)
             }.to raise_error(Errors::SchemaError, a_string_including(
               "Cannot allocate another protobuf field number for message `Account`",
               "maximum field number (#{FieldNumberMappings::MAX_FIELD_NUMBER}) has been reached"
@@ -157,7 +216,7 @@ module ElasticGraph
         describe "allocation cursor readers" do
           it "returns stored cursors, defaulting to 1 for unmapped messages and enums" do
             mappings = FieldNumberMappings.from_parsed_yaml({
-              "messages" => {"Account" => {"fields" => {"id" => 7}, "next_number" => 10}},
+              "messages" => {"Account" => {"fields" => {"id" => proto_field_contract(7)}, "next_number" => 10}},
               "enums" => {"Status" => {"values" => {"ACTIVE" => 3}, "next_number" => 8}}
             })
 
@@ -208,7 +267,7 @@ module ElasticGraph
           it "returns mapped names that are not active, ordered by number" do
             mappings = FieldNumberMappings.from_parsed_yaml({
               "messages" => {"Account" => {
-                "fields" => {"name" => 3, "legacy_id" => 1, "id" => 2},
+                "fields" => {"name" => proto_field_contract(3), "legacy_id" => proto_field_contract(1), "id" => proto_field_contract(2)},
                 "next_number" => 4
               }},
               "enums" => {"Status" => {"values" => {"PAUSED" => 2, "ACTIVE" => 1}, "next_number" => 3}}
@@ -231,8 +290,8 @@ module ElasticGraph
             mappings = FieldNumberMappings.from_parsed_yaml(
               {
                 "messages" => {
-                  "ZMessage" => {"fields" => {"first" => 2, "second" => 1}, "next_number" => 3},
-                  "AMessage" => {"fields" => {"only" => 3}, "next_number" => 4}
+                  "ZMessage" => {"fields" => {"first" => proto_field_contract(2), "second" => proto_field_contract(1)}, "next_number" => 3},
+                  "AMessage" => {"fields" => {"only" => proto_field_contract(3)}, "next_number" => 4}
                 },
                 "enums" => {
                   "ZEnum" => {"values" => {"FIRST" => 2, "SECOND" => 1}, "next_number" => 3},
