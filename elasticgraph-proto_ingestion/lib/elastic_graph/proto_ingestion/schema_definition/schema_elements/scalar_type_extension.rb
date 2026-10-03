@@ -7,6 +7,8 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/proto_ingestion"
+require "elastic_graph/schema_artifacts/runtime_metadata/scalar_type"
 
 module ElasticGraph
   module ProtoIngestion
@@ -112,6 +114,25 @@ module ElasticGraph
           # @return [String]
           def proto_type_reference(_package_name)
             proto_name
+          end
+
+          # Returns the runtime metadata the indexer needs to ingest fields of this scalar type. Empty
+          # when the indexer's default scalar for this type's protobuf wire type has the same ingestion
+          # rules, or when this type is a plain string.
+          #
+          # @return [Hash<String, String>] `type` and, for a renamed built-in scalar, its original `scalar` name
+          def proto_ingestion_overrides
+            return {} if name == DEFAULT_SCALARS_BY_PROTO_TYPE[proto_name]
+
+            scalar_name = type_ref.with_reverted_override.name
+            plain_string = proto_name == "string" &&
+              !VALIDATED_SCALARS.include?(scalar_name) &&
+              runtime_metadata.indexing_preparer_ref == SchemaArtifacts::RuntimeMetadata::ScalarType::DEFAULT_INDEXING_PREPARER_REF
+            return {} if plain_string
+
+            overrides = {"type" => name}
+            overrides["scalar"] = scalar_name unless scalar_name == name
+            overrides
           end
         end
       end

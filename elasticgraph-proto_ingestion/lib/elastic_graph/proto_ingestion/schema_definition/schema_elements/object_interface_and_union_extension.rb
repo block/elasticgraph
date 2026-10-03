@@ -52,6 +52,25 @@ module ElasticGraph
             [list_depth, current]
           end
 
+          # Returns the runtime metadata the indexer needs for this message's fields, keyed by protobuf
+          # field name. Only fields whose index name differs from their public name, or whose scalar has
+          # ingestion rules beyond its protobuf wire type, are included. Abstract types have no fields.
+          #
+          # @return [Hash<String, Hash<String, String>>]
+          def proto_field_overrides
+            return {} if abstract?
+
+            proto_fields.filter_map do |schema_field, field|
+              overrides = {} # : ::Hash[::String, ::String]
+              overrides["name_in_index"] = field.name_in_index unless field.name_in_index == schema_field.name
+
+              base_type = _ = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(field.type).last.resolved
+              overrides.merge!(base_type.proto_ingestion_overrides)
+
+              [schema_field.name, overrides] unless overrides.empty?
+            end.to_h
+          end
+
           # Returns this type's name in protobuf schemas.
           #
           # @return [String]
@@ -79,6 +98,14 @@ module ElasticGraph
           # @return [nil]
           def protobuf_field_comment
             nil
+          end
+
+          # The indexer reads message structure from protobuf descriptors, so fields of this type
+          # need no ingestion overrides. Only scalar types have them.
+          #
+          # @return [Hash<String, String>]
+          def proto_ingestion_overrides
+            {}
           end
 
           private
