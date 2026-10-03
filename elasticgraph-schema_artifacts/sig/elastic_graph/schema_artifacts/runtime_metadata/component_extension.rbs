@@ -2,19 +2,19 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       class ComponentExtensionSupertype
-        attr_reader extension_ref: ::Hash[::String, untyped]
+        attr_reader extension_ref: extensionRef
 
         def initialize: (
-          extension_ref: ::Hash[::String, untyped]
+          extension_ref: extensionRef
         ) -> void
 
         def with: (
-          ?extension_ref: ::Hash[::String, untyped]
+          ?extension_ref: extensionRef
         ) -> instance
 
         def self.new:
-          (extension_ref: ::Hash[::String, untyped]) -> instance
-          | (::Hash[::String, untyped]) -> instance
+          (extension_ref: extensionRef) -> instance
+          | (extensionRef) -> instance
       end
 
       class ComponentExtension < ComponentExtensionSupertype

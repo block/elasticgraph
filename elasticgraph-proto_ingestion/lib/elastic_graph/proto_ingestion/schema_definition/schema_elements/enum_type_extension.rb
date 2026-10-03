@@ -82,6 +82,14 @@ module ElasticGraph
             nil
           end
 
+          # Enum value names are covered by {#proto_enum_value_name_overrides}, so fields of this
+          # type need no ingestion overrides. Only scalar types have them.
+          #
+          # @return [Hash<String, String>]
+          def proto_ingestion_overrides
+            {}
+          end
+
           # Returns the package-level prefix applied to this enum's protobuf values.
           #
           # @return [String]

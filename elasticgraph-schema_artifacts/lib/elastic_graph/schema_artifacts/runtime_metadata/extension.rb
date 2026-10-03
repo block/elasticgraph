@@ -40,11 +40,11 @@ module ElasticGraph
         # The serialized form of an extension.
         def to_dumpable_hash
           # Keys here are ordered alphabetically; please keep them that way.
-          {
-            "config" => Support::HashUtil.stringify_keys(config),
-            "name" => name,
-            "require_path" => require_path
-          }.reject { |_, v| v.empty? }
+          if config.empty?
+            {"name" => name, "require_path" => require_path}
+          else
+            {"config" => Support::HashUtil.stringify_keys(config), "name" => name, "require_path" => require_path}
+          end
         end
 
         def verify_against!(interface_def)

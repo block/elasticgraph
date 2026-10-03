@@ -13,6 +13,7 @@ module ElasticGraph
           def proto_type_reference: (::String package_name) -> ::String
           def protobuf_import: () -> nil
           def protobuf_field_comment: () -> nil
+          def proto_ingestion_overrides: () -> ::Hash[::String, ::String]
           def proto_enum_value_prefix: () -> ::String
           def proto_enum_value_name_overrides: () -> ::Hash[::String, ::String]
           def to_proto: (Schema schema, ::String package_name) -> ::String

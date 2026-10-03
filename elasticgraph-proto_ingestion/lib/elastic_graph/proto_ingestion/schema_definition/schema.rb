@@ -137,7 +137,9 @@ module ElasticGraph
           } # : ::Hash[::String, untyped]
 
           # The indexer can't load GraphQL's time zone list, so it's included when a field needs it.
-          if types.grep(SchemaElements::ScalarTypeExtension).any? { |type| type.type_ref.with_reverted_override.name == "TimeZone" }
+          # `TimeZone` is a validated scalar, so every `TimeZone` field has an override naming it.
+          field_overrides = metadata.fetch("fields").values.flat_map(&:values)
+          if field_overrides.any? { |overrides| overrides.fetch("scalar") { overrides["type"] } == "TimeZone" }
             metadata["time_zones"] = GraphQL::ScalarCoercionAdapters::VALID_TIME_ZONES.to_a
           end
 

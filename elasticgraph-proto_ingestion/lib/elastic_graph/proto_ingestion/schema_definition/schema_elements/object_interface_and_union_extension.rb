@@ -64,11 +64,8 @@ module ElasticGraph
               overrides = {} # : ::Hash[::String, ::String]
               overrides["name_in_index"] = field.name_in_index unless field.name_in_index == schema_field.name
 
-              base_type = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(field.type).last.resolved
-              if base_type.is_a?(::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType)
-                scalar_type = base_type # : ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType & ScalarTypeExtension
-                overrides.merge!(scalar_type.proto_ingestion_overrides)
-              end
+              base_type = _ = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(field.type).last.resolved
+              overrides.merge!(base_type.proto_ingestion_overrides)
 
               [schema_field.name, overrides] unless overrides.empty?
             end.to_h
@@ -101,6 +98,14 @@ module ElasticGraph
           # @return [nil]
           def protobuf_field_comment
             nil
+          end
+
+          # The indexer reads message structure from protobuf descriptors, so fields of this type
+          # need no ingestion overrides. Only scalar types have them.
+          #
+          # @return [Hash<String, String>]
+          def proto_ingestion_overrides
+            {}
           end
 
           private
