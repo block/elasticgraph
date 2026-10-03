@@ -14,6 +14,7 @@ module ElasticGraph
           def protobuf_import: () -> nil
           def protobuf_field_comment: () -> nil
           def proto_enum_value_prefix: () -> ::String
+          def proto_enum_value_name_overrides: () -> ::Hash[::String, ::String]
           def to_proto: (Schema schema, ::String package_name) -> ::String
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
           def configure_derived_scalar_type: (::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType) -> void

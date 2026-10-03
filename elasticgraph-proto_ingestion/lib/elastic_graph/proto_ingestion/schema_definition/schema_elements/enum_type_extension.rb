@@ -89,6 +89,18 @@ module ElasticGraph
             @proto_enum_value_prefix ||= Support::Casing.to_upper_snake(name)
           end
 
+          # Maps protobuf value names to GraphQL value names wherever removing this enum's value prefix
+          # does not recover the GraphQL name.
+          #
+          # @return [Hash<String, String>]
+          def proto_enum_value_name_overrides
+            values_by_name.values.filter_map do |raw_value|
+              value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
+              proto_name = value.proto_name(proto_enum_value_prefix)
+              [proto_name, value.name] unless proto_name == "#{proto_enum_value_prefix}_#{value.name}"
+            end.to_h
+          end
+
           # @private
           def configure_derived_scalar_type(scalar_type)
             super
