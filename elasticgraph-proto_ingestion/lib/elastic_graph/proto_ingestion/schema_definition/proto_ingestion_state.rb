@@ -12,7 +12,7 @@ module ElasticGraph
       # Holds the proto ingestion extension's schema definition state.
       #
       # @private
-      class ProtoIngestionState < ::Struct.new(:package_name, :field_number_mappings, :syntax, :header_lines, :previous_proto_schema)
+      class ProtoIngestionState < ::Struct.new(:package_name, :field_number_mappings, :syntax, :header_lines)
       end
     end
   end

@@ -29,20 +29,6 @@ module ElasticGraph
           protobuf_schema_generator.field_number_mappings_for_artifact
         end
 
-        # Loads the existing proto before generation, invalidating any previously rendered result.
-        # An artifact manager can be constructed after a caller has already read `proto_schema`.
-        #
-        # @param previous_proto [String] existing schema.proto contents
-        # @return [void]
-        # @api private
-        def load_previous_proto_schema(previous_proto)
-          extension_state = state # : ElasticGraph::SchemaDefinition::State & StateExtension
-          ingestion_state = extension_state.proto_ingestion_state
-          ingestion_state.previous_proto_schema = previous_proto
-          @proto_schema = nil
-          @protobuf_schema_generator = nil
-        end
-
         private
 
         def protobuf_schema_generator

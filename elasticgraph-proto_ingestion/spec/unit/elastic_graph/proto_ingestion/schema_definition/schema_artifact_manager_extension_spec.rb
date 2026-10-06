@@ -66,7 +66,10 @@ module ElasticGraph
             messages:
               Widget:
                 fields:
-                  id: 7
+                  id:
+                    field_number: 7
+                    proto_type: string
+                    list_depth: 0
                 next_number: 8
             enums:
               Status:
@@ -94,19 +97,6 @@ module ElasticGraph
             "STATUS_INACTIVE = 5;",
             "// Next value number: 9"
           )
-        end
-
-        it "checks existing proto contracts even if results were rendered before the manager was constructed" do
-          old = define_indexed_type_schema
-          artifacts_for(old).each { |artifact| artifact.dump(::StringIO.new) }
-          updated = define_proto_schema_results(path_to_schema: ::File.join("config", "schema.rb")) do |schema|
-            schema.object_type "Widget" do |type|
-              type.field "id", "Int"
-              type.index "widgets"
-            end
-          end
-          expect(updated.proto_schema).to include("int32 id = 1;")
-          expect { artifacts_for(updated) }.to raise_error(Errors::SchemaError, a_string_including("Widget.id", "retained string"))
         end
 
         it "raises a clear error when dumping proto artifacts without a configured `path_to_schema`" do

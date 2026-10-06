@@ -17,7 +17,6 @@ module ElasticGraph
         @all_types: ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         @package_name: ::String
         @field_number_mappings: FieldNumberMappings
-        @wire_contracts: WireContracts
         @ingestible_types_by_name: ::Hash[::String, ::ElasticGraph::SchemaDefinition::indexableType]
         @previous_field_names_by_type_name_and_field_name: ::Hash[::String, ::Hash[::String, ::Array[::String]]]?
 

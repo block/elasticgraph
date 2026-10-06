@@ -11,7 +11,6 @@ require "elastic_graph/proto_ingestion/schema_definition/field_number_mappings"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/enum_type_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/object_interface_and_union_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/scalar_type_extension"
-require "elastic_graph/proto_ingestion/schema_definition/wire_contracts"
 require "forwardable"
 
 module ElasticGraph
@@ -87,7 +86,6 @@ module ElasticGraph
           @syntax = self.class.validate_syntax(ingestion_state.syntax)
           @header_lines = self.class.validate_header_lines(ingestion_state.header_lines)
           @field_number_mappings = FieldNumberMappings.from_parsed_yaml(ingestion_state.field_number_mappings)
-          @wire_contracts = WireContracts.new(ingestion_state.previous_proto_schema, @package_name)
         end
 
         # Renders the schema as a valid file in the configured syntax.
@@ -95,7 +93,7 @@ module ElasticGraph
         # @return [String]
         def to_proto
           types = proto_types
-          return @wire_contracts.retired_contract_comments if types.empty?
+          return "" if types.empty?
 
           validate_unique_enum_value_prefixes(types)
 
@@ -104,11 +102,10 @@ module ElasticGraph
             "package #{@package_name};",
             *render_header_lines,
             *render_imports(types),
-            render_definitions(types),
-            @wire_contracts.retired_contract_comments
+            render_definitions(types)
           ]
 
-          sections.reject(&:empty?).join("\n\n") + "\n"
+          sections.join("\n\n") + "\n"
         end
 
         # Exposes the field-number and enum-value-number mappings for writing to artifact YAML.
@@ -122,13 +119,13 @@ module ElasticGraph
         #
         # @api private
         def field_number_for(message_name:, type_name:, public_field_name:, proto_type:, list_depth:)
-          number = @field_number_mappings.field_number_for(
+          @field_number_mappings.field_number_for(
             message_name: message_name,
             public_field_name: public_field_name,
-            previous_field_names: previous_field_names_for(type_name, public_field_name)
+            previous_field_names: previous_field_names_for(type_name, public_field_name),
+            proto_type: proto_type,
+            list_depth: list_depth
           )
-          @wire_contracts.verify_and_record(message_name, public_field_name, number, proto_type, list_depth)
-          number
         end
 
         # @dynamic next_field_number_for, reserved_field_numbers_for, enum_value_numbers_for
@@ -170,7 +167,6 @@ module ElasticGraph
             }
           PROTO
 
-          @wire_contracts.verify_and_record("ElasticGraphEventBatch", "events", 1, "ElasticGraphEventEnvelope", 1)
           batch = <<~PROTO
             message ElasticGraphEventBatch {
               repeated ElasticGraphEventEnvelope events = 1;
