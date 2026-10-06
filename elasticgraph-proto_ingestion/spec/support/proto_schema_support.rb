@@ -17,19 +17,9 @@ module ElasticGraph
     module SchemaSupport
       include ElasticGraph::SchemaDefinition::TestSupport
 
-      def proto_field_contract(number, proto_type = "string", list_depth: 0)
-        {"field_number" => number, "proto_type" => proto_type, "list_depth" => list_depth}
-      end
-
       def envelope_field_number_mapping(record_name)
         {
-          "fields" => {
-            "op" => proto_field_contract(1),
-            "id" => proto_field_contract(2),
-            "version" => proto_field_contract(3, "int64"),
-            "latency_timestamps" => proto_field_contract(4, "map<string, google.protobuf.Timestamp>", list_depth: 1),
-            record_name => proto_field_contract(5, ".elasticgraph.#{Support::Casing.to_title(record_name)}")
-          },
+          "fields" => {"op" => 1, "id" => 2, "version" => 3, "latency_timestamps" => 4, record_name => 5},
           "next_number" => 6
         }
       end
@@ -41,8 +31,8 @@ module ElasticGraph
       # Defines a schema and returns its `Results`. When `VALIDATE_SCHEMA_ARTIFACTS` is set
       # when this file loads, also verifies that its proto compiles. Pass the results of a previous
       # `define_proto_schema_results` call as `prior_results` to seed the new schema with the
-      # field-number mappings the previous one generated, standing in for the
-      # `proto_field_numbers.yaml` file that `schema_artifacts:dump` would have written between
+      # field-number mappings and proto declarations the previous one generated, standing in for
+      # the `proto_field_numbers.yaml` and `schema.proto` files that `schema_artifacts:dump` would have written between
       # the two schema definitions. (Loading that file is covered by
       # `schema_artifact_manager_extension_spec` and `rake_tasks_spec`.) `prior_results` is the
       # standard way to test mapping behavior; pass raw `proto_field_number_mappings:` only for
@@ -56,6 +46,7 @@ module ElasticGraph
           **options
         ) do |schema|
           schema.state.proto_ingestion_state.field_number_mappings = mappings if mappings
+          schema.state.proto_ingestion_state.previous_proto_schema = prior_results.proto_schema if prior_results
           block.call(schema)
         end
 

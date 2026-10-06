@@ -23,7 +23,7 @@ module ElasticGraph
             "messages" => {
               "Account" => {
                 "fields" => {
-                  "id" => proto_field_contract(7)
+                  "id" => 7
                 },
                 "next_number" => 10
               }
@@ -84,8 +84,8 @@ module ElasticGraph
             "messages" => {
               "Account" => {
                 "fields" => {
-                  "id" => proto_field_contract(1),
-                  "name" => proto_field_contract(2)
+                  "id" => 1,
+                  "name" => 2
                 },
                 "next_number" => 3
               },
@@ -123,9 +123,9 @@ module ElasticGraph
             "messages" => {
               "Account" => {
                 "fields" => {
-                  "id" => proto_field_contract(1),
-                  "legacy_field" => proto_field_contract(2),
-                  "name" => proto_field_contract(3)
+                  "id" => 1,
+                  "legacy_field" => 2,
+                  "name" => 3
                 },
                 "next_number" => 4
               },
@@ -150,50 +150,6 @@ module ElasticGraph
           expect(results3.proto_field_number_mappings).to eq(results2.proto_field_number_mappings)
         end
 
-        it "retains base wire types and list depths for scalars, enums, messages, and nested wrappers" do
-          results = define_proto_schema_results do |schema|
-            schema.enum_type("Status") { |type| type.values "ACTIVE" }
-            schema.object_type("Details") { |type| type.field "name", "String" }
-            schema.object_type "Account" do |type|
-              type.field "id", "ID"
-              type.field "scores", "[[Int!]!]"
-              type.field "status", "Status"
-              type.field("details", "[Details]") { |field| field.mapping type: "nested" }
-              type.field "updated_at", "DateTime"
-              type.index "accounts"
-            end
-          end
-          fields = results.proto_field_number_mappings.dig("messages", "Account", "fields")
-          expect(fields).to eq({
-            "id" => proto_field_contract(1),
-            "scores" => proto_field_contract(2, "int32", list_depth: 2),
-            "status" => proto_field_contract(3, ".elasticgraph.Status"),
-            "details" => proto_field_contract(4, ".elasticgraph.Details", list_depth: 1),
-            "updated_at" => proto_field_contract(5, "google.protobuf.Timestamp")
-          })
-        end
-
-        it "rejects a different wire type or list depth at a retained field number, including after removal" do
-          define_account = lambda do |prior, field_type|
-            define_proto_schema_results(prior) do |schema|
-              schema.object_type "Account" do |type|
-                type.field "id", "ID"
-                type.field "score", field_type if field_type
-                type.index "accounts"
-              end
-            end
-          end
-          old = define_account.call(nil, "Int")
-          removed = define_account.call(old, nil)
-          [old, removed].each do |prior|
-            ["String", "JsonSafeLong", "[Int]", "[[Int]]"].each do |field_type|
-              expect { define_account.call(prior, field_type) }.to raise_error(Errors::SchemaError, a_string_including("Account.score", "retained int32", "Use a new field name"))
-            end
-          end
-          expect(removed.proto_field_number_mappings.dig("messages", "Account", "fields", "score")).to eq(proto_field_contract(2, "int32"))
-          expect(define_account.call(old, "Int!").proto_field_number_mappings).to eq(old.proto_field_number_mappings)
-        end
-
         it "keeps index field names out of the protobuf schema and field-number mappings" do
           results1 = define_proto_schema_results do |s|
             s.object_type "Widget" do |t|
@@ -216,8 +172,8 @@ module ElasticGraph
           expect(results2.proto_schema).to eq(results1.proto_schema)
 
           expect(results2.proto_field_number_mappings.dig("messages", "Widget", "fields")).to eq({
-            "id" => proto_field_contract(1),
-            "display_name" => proto_field_contract(2)
+            "id" => 1,
+            "display_name" => 2
           })
         end
 
@@ -249,8 +205,8 @@ module ElasticGraph
             "messages" => {
               "Account" => {
                 "fields" => {
-                  "id" => proto_field_contract(2),
-                  "display_name" => proto_field_contract(1)
+                  "id" => 2,
+                  "display_name" => 1
                 },
                 "next_number" => 3
               },
@@ -357,10 +313,10 @@ module ElasticGraph
           # `truck` keeps its number reserved in the artifact so it is never reused.
           expect(results2.proto_field_number_mappings.fetch("messages").fetch("Vehicle")).to eq({
             "fields" => {
-              "truck" => proto_field_contract(1, ".elasticgraph.Truck"),
-              "car" => proto_field_contract(2, ".elasticgraph.Car"),
-              "bike" => proto_field_contract(3, ".elasticgraph.Bike"),
-              "scooter" => proto_field_contract(4, ".elasticgraph.Scooter")
+              "truck" => 1,
+              "car" => 2,
+              "bike" => 3,
+              "scooter" => 4
             },
             "next_number" => 5
           })

@@ -160,7 +160,7 @@ module ElasticGraph
           # so this test must seed raw mappings instead of results from a prior dump.
           expect {
             define_proto_schema_results(proto_field_number_mappings: {
-              "messages" => {"Account" => {"fields" => {"id" => proto_field_contract(0)}}}
+              "messages" => {"Account" => {"fields" => {"id" => 0}}}
             }) do |s|
               s.object_type "Account" do |t|
                 t.field "id", "ID"

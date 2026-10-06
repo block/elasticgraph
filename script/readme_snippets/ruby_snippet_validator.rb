@@ -91,9 +91,10 @@ class RubySnippetValidator < SnippetValidator
   end
 
   def dump_artifacts
-    # Each snippet configures an unpublished prototype, rather than evolving the prior example's
-    # protobuf contract. Reset its scratch sidecar before dumping the new example.
-    FileUtils.rm_f("config/proto_field_numbers.yaml")
+    # Independent README examples do not share protobuf numbers or wire contracts.
+    FileUtils.rm_f("config/schema/proto_field_numbers.yaml")
+    FileUtils.rm_f("config/schema/artifacts/schema.proto")
+
     output = `bundle exec rake schema_artifacts:dump 2>&1`
     [$?.success?, output]
   end

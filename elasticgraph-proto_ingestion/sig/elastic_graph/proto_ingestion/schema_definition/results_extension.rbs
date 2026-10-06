@@ -2,6 +2,7 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       module ResultsExtension : ::ElasticGraph::SchemaDefinition::Results
+        def load_previous_proto_schema: (::String) -> void
         def proto_schema: () -> ::String
         def proto_field_number_mappings: () -> ::Hash[::String, untyped]
 

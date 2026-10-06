@@ -1,0 +1,24 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      class WireContracts
+        class Contract
+          attr_reader field_name: ::String
+          attr_reader proto_type: ::String
+          attr_reader list_depth: ::Integer
+          def self.new: (field_name: ::String, proto_type: ::String, list_depth: ::Integer) -> instance
+        end
+
+        @contracts: ::Hash[[::String, ::Integer], Contract]
+        @active_keys: ::Set[[::String, ::Integer]]
+        def initialize: (::String?, ::String) -> void
+        def verify_and_record: (::String, ::String, ::Integer, ::String, ::Integer) -> void
+        def retired_contract_comments: () -> ::String
+
+        private
+
+        def read_contracts: (::String, ::String) -> void
+      end
+    end
+  end
+end

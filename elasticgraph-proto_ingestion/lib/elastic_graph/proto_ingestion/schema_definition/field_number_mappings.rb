@@ -13,31 +13,20 @@ require "elastic_graph/support/json_schema/validator_factory"
 module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
-      # Registry of protobuf wire contracts and enum value numbers assigned to an ElasticGraph schema.
-      # Retains each field's number, protobuf type, and list depth in `proto_field_numbers.yaml`, hands
+      # Registry of the protobuf field and enum value numbers assigned to an ElasticGraph schema.
+      # Parses and validates the numbers stored in the `proto_field_numbers.yaml` artifact, hands
       # out the next available numbers for new fields and enum values, and serializes the updated
       # mappings for the next artifact dump so that numbers stay stable over time.
       class FieldNumberMappings
         extend Support::FromYamlFile
 
-        # A field's retained wire contract, including the base type beneath any list wrappers.
+        # Stored field numbers and allocation cursor for a single protobuf message.
         #
-        # @!attribute [r] field_number
-        #   @return [Integer]
-        # @!attribute [r] proto_type
-        #   @return [String]
-        # @!attribute [r] list_depth
-        #   @return [Integer]
-        FieldContract = ::Data.define(:field_number, :proto_type, :list_depth)
-        private_constant :FieldContract
-
-        # Stored field contracts and allocation cursor for a single protobuf message.
-        #
-        # @!attribute [r] field_contracts_by_name
-        #   @return [Hash<String, FieldContract>]
+        # @!attribute [r] field_numbers_by_name
+        #   @return [Hash<String, Integer>]
         # @!attribute [r] next_number
         #   @return [Integer]
-        MessageMapping = ::Data.define(:field_contracts_by_name, :next_number)
+        MessageMapping = ::Data.define(:field_numbers_by_name, :next_number)
         private_constant :MessageMapping
 
         # Stored value numbers and allocation cursor for a single protobuf enum.
@@ -80,16 +69,6 @@ module ElasticGraph
           "$schema" => "http://json-schema.org/draft-07/schema#",
           "definitions" => {
             "field_number" => field_number_schema,
-            "field_contract" => {
-              "type" => "object",
-              "properties" => {
-                "field_number" => {"$ref" => "#/definitions/field_number"},
-                "proto_type" => {"type" => "string", "minLength" => 1},
-                "list_depth" => {"type" => "integer", "minimum" => 0}
-              },
-              "required" => ["field_number", "proto_type", "list_depth"],
-              "additionalProperties" => false
-            },
             "next_field_number" => field_number_schema.merge({"maximum" => MAX_FIELD_NUMBER + 1}),
             "enum_value_number" => enum_value_number_schema,
             "next_enum_value_number" => enum_value_number_schema.merge({"maximum" => MAX_ENUM_VALUE_NUMBER + 1})
@@ -103,7 +82,7 @@ module ElasticGraph
                 "properties" => {
                   "fields" => {
                     "type" => "object",
-                    "additionalProperties" => {"$ref" => "#/definitions/field_contract"}
+                    "additionalProperties" => {"$ref" => "#/definitions/field_number"}
                   },
                   "next_number" => {"$ref" => "#/definitions/next_field_number"}
                 },
@@ -174,19 +153,14 @@ module ElasticGraph
         # @param message_name [String]
         # @param public_field_name [String]
         # @param previous_field_names [Array<String>] old public names of the field, if renamed
-        # @param proto_type [String] fully qualified protobuf base type, excluding list wrappers
-        # @param list_depth [Integer] number of nested list levels
         # @return [Integer]
-        def field_number_for(message_name:, public_field_name:, previous_field_names:, proto_type:, list_depth:)
+        def field_number_for(message_name:, public_field_name:, previous_field_names:)
           message_mapping = message_mapping_for(message_name)
-          field_contracts = message_mapping.field_contracts_by_name
+          field_numbers = message_mapping.field_numbers_by_name
 
-          if (contract = field_contracts[public_field_name])
-            verify_field_contract(message_name, public_field_name, contract, proto_type, list_depth)
-            return contract.field_number
-          end
+          return field_numbers.fetch(public_field_name) if field_numbers.key?(public_field_name)
 
-          old_field_names = previous_field_names.intersection(field_contracts.keys)
+          old_field_names = previous_field_names.intersection(field_numbers.keys)
           if old_field_names.size > 1
             formatted_old_field_names = old_field_names.sort.map { |name| "`#{name}`" }.join(" and ")
             raise Errors::SchemaError, "Cannot preserve a protobuf field number for `#{message_name}.#{public_field_name}`: " \
@@ -197,19 +171,17 @@ module ElasticGraph
           old_field_name = old_field_names.first
           updated_mapping =
             if old_field_name
-              contract = field_contracts.fetch(old_field_name)
-              verify_field_contract(message_name, public_field_name, contract, proto_type, list_depth)
               message_mapping.with(
-                field_contracts_by_name: field_contracts
+                field_numbers_by_name: field_numbers
                   .except(old_field_name)
-                  .merge(public_field_name => contract)
+                  .merge(public_field_name => field_numbers.fetch(old_field_name))
               )
             else
-              allocate_field_number(message_name, public_field_name, message_mapping, proto_type, list_depth)
+              allocate_field_number(message_name, public_field_name, message_mapping)
             end
 
           @message_mappings_by_name = @message_mappings_by_name.merge(message_name => updated_mapping)
-          updated_mapping.field_contracts_by_name.fetch(public_field_name).field_number
+          updated_mapping.field_numbers_by_name.fetch(public_field_name)
         end
 
         # Returns the next field number that will be assigned for the given message.
@@ -226,7 +198,7 @@ module ElasticGraph
         # @param active_field_names [Array<String>]
         # @return [Hash<String, Integer>]
         def reserved_field_numbers_for(message_name, active_field_names)
-          field_numbers = message_mapping_for(message_name).field_contracts_by_name.transform_values(&:field_number)
+          field_numbers = message_mapping_for(message_name).field_numbers_by_name
           reserved_numbers_by_name(field_numbers, active_field_names)
         end
 
@@ -291,9 +263,7 @@ module ElasticGraph
               .sort_by(&:first)
               .to_h do |message_name, message_mapping|
                 [message_name, {
-                  "fields" => message_mapping.field_contracts_by_name.sort_by { |field_name, contract| [contract.field_number, field_name] }.to_h do |field_name, contract|
-                    [field_name, {"field_number" => contract.field_number, "proto_type" => contract.proto_type, "list_depth" => contract.list_depth}]
-                  end,
+                  "fields" => message_mapping.field_numbers_by_name.sort_by { |field_name, number| [number, field_name] }.to_h,
                   "next_number" => message_mapping.next_number
                 }]
               end,
@@ -312,7 +282,7 @@ module ElasticGraph
 
         def message_mapping_for(message_name)
           @message_mappings_by_name.fetch(message_name) do
-            MessageMapping.new(field_contracts_by_name: {}, next_number: 1)
+            MessageMapping.new(field_numbers_by_name: {}, next_number: 1)
           end
         end
 
@@ -329,17 +299,9 @@ module ElasticGraph
             .to_h
         end
 
-        def verify_field_contract(message_name, field_name, contract, proto_type, list_depth)
-          return if contract.proto_type == proto_type && contract.list_depth == list_depth
-
-          raise Errors::SchemaError, "Incompatible protobuf change for `#{message_name}.#{field_name}`: " \
-            "retained #{contract.proto_type} (list depth #{contract.list_depth}), requested #{proto_type} (list depth #{list_depth}). " \
-            "Use a new field name to assign a fresh protobuf number."
-        end
-
         # Returns a message mapping with the stored allocation cursor assigned to `field_name` and
         # advanced past the claimed number and protobuf's reserved 19000..19999 range.
-        def allocate_field_number(message_name, field_name, message_mapping, proto_type, list_depth)
+        def allocate_field_number(message_name, field_name, message_mapping)
           field_number = message_mapping.next_number
           if field_number > MAX_FIELD_NUMBER
             raise Errors::SchemaError, "Cannot allocate another protobuf field number for message `#{message_name}`: " \
@@ -352,27 +314,24 @@ module ElasticGraph
           end
 
           message_mapping.with(
-            field_contracts_by_name: message_mapping.field_contracts_by_name.merge(field_name => FieldContract.new(field_number: field_number, proto_type: proto_type, list_depth: list_depth)),
+            field_numbers_by_name: message_mapping.field_numbers_by_name.merge(field_name => field_number),
             next_number: next_number
           )
         end
 
         private_class_method def self.parse_messages(messages_section)
           messages_section.to_h do |message_name, message_entry|
-            fields = message_entry.fetch("fields").transform_values do |contract|
-              FieldContract.new(field_number: contract.fetch("field_number"), proto_type: contract.fetch("proto_type"), list_depth: contract.fetch("list_depth"))
-            end
-            field_numbers = fields.transform_values(&:field_number)
+            fields = message_entry.fetch("fields") # : ::Hash[::String, ::Integer]
 
             verify_no_number_collisions(
-              field_numbers,
+              fields,
               "field-number mapping collision in message `#{message_name}`"
             )
 
             next_number = message_entry.fetch("next_number") # : ::Integer
 
-            verify_next_number_is_after_mapped_numbers("message `#{message_name}`", next_number, field_numbers)
-            [message_name, MessageMapping.new(field_contracts_by_name: fields, next_number: next_number)]
+            verify_next_number_is_after_mapped_numbers("message `#{message_name}`", next_number, fields)
+            [message_name, MessageMapping.new(field_numbers_by_name: fields, next_number: next_number)]
           end
         end
 
