@@ -98,6 +98,31 @@ module ElasticGraph
           })
         end
 
+        it "resolves entity ref fields to empty values when the backing id fields are absent from `_source`" do
+          index_records(build(:component, id: "c1", owner_ids: ["oid_1"]))
+          # The indexer always writes every field (as `null` if needed), but documents indexed before the backing
+          # fields were added to the schema lack them entirely. Simulate that by removing them.
+          main_datastore_client.bulk(refresh: true, body: [
+            {update: {_index: "components", _id: "c1"}},
+            {script: {source: "ctx._source.remove('owner_id'); ctx._source.remove('owner_ids')"}}
+          ])
+
+          data = execute_expecting_no_errors(<<~QUERY).dig("components", "nodes")
+            query {
+              components {
+                nodes {
+                  id
+                  owner { token }
+                  owners { token }
+                  owners_paginated { nodes { token } }
+                }
+              }
+            }
+          QUERY
+
+          expect(data).to eq [{"id" => "c1", "owner" => nil, "owners" => [], "owners_paginated" => {"nodes" => []}}]
+        end
+
         def query_owners_paginated(**variables)
           execute_expecting_no_errors(<<~QUERY, variables: variables).dig("components", "nodes").to_h { |n| [n.fetch("id"), n.fetch("owners_paginated")] }
             query OwnersPaginated($first: Int, $after: Cursor) {

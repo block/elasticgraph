@@ -25,7 +25,7 @@ module ElasticGraph
           end
 
           def resolve(field:, object:, args:, context:)
-            if (id = object.fetch(@source_id_field))
+            if (id = object[@source_id_field])
               {@exposed_id_field => id}
             end
           end
@@ -41,9 +41,7 @@ module ElasticGraph
           end
 
           def resolve(field:, object:, args:, context:)
-            object
-              .fetch(@source_ids_field)
-              .map { |id| {@exposed_id_field => id} }
+            (object[@source_ids_field] || []).map { |id| {@exposed_id_field => id} }
           end
         end
 
