@@ -167,6 +167,80 @@ module ElasticGraph
             end
           end
 
+          context "when given a query string that declares the same variables as a registered query in a different order" do
+            let(:registered_declarations) { '$first: String!, $second: String = "Part"' }
+            let(:reordered_declarations) { '$second: String = "Part", $first: String!' }
+
+            it "treats it as the registered query, since variable declaration order has no effect on execution" do
+              registry = registry_with({"my_client" => [two_type_names_query_with(registered_declarations)]})
+              reordered_query_string = two_type_names_query_with(reordered_declarations)
+
+              # Submit it twice so that we cover both the initial match and the cached alternate form of the query.
+              2.times do
+                query, errors, status = registry.build_and_validate_query(reordered_query_string, client: client_named("my_client"), variables: {"first" => "Widget"})
+
+                expect(errors).to be_empty
+                expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
+                expect(query.query_string).to eq(reordered_query_string)
+                expect(query.result.to_h).to eq({"data" => {"first" => {"name" => "Widget"}, "second" => {"name" => "Part"}}})
+              end
+            end
+
+            it "ignores the variable declaration order of each operation in a multi-operation query string" do
+              registered_query_string = [
+                two_type_names_query_with(registered_declarations, operation_name: "TwoTypeNames1"),
+                two_type_names_query_with(registered_declarations, operation_name: "TwoTypeNames2")
+              ].join("\n\n")
+
+              reordered_query_string = [
+                two_type_names_query_with(reordered_declarations, operation_name: "TwoTypeNames1"),
+                two_type_names_query_with(registered_declarations, operation_name: "TwoTypeNames2")
+              ].join("\n\n")
+
+              registry = registry_with({"my_client" => [registered_query_string]})
+
+              %w[TwoTypeNames1 TwoTypeNames2].each do |operation_name|
+                _query, errors, status = registry.build_and_validate_query(reordered_query_string, client: client_named("my_client"), operation_name: operation_name)
+
+                expect(errors).to be_empty
+                expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
+              end
+            end
+
+            {
+              "a different variable type" => '$second: String! = "Part", $first: String!',
+              "a different default value" => '$second: String = "Widget", $first: String!',
+              "an additional variable" => '$second: String = "Part", $first: String!, $third: Int',
+              "a directive on a variable" => '$second: String = "Part" @some_directive, $first: String!'
+            }.each do |difference, declarations|
+              it "returns a validation error when the variable declarations also have #{difference}, since that could be a substantive difference" do
+                registry = registry_with({"my_client" => [two_type_names_query_with(registered_declarations)]})
+                modified_query_string = two_type_names_query_with(declarations)
+
+                query, errors, status = registry.build_and_validate_query(modified_query_string, client: client_named("my_client"))
+
+                expect(errors).to contain_exactly(a_string_including(
+                  "Query TwoTypeNames", "differs from the registered form of `TwoTypeNames`", "my_client"
+                ))
+                expect(query.query_string).to eq(modified_query_string)
+                expect(status).to eq(RegistrationStatus::DIFFERING_REGISTERED_QUERY)
+              end
+            end
+
+            def two_type_names_query_with(variable_declarations, operation_name: "TwoTypeNames")
+              <<~EOS.strip
+                query #{operation_name}(#{variable_declarations}) {
+                  first: __type(name: $first) {
+                    name
+                  }
+                  second: __type(name: $second) {
+                    name
+                  }
+                }
+              EOS
+            end
+          end
+
           context "when the client is also in `allow_any_query_for_clients`" do
             context "for a query that is unregistered" do
               include_examples "any case when a query is returned"

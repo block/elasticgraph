@@ -31,7 +31,7 @@ module ElasticGraph
     # In addition, it's worth noting that we support some basic "fuzzy" matching of query
     # strings, based on the query canonicalization performed by the GraphQL gem. Semantically
     # insignificant changes to the query string from a registered query (such as whitespace
-    # differences, or comments) are tolerated.
+    # differences, comments, or the order of variable declarations) are tolerated.
     class Registry
       # Public factory method, which builds a `Registry` instance from the given directory.
       # Subdirectories are treated as client names, and the files in them are treated as

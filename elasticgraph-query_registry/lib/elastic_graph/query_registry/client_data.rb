@@ -85,9 +85,7 @@ module ElasticGraph
         return "" unless (document = query.document)
 
         canonicalized_definitions = document.definitions.map do |definition|
-          if definition.directives.empty?
-            definition
-          else
+          unless definition.directives.empty?
             # Ignore the `@egLatencySlo` directive if it is present. We want to allow it to be included (or not)
             # and potentially have different values from the registered query so that clients don't have to register
             # a new version of their query just to change the latency SLO value.
@@ -98,8 +96,19 @@ module ElasticGraph
               dir.name == schema_element_names.eg_latency_slo
             end
 
-            definition.merge(directives: directives)
+            definition = definition.merge(directives: directives)
           end
+
+          if definition.is_a?(::GraphQL::Language::Nodes::OperationDefinition)
+            # Ignore the order of variable declarations. Variables are referenced by name, so the order has no effect
+            # on execution. Federation gateways (such as Apollo Router and Hive Gateway) redeclare variables in the
+            # order they are first used when they print the operation they send to a subgraph, so without this, a
+            # registered query would be rejected on every request through one. The declarations themselves (including
+            # their types, default values, and directives) are still compared.
+            definition = definition.merge(variables: definition.variables.sort_by(&:name))
+          end
+
+          definition
         end
 
         document.merge(definitions: canonicalized_definitions).to_query_string
