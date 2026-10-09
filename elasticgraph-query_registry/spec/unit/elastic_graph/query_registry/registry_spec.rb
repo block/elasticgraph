@@ -182,11 +182,13 @@ module ElasticGraph
                 expect(errors).to be_empty
                 expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
                 expect(query.query_string).to eq(reordered_query_string)
+                # Static validation is skipped, just like any other form of a registered query.
+                expect(query.validate).to eq(false)
                 expect(query.result.to_h).to eq({"data" => {"first" => {"name" => "Widget"}, "second" => {"name" => "Part"}}})
               end
             end
 
-            it "ignores the variable declaration order of each operation in a multi-operation query string" do
+            it "ignores variable declaration order across all operations in a multi-operation query string" do
               registered_query_string = [
                 two_type_names_query_with(registered_declarations, operation_name: "TwoTypeNames1"),
                 two_type_names_query_with(registered_declarations, operation_name: "TwoTypeNames2")
