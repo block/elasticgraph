@@ -188,6 +188,17 @@ module ElasticGraph
               end
             end
 
+            it "also tolerates a different `@egLatencySlo` directive on a query with reordered variable declarations" do
+              registered_query_string = add_query_directives_to(two_type_names_query_with(registered_declarations), "@eg_latency_slo(ms: 4000)")
+              registry = registry_with({"my_client" => [registered_query_string]})
+              submitted_query_string = add_query_directives_to(two_type_names_query_with(reordered_declarations), "@eg_latency_slo(ms: 2000)")
+
+              _query, errors, status = registry.build_and_validate_query(submitted_query_string, client: client_named("my_client"))
+
+              expect(errors).to be_empty
+              expect(status).to eq(RegistrationStatus::MATCHED_REGISTERED_QUERY)
+            end
+
             it "ignores variable declaration order across all operations in a multi-operation query string" do
               registered_query_string = [
                 two_type_names_query_with(registered_declarations, operation_name: "TwoTypeNames1"),

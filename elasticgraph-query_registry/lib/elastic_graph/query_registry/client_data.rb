@@ -113,6 +113,7 @@ module ElasticGraph
       # their types, default values, and directives) are still compared.
       private_class_method def self.with_sorted_variables(definition)
         return definition unless definition.is_a?(::GraphQL::Language::Nodes::OperationDefinition)
+        return definition if definition.variables.size < 2
 
         definition.merge(variables: definition.variables.sort_by(&:name))
       end
