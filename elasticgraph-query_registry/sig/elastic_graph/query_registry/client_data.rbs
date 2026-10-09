@@ -41,6 +41,15 @@ module ElasticGraph
         ::GraphQL::Query,
         schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
       ) -> ::String
+
+      type definition = ::GraphQL::Language::Nodes::FragmentDefinition | ::GraphQL::Language::Nodes::OperationDefinition
+
+      def self.without_eg_latency_slo_directive: (
+        definition,
+        SchemaArtifacts::RuntimeMetadata::SchemaElementNames
+      ) -> definition
+
+      def self.with_sorted_variables: (definition) -> definition
     end
   end
 end

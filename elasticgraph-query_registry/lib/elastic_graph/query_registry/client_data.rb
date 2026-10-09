@@ -85,24 +85,37 @@ module ElasticGraph
         return "" unless (document = query.document)
 
         canonicalized_definitions = document.definitions.map do |definition|
-          if definition.directives.empty?
-            definition
-          else
-            # Ignore the `@egLatencySlo` directive if it is present. We want to allow it to be included (or not)
-            # and potentially have different values from the registered query so that clients don't have to register
-            # a new version of their query just to change the latency SLO value.
-            #
-            # Note: we don't ignore _all_ directives here because other directives might cause significant behavioral
-            # changes that should be enforced by the registry query approval process.
-            directives = definition.directives.reject do |dir|
-              dir.name == schema_element_names.eg_latency_slo
-            end
-
-            definition.merge(directives: directives)
-          end
+          with_sorted_variables(without_eg_latency_slo_directive(definition, schema_element_names))
         end
 
         document.merge(definitions: canonicalized_definitions).to_query_string
+      end
+
+      # Ignore the `@egLatencySlo` directive if it is present. We want to allow it to be included (or not)
+      # and potentially have different values from the registered query so that clients don't have to register
+      # a new version of their query just to change the latency SLO value.
+      #
+      # Note: we don't ignore _all_ directives here because other directives might cause significant behavioral
+      # changes that should be enforced by the registry query approval process.
+      private_class_method def self.without_eg_latency_slo_directive(definition, schema_element_names)
+        return definition if definition.directives.empty?
+
+        directives = definition.directives.reject do |dir|
+          dir.name == schema_element_names.eg_latency_slo
+        end
+
+        definition.merge(directives: directives)
+      end
+
+      # Ignore the order of variable declarations. Variables are referenced by name, so the order has no effect
+      # on execution. Some federation gateways (such as Hive Gateway) redeclare variables in the order they are
+      # first used when they print the operation they send to a subgraph. The declarations themselves (including
+      # their types, default values, and directives) are still compared.
+      private_class_method def self.with_sorted_variables(definition)
+        return definition unless definition.is_a?(::GraphQL::Language::Nodes::OperationDefinition)
+        return definition if definition.variables.size < 2
+
+        definition.merge(variables: definition.variables.sort_by(&:name))
       end
     end
   end

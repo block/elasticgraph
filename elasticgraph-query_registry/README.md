@@ -100,6 +100,15 @@ this setup, `client2` will not be able to submit any queries, but
 a completely unregistered client (say, `client4`) will be able to
 execute any query.
 
+A submitted query does not have to match its registered form byte for
+byte. The registry tolerates some differences that have no effect on
+how the query executes, including whitespace, comments, the order in
+which variables are declared (some federation gateways redeclare them
+in the order they are first used), and the presence or value of an
+`@egLatencySlo` directive. Other differences, such as a changed
+selection, argument, variable type, or variable default value, cause
+the query to be rejected as differing from its registered form.
+
 ## Setup
 
 `elasticgraph-query_registry` comes installed in new projects bootstrapped using `elasticgraph new`.
