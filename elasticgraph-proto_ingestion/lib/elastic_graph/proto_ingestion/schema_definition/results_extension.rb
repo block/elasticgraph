@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/proto_ingestion/schema_definition/schema"
+require "elastic_graph/schema_artifacts/runtime_metadata/component_extension"
 
 module ElasticGraph
   module ProtoIngestion
@@ -30,6 +31,19 @@ module ElasticGraph
         end
 
         private
+
+        # Registers the protobuf indexer extension, configured with the ingestion facts that
+        # protobuf descriptors cannot express. The configuration depends on the complete schema,
+        # so it is added here rather than when {APIExtension} is extended onto the API.
+        def build_runtime_metadata
+          metadata = super
+          extension = SchemaArtifacts::RuntimeMetadata::ComponentExtension.new({
+            "name" => "ElasticGraph::ProtoIngestion::IndexerExtension",
+            "require_path" => "elastic_graph/proto_ingestion/indexer_extension",
+            "config" => protobuf_schema_generator.ingestion_metadata
+          })
+          metadata.with(indexer_extension_modules: metadata.indexer_extension_modules + [extension])
+        end
 
         def protobuf_schema_generator
           @protobuf_schema_generator ||= begin

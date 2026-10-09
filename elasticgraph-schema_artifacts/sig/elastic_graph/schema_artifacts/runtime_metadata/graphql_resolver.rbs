@@ -3,21 +3,21 @@ module ElasticGraph
     module RuntimeMetadata
       class GraphQLResolverSupertype
         attr_reader needs_lookahead: bool
-        attr_reader resolver_ref: ::Hash[::String, ::String]
+        attr_reader resolver_ref: extensionRef
 
         def initialize: (
           needs_lookahead: bool,
-          resolver_ref: ::Hash[::String, ::String]
+          resolver_ref: extensionRef
         ) -> void
 
         def with: (
           ?needs_lookahead: bool,
-          ?resolver_ref: ::Hash[::String, ::String]
+          ?resolver_ref: extensionRef
         ) -> instance
 
         def self.new:
-          (needs_lookahead: bool, resolver_ref: ::Hash[::String, ::String]) -> instance
-          | (bool, ::Hash[::String, ::String]) -> instance
+          (needs_lookahead: bool, resolver_ref: extensionRef) -> instance
+          | (bool, extensionRef) -> instance
       end
 
       class GraphQLResolver < GraphQLResolverSupertype

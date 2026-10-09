@@ -14,5 +14,19 @@ module ElasticGraph
 
     # The name of the generated proto field-number mapping file.
     PROTO_FIELD_NUMBERS_FILE = "proto_field_numbers.yaml"
+
+    # The scalar the indexer ingests a protobuf field of each wire type as when runtime metadata
+    # does not name one.
+    DEFAULT_SCALARS_BY_PROTO_TYPE = {
+      "bool" => "Boolean",
+      "double" => "Float",
+      "google.protobuf.Timestamp" => "DateTime",
+      "int32" => "Int",
+      "int64" => "LongString",
+      "string" => "String"
+    }.freeze
+
+    # Built-in scalars whose valid values are narrower than their protobuf wire type allows.
+    VALIDATED_SCALARS = %w[Boolean Date DateTime Float Int JsonSafeLong LocalTime LongString TimeZone].freeze
   end
 end

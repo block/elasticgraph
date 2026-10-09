@@ -29,6 +29,7 @@ module ElasticGraph
 
         def to_proto: () -> ::String
         def field_number_mappings_for_artifact: () -> ::Hash[::String, untyped]
+        def ingestion_metadata: () -> ::Hash[::String, untyped]
         def field_number_for: (
           message_name: ::String,
           type_name: ::String,
