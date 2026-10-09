@@ -118,11 +118,13 @@ module ElasticGraph
         # Returns the stable protobuf number for a message field.
         #
         # @api private
-        def field_number_for(message_name:, type_name:, public_field_name:)
+        def field_number_for(message_name:, type_name:, public_field_name:, proto_type:, list_depth:)
           @field_number_mappings.field_number_for(
             message_name: message_name,
             public_field_name: public_field_name,
-            previous_field_names: previous_field_names_for(type_name, public_field_name)
+            previous_field_names: previous_field_names_for(type_name, public_field_name),
+            proto_type: proto_type,
+            list_depth: list_depth
           )
         end
 
@@ -201,7 +203,9 @@ module ElasticGraph
             number = field_number_for(
               message_name: "ElasticGraphEventEnvelope",
               type_name: "ElasticGraphEventEnvelope",
-              public_field_name: name
+              public_field_name: name,
+              proto_type: declaration.delete_prefix("optional "),
+              list_depth: declaration.start_with?("map<") ? 1 : 0
             )
             [number, "#{indent}#{declaration} #{name} = #{number};"]
           end.sort_by(&:first).map(&:last).join("\n")
