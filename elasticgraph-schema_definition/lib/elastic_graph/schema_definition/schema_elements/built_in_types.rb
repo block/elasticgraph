@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
-require "elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones"
 require "elastic_graph/schema_artifacts/runtime_metadata/enum"
 
 module ElasticGraph

@@ -7,8 +7,8 @@
 # frozen_string_literal: true
 
 require_relative "elasticgraph_graphql_acceptance_support"
-require "elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones"
 require "elastic_graph/graphql/datastore_query"
+require "elastic_graph/support/valid_time_zones"
 
 module ElasticGraph
   RSpec.describe "ElasticGraph::GraphQL--aggregations" do
@@ -1069,7 +1069,7 @@ module ElasticGraph
       it "supports all IANA timezone ids for timestamp grouping" do
         index_records(build(:widget, created_at: "2022-11-23T03:00:00Z"))
 
-        agg_queries = GraphQL::ScalarCoercionAdapters::VALID_TIME_ZONES.map.with_index do |time_zone, index|
+        agg_queries = Support::VALID_TIME_ZONES.map.with_index do |time_zone, index|
           # Use 2 different args as part of our assertions on the impact of `Aggregation::QueryOptimizer`.
           args =
             if time_zone.start_with?("America/")

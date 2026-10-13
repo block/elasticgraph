@@ -1,7 +1,0 @@
-module ElasticGraph
-  class GraphQL
-    module ScalarCoercionAdapters
-      VALID_TIME_ZONES: ::Set[::String]
-    end
-  end
-end

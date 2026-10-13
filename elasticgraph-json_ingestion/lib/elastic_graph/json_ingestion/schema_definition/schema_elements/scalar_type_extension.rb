@@ -7,8 +7,8 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
-require "elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones"
 require "elastic_graph/json_ingestion/schema_definition/schema_elements/has_json_schema"
+require "elastic_graph/support/valid_time_zones"
 
 module ElasticGraph
   module JSONIngestion
@@ -29,7 +29,7 @@ module ElasticGraph
             "Date" => {type: "string", format: "date"},
             "DateTime" => {type: "string", format: "date-time"},
             "LocalTime" => {type: "string", pattern: VALID_LOCAL_TIME_JSON_SCHEMA_PATTERN},
-            "TimeZone" => {type: "string", enum: GraphQL::ScalarCoercionAdapters::VALID_TIME_ZONES.to_a.freeze},
+            "TimeZone" => {type: "string", enum: Support::VALID_TIME_ZONES.to_a.freeze},
             "Untyped" => {type: ["array", "boolean", "integer", "number", "object", "string"].freeze},
             "JsonSafeLong" => {type: "integer", minimum: JSON_SAFE_LONG_MIN, maximum: JSON_SAFE_LONG_MAX},
             "LongString" => {type: "integer", minimum: LONG_STRING_MIN, maximum: LONG_STRING_MAX}

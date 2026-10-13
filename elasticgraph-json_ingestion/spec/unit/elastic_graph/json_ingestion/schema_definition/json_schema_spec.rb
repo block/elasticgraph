@@ -127,7 +127,7 @@ module ElasticGraph
           example "for `TimeZone`" do
             expect(json_schema).to have_json_schema_like("TimeZone", {
               "type" => "string",
-              "enum" => GraphQL::ScalarCoercionAdapters::VALID_TIME_ZONES.to_a
+              "enum" => Support::VALID_TIME_ZONES.to_a
             })
               .which_matches("America/Los_Angeles")
               .and_fails_to_match("America/Seattle") # America/Seattle is not a valid time zone.

@@ -1,0 +1,5 @@
+module ElasticGraph
+  module Support
+    VALID_TIME_ZONES: ::Set[::String]
+  end
+end
