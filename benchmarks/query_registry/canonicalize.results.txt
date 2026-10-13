@@ -1,0 +1,140 @@
+
+======================================================================
+no directives or variables
+======================================================================
+ruby 3.4.4 (2025-05-14 revision a38531fd3f) +PRISM [arm64-darwin24]
+Warming up --------------------------------------
+canonicalize definitions (before)   292.754k i/100ms
+ canonicalize definitions (after)   293.439k i/100ms
+Calculating -------------------------------------
+canonicalize definitions (before)      2.783M (± 6.3%) i/s  (359.26 ns/i) -     14.052M in   5.048448s
+ canonicalize definitions (after)      2.895M (± 1.9%) i/s  (345.40 ns/i) -     14.672M in   5.067667s
+
+Comparison:
+ canonicalize definitions (after):  2895208.0 i/s
+canonicalize definitions (before):  2783467.7 i/s - same-ish: difference falls within error
+
+ruby 3.4.4 (2025-05-14 revision a38531fd3f) +PRISM [arm64-darwin24]
+Warming up --------------------------------------
+canonical query string (before)    12.715k i/100ms
+ canonical query string (after)     9.869k i/100ms
+Calculating -------------------------------------
+canonical query string (before)    132.926k (± 6.0%) i/s    (7.52 μs/i) -    673.895k in   5.069701s
+ canonical query string (after)    127.729k (± 6.7%) i/s    (7.83 μs/i) -    641.485k in   5.022240s
+
+Comparison:
+canonical query string (before):   132926.0 i/s
+ canonical query string (after):   127728.9 i/s - same-ish: difference falls within error
+
+
+======================================================================
+@egLatencySlo only
+======================================================================
+ruby 3.4.4 (2025-05-14 revision a38531fd3f) +PRISM [arm64-darwin24]
+Warming up --------------------------------------
+canonicalize definitions (before)   114.712k i/100ms
+ canonicalize definitions (after)   114.844k i/100ms
+Calculating -------------------------------------
+canonicalize definitions (before)      1.060M (±13.2%) i/s  (943.72 ns/i) -      5.391M in   5.088007s
+ canonicalize definitions (after)      1.155M (± 4.2%) i/s  (865.63 ns/i) -      5.857M in   5.070012s
+
+Comparison:
+ canonicalize definitions (after):  1155232.8 i/s
+canonicalize definitions (before):  1059641.6 i/s - same-ish: difference falls within error
+
+ruby 3.4.4 (2025-05-14 revision a38531fd3f) +PRISM [arm64-darwin24]
+Warming up --------------------------------------
+canonical query string (before)    10.614k i/100ms
+ canonical query string (after)    11.431k i/100ms
+Calculating -------------------------------------
+canonical query string (before)    121.369k (± 5.7%) i/s    (8.24 μs/i) -    615.612k in   5.072215s
+ canonical query string (after)    117.137k (± 7.3%) i/s    (8.54 μs/i) -    594.412k in   5.074481s
+
+Comparison:
+canonical query string (before):   121369.5 i/s
+ canonical query string (after):   117137.5 i/s - same-ish: difference falls within error
+
+
+======================================================================
+other directive only
+======================================================================
+ruby 3.4.4 (2025-05-14 revision a38531fd3f) +PRISM [arm64-darwin24]
+Warming up --------------------------------------
+canonicalize definitions (before)    97.260k i/100ms
+ canonicalize definitions (after)   150.080k i/100ms
+Calculating -------------------------------------
+canonicalize definitions (before)      1.123M (± 7.9%) i/s  (890.24 ns/i) -      5.641M in   5.021929s
+ canonicalize definitions (after)      2.255M (± 6.3%) i/s  (443.45 ns/i) -     11.406M in   5.058020s
+
+Comparison:
+ canonicalize definitions (after):  2255048.4 i/s
+canonicalize definitions (before):  1123289.5 i/s - 2.01x  slower
+
+ruby 3.4.4 (2025-05-14 revision a38531fd3f) +PRISM [arm64-darwin24]
+Warming up --------------------------------------
+canonical query string (before)    12.212k i/100ms
+ canonical query string (after)    12.647k i/100ms
+Calculating -------------------------------------
+canonical query string (before)    116.314k (± 5.2%) i/s    (8.60 μs/i) -    586.176k in   5.039609s
+ canonical query string (after)    129.644k (± 2.2%) i/s    (7.71 μs/i) -    657.644k in   5.072709s
+
+Comparison:
+ canonical query string (after):   129643.5 i/s
+canonical query string (before):   116313.8 i/s - 1.11x  slower
+
+
+======================================================================
+5 variables only
+======================================================================
+ruby 3.4.4 (2025-05-14 revision a38531fd3f) +PRISM [arm64-darwin24]
+Warming up --------------------------------------
+canonicalize definitions (before)    74.849k i/100ms
+ canonicalize definitions (after)    73.656k i/100ms
+Calculating -------------------------------------
+canonicalize definitions (before)    742.848k (± 2.3%) i/s    (1.35 μs/i) -      3.742M in   5.037975s
+ canonicalize definitions (after)    723.477k (± 7.2%) i/s    (1.38 μs/i) -      3.683M in   5.090416s
+
+Comparison:
+canonicalize definitions (before):   742848.1 i/s
+ canonicalize definitions (after):   723477.2 i/s - same-ish: difference falls within error
+
+ruby 3.4.4 (2025-05-14 revision a38531fd3f) +PRISM [arm64-darwin24]
+Warming up --------------------------------------
+canonical query string (before)     6.537k i/100ms
+ canonical query string (after)     6.611k i/100ms
+Calculating -------------------------------------
+canonical query string (before)     62.439k (± 4.4%) i/s   (16.02 μs/i) -    313.776k in   5.025285s
+ canonical query string (after)     65.966k (± 1.4%) i/s   (15.16 μs/i) -    330.550k in   5.010893s
+
+Comparison:
+ canonical query string (after):    65966.3 i/s
+canonical query string (before):    62439.4 i/s - same-ish: difference falls within error
+
+
+======================================================================
+@egLatencySlo and 5 variables
+======================================================================
+ruby 3.4.4 (2025-05-14 revision a38531fd3f) +PRISM [arm64-darwin24]
+Warming up --------------------------------------
+canonicalize definitions (before)    49.286k i/100ms
+ canonicalize definitions (after)    65.445k i/100ms
+Calculating -------------------------------------
+canonicalize definitions (before)    517.441k (± 4.0%) i/s    (1.93 μs/i) -      2.612M in   5.048223s
+ canonicalize definitions (after)    619.242k (± 5.3%) i/s    (1.61 μs/i) -      3.141M in   5.072908s
+
+Comparison:
+ canonicalize definitions (after):   619242.5 i/s
+canonicalize definitions (before):   517441.1 i/s - 1.20x  slower
+
+ruby 3.4.4 (2025-05-14 revision a38531fd3f) +PRISM [arm64-darwin24]
+Warming up --------------------------------------
+canonical query string (before)     5.277k i/100ms
+ canonical query string (after)     6.586k i/100ms
+Calculating -------------------------------------
+canonical query string (before)     62.625k (± 3.0%) i/s   (15.97 μs/i) -    316.620k in   5.055784s
+ canonical query string (after)     62.972k (± 5.6%) i/s   (15.88 μs/i) -    316.128k in   5.020121s
+
+Comparison:
+ canonical query string (after):    62972.2 i/s
+canonical query string (before):    62625.3 i/s - same-ish: difference falls within error
+

@@ -41,6 +41,22 @@ module ElasticGraph
         ::GraphQL::Query,
         schema_element_names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
       ) -> ::String
+
+      type definition = ::GraphQL::Language::Nodes::FragmentDefinition | ::GraphQL::Language::Nodes::OperationDefinition
+
+      def self.canonicalize: (
+        definition,
+        SchemaArtifacts::RuntimeMetadata::SchemaElementNames
+      ) -> definition
+
+      def self.without_eg_latency_slo: (
+        ::Array[::GraphQL::Language::Nodes::Directive],
+        SchemaArtifacts::RuntimeMetadata::SchemaElementNames
+      ) -> ::Array[::GraphQL::Language::Nodes::Directive]?
+
+      def self.sorted_variables_of: (
+        ::Array[::GraphQL::Language::Nodes::VariableDefinition]
+      ) -> ::Array[::GraphQL::Language::Nodes::VariableDefinition]?
     end
   end
 end
