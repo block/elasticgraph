@@ -2,19 +2,19 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       class ScalarTypeSupertype
-        attr_reader coercion_adapter_ref: ::Hash[::String, ::String]
-        attr_reader indexing_preparer_ref: ::Hash[::String, ::String]
+        attr_reader coercion_adapter_ref: extensionRef
+        attr_reader indexing_preparer_ref: extensionRef
         attr_reader grouping_missing_value_placeholder: (::String | ::Numeric)?
 
         def initialize: (
-          coercion_adapter_ref: ::Hash[::String, ::String],
-          indexing_preparer_ref: ::Hash[::String, ::String],
+          coercion_adapter_ref: extensionRef,
+          indexing_preparer_ref: extensionRef,
           grouping_missing_value_placeholder: (::String | ::Numeric)?
         ) -> void
 
         def with: (
-          ?coercion_adapter_ref: ::Hash[::String, ::String],
-          ?indexing_preparer_ref: ::Hash[::String, ::String],
+          ?coercion_adapter_ref: extensionRef,
+          ?indexing_preparer_ref: extensionRef,
           ?grouping_missing_value_placeholder: (::String | ::Numeric)?
         ) -> ScalarType
       end
@@ -26,8 +26,8 @@ module ElasticGraph
         self.@indexing_preparer_extension_loader: ExtensionLoader?
         def self.indexing_preparer_extension_loader: () -> ExtensionLoader
 
-        DEFAULT_COERCION_ADAPTER_REF: ::Hash[::String, ::String]
-        DEFAULT_INDEXING_PREPARER_REF: ::Hash[::String, ::String]
+        DEFAULT_COERCION_ADAPTER_REF: extensionRef
+        DEFAULT_INDEXING_PREPARER_REF: extensionRef
 
         def self.load_many: (::Hash[::String, ::Hash[::String, untyped]]) -> ::Hash[::String, ScalarType]
 
