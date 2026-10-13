@@ -8,6 +8,7 @@
 
 require "elastic_graph/constants"
 require "elastic_graph/errors"
+require "elastic_graph/support/valid_time_zones"
 require "support/json_schema_matcher"
 
 module ElasticGraph
