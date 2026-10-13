@@ -109,7 +109,7 @@ module ElasticGraph
 
       # Ignore the order of variable declarations. Variables are referenced by name, so the order has no effect
       # on execution. Some federation gateways (such as Hive Gateway) redeclare variables in the order they are
-      # first used when they print the operation they send to a subgraph. The declarations themselves (including
+      # first used when they format the operation they send to a subgraph. The declarations themselves (including
       # their types, default values, and directives) are still compared.
       private_class_method def self.with_sorted_variables(definition)
         return definition unless definition.is_a?(::GraphQL::Language::Nodes::OperationDefinition)

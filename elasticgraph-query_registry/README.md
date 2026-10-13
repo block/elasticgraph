@@ -105,8 +105,7 @@ byte. The registry tolerates some differences that have no effect on
 how the query executes, including whitespace, comments, the order in
 which variables are declared (some federation gateways redeclare them
 in the order they are first used), and the presence or value of an
-`@egLatencySlo` directive. Other differences, such as a changed
-selection, argument, variable type, or variable default value, cause
+`@egLatencySlo` directive. Any other difference will cause
 the query to be rejected as differing from its registered form.
 
 ## Setup
