@@ -37,10 +37,13 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
 
-  spec.add_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
-
   # Indexer specs use real datastore client classes.
   spec.add_development_dependency "elasticgraph-admin", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
+
+  # Note: technically, this is not purely a development dependency, but since `eg-schema_def`
+  # isn't intended to be used in production (or even included in a deployed bundle) we don't
+  # want to declare it as normal dependency here.
+  spec.add_development_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
 end
