@@ -7,16 +7,16 @@
 # frozen_string_literal: true
 
 require "did_you_mean"
-require "elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones"
+require "elastic_graph/support/valid_time_zones"
 
 module ElasticGraph
   class GraphQL
     module ScalarCoercionAdapters
       class TimeZone
-        SUGGESTER = ::DidYouMean::SpellChecker.new(dictionary: VALID_TIME_ZONES.to_a)
+        SUGGESTER = ::DidYouMean::SpellChecker.new(dictionary: Support::VALID_TIME_ZONES.to_a)
 
         def self.coerce_input(value, ctx)
-          return value if value.nil? || VALID_TIME_ZONES.include?(value)
+          return value if value.nil? || Support::VALID_TIME_ZONES.include?(value)
 
           suggestions = SUGGESTER.correct(value).map(&:inspect)
           suggestion_sentence =
@@ -35,7 +35,7 @@ module ElasticGraph
         end
 
         def self.coerce_result(value, ctx)
-          return value if value.nil? || VALID_TIME_ZONES.include?(value)
+          return value if value.nil? || Support::VALID_TIME_ZONES.include?(value)
           nil
         end
       end

@@ -141,12 +141,12 @@ See https://github.com/block/elasticgraph/pull/545 for an example PR.
 
 ## Maintaining Time Zones
 
-ElasticGraph maintains a [set of valid time zones](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/lib/elastic_graph/graphql/scalar_coercion_adapters/valid_time_zones.rb),
+ElasticGraph maintains a [set of valid time zones](https://github.com/block/elasticgraph/blob/main/elasticgraph-support/lib/elastic_graph/support/valid_time_zones.rb),
 which is used to validate client-provided values for the `TimeZone` scalar type. The set is maintained and validated in a few ways:
 
-* [elasticgraph-graphql/script/dump_time_zones](https://github.com/block/elasticgraph/blob/main/elasticgraph-graphql/script/dump_time_zones)
+* [elasticgraph-support/script/dump_time_zones](https://github.com/block/elasticgraph/blob/main/elasticgraph-support/script/dump_time_zones)
   generates `valid_time_zones.rb` by querying the JVM (in order to match OpenSearch and Elasticsearch since they run on the JVM).
-* A [unit test](https://github.com/block/elasticgraph/blob/v1.0.0.rc3/elasticgraph-graphql/spec/unit/elastic_graph/graphql/scalar_coercion_adapters/time_zone_spec.rb#L90)
+* A [unit test](https://github.com/block/elasticgraph/blob/main/elasticgraph-support/spec/unit/elastic_graph/support/valid_time_zones_spec.rb)
   verifies that `valid_time_zones.rb` is up-to-date.
 * An [acceptance test](https://github.com/block/elasticgraph/blob/v1.0.0.rc3/elasticgraph-graphql/spec/acceptance/aggregations_spec.rb#L947)
   executes a GraphQL query using every time zone, to verify that all time zones accepted by our `TimeZone` scalar type are in fact handled
