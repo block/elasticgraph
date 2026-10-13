@@ -4,7 +4,7 @@ module ElasticGraph
       type extensionClass = ::Module | ::Class
 
       # The serialized form of an extension, as produced by `Extension#to_dumpable_hash`.
-      type extensionRef = {
+      type extensionRefHash = {
         "name" => ::String,
         "require_path" => ::String,
         ?"config" => ::Hash[::String, untyped]
@@ -44,7 +44,7 @@ module ElasticGraph
           | (extensionClass, ::String, ::Hash[::Symbol | ::String, untyped], ?::String) -> Extension
 
         def self.load_from_hash: (::Hash[::String, untyped], via: ExtensionLoader) -> Extension
-        def to_dumpable_hash: () -> extensionRef
+        def to_dumpable_hash: () -> extensionRefHash
 
         def verify_against!: (extensionClass) -> void
         def verify_against: (extensionClass) -> ::Array[::String]
