@@ -167,6 +167,33 @@ module ElasticGraph
             end
           end
 
+          context "when given a query string that has an `@egLatencySlo` directive on a fragment" do
+            it "returns a validation error since `@egLatencySlo` is only valid on a query operation and matching would skip the static validation that rejects it" do
+              registered_query_string = <<~EOS.strip
+                query GetTypeName {
+                  __type(name: "Widget") {
+                    ...typeFields
+                  }
+                }
+
+                fragment typeFields on __Type {
+                  name
+                }
+              EOS
+
+              registry = registry_with({"my_client" => [registered_query_string]})
+              modified_query_string = registered_query_string.sub("fragment typeFields on __Type", "fragment typeFields on __Type @eg_latency_slo(ms: 2000)")
+
+              query, errors, status = registry.build_and_validate_query(modified_query_string, client: client_named("my_client"))
+
+              expect(errors).to contain_exactly(a_string_including(
+                "Query GetTypeName", "differs from the registered form of `GetTypeName`", "my_client"
+              ))
+              expect(query.query_string).to eq(modified_query_string)
+              expect(status).to eq(RegistrationStatus::DIFFERING_REGISTERED_QUERY)
+            end
+          end
+
           context "when given a query string that declares the same variables as a registered query in a different order" do
             let(:registered_declarations) { '$first: String!, $second: String = "Part"' }
             let(:reordered_declarations) { '$second: String = "Part", $first: String!' }

@@ -44,12 +44,19 @@ module ElasticGraph
 
       type definition = ::GraphQL::Language::Nodes::FragmentDefinition | ::GraphQL::Language::Nodes::OperationDefinition
 
-      def self.without_eg_latency_slo_directive: (
+      def self.canonicalize: (
         definition,
         SchemaArtifacts::RuntimeMetadata::SchemaElementNames
       ) -> definition
 
-      def self.with_sorted_variables: (definition) -> definition
+      def self.without_eg_latency_slo: (
+        ::Array[::GraphQL::Language::Nodes::Directive],
+        SchemaArtifacts::RuntimeMetadata::SchemaElementNames
+      ) -> ::Array[::GraphQL::Language::Nodes::Directive]?
+
+      def self.sorted_variables_of: (
+        ::Array[::GraphQL::Language::Nodes::VariableDefinition]
+      ) -> ::Array[::GraphQL::Language::Nodes::VariableDefinition]?
     end
   end
 end
