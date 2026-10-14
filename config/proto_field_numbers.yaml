@@ -1,0 +1,362 @@
+# This file is part of your schema definition--not a regenerable schema artifact. It is an
+# input to `schema.proto` generation: ElasticGraph reads it to keep protobuf field and enum
+# value numbers stable as your schema evolves, and `rake schema_artifacts:dump` maintains it
+# for you.
+#
+# You may update it by hand (e.g. to assign a specific number). While prototyping, you may
+# delete this file and regenerate it to reset the number assignments.
+#
+# Once generated protos have been used to serialize data or consumed by another codebase,
+# you must NOT delete this file and regenerate it. The original number assignments would be
+# lost, and previously serialized protobuf messages would be misread.
+---
+messages:
+  Address:
+    fields:
+      id: 1
+      full_address: 2
+      timestamps: 3
+      geo_location: 4
+      shapes: 5
+      manufacturer_id: 6
+    next_number: 7
+  AddressTimestamps:
+    fields:
+      created_at: 1
+    next_number: 2
+  Affiliations:
+    fields:
+      sponsorships_nested: 1
+      sponsorships_object: 2
+    next_number: 3
+  BrokerWholesaler:
+    fields:
+      id: 1
+      active: 2
+    next_number: 3
+  Coach:
+    fields:
+      id: 1
+      name: 2
+      salary: 3
+    next_number: 4
+  CoachProfile:
+    fields:
+      id: 1
+      team_id: 2
+      coach_id: 3
+      annual_salary: 4
+      team_league: 5
+      team_formed_on: 6
+    next_number: 7
+  Company:
+    fields:
+      id: 1
+      name: 2
+      stock_ticker: 3
+    next_number: 4
+  Component:
+    fields:
+      id: 1
+      name: 2
+      created_at: 3
+      position: 4
+      tags: 5
+      widget_name: 6
+      widget_tags: 7
+      widget_workspace_id: 8
+      widget_size: 9
+      widget_cost: 10
+      designer_name: 11
+      part_ids: 12
+      owner_ids: 13
+      owner_id: 14
+    next_number: 15
+  ComponentDesign:
+    fields:
+      id: 1
+      component_id: 2
+      designer_name: 3
+    next_number: 4
+  DirectWholesaler:
+    fields:
+      id: 1
+      active: 2
+    next_number: 3
+  DistributionChannel:
+    fields:
+      online_store: 1
+      physical_store: 2
+      direct_wholesaler: 3
+      broker_wholesaler: 4
+    next_number: 5
+  ElasticGraphEventEnvelope:
+    fields:
+      op: 1
+      id: 2
+      version: 3
+      latency_timestamps: 4
+      address: 5
+      broker_wholesaler: 6
+      coach_profile: 7
+      company: 8
+      component: 9
+      component_design: 10
+      direct_wholesaler: 11
+      distribution_channel: 12
+      electrical_part: 13
+      general_manager_profile: 14
+      manufacturer: 15
+      mechanical_part: 16
+      named_inventor: 17
+      online_store: 18
+      person: 19
+      physical_store: 20
+      sponsor: 21
+      team: 22
+      widget: 23
+      widget_workspace: 24
+    next_number: 25
+  ElectricalPart:
+    fields:
+      id: 1
+      name: 2
+      created_at: 3
+      voltage: 4
+      manufacturer_id: 5
+    next_number: 6
+  GeneralManager:
+    fields:
+      id: 1
+      name: 2
+      salary: 3
+    next_number: 4
+  GeneralManagerProfile:
+    fields:
+      id: 1
+      team_id: 2
+      annual_salary: 3
+      team_league: 4
+      team_formed_on: 5
+    next_number: 6
+  GeoLocation:
+    fields:
+      latitude: 1
+      longitude: 2
+    next_number: 3
+  GeoShape:
+    fields:
+      type: 1
+      coordinates: 2
+    next_number: 3
+  Inventor:
+    fields:
+      person: 1
+      company: 2
+    next_number: 3
+  Manufacturer:
+    fields:
+      id: 1
+      name: 2
+      created_at: 3
+      ceo: 4
+    next_number: 5
+  MechanicalPart:
+    fields:
+      id: 1
+      name: 2
+      created_at: 3
+      material: 4
+      manufacturer_id: 5
+    next_number: 6
+  Money:
+    fields:
+      currency: 1
+      amount_cents: 2
+    next_number: 3
+  NamedInventor:
+    fields:
+      person: 1
+      company: 2
+    next_number: 3
+  OnlineStore:
+    fields:
+      id: 1
+      established_on: 2
+      active: 3
+      name: 4
+    next_number: 5
+  Person:
+    fields:
+      id: 1
+      name: 2
+      nationality: 3
+    next_number: 4
+  PhysicalStore:
+    fields:
+      id: 1
+      established_on: 2
+      active: 3
+    next_number: 4
+  Player:
+    fields:
+      name: 1
+      nicknames: 2
+      affiliations: 3
+      seasons_nested: 4
+      seasons_object: 5
+    next_number: 6
+  PlayerSeason:
+    fields:
+      year: 1
+      games_played: 2
+      awards: 3
+    next_number: 4
+  Position:
+    fields:
+      x: 1
+      "y": 2
+    next_number: 3
+  Sponsor:
+    fields:
+      id: 1
+      name: 2
+    next_number: 3
+  Sponsorship:
+    fields:
+      sponsor_id: 1
+      annual_total: 2
+    next_number: 3
+  Staff:
+    fields:
+      coaches: 1
+      general_manager: 2
+    next_number: 3
+  Team:
+    fields:
+      id: 1
+      league: 2
+      country_code: 3
+      formed_on: 4
+      current_name: 5
+      past_names: 6
+      won_championships_at: 7
+      details: 8
+      stadium_location: 9
+      forbes_valuations: 10
+      forbes_valuation_moneys_nested: 11
+      forbes_valuation_moneys_object: 12
+      current_players_nested: 13
+      current_players_object: 14
+      seasons_nested: 15
+      seasons_object: 16
+      nested_fields: 17
+      nested_fields2: 18
+      staff: 19
+    next_number: 20
+  TeamDetails:
+    fields:
+      uniform_colors: 1
+      count: 2
+    next_number: 3
+  TeamNestedFields:
+    fields:
+      forbes_valuation_moneys: 1
+      current_players: 2
+      seasons: 3
+    next_number: 4
+  TeamRecord:
+    fields:
+      wins: 1
+      losses: 2
+      last_win_on: 3
+      first_win_on: 4
+    next_number: 5
+  TeamSeason:
+    fields:
+      record: 1
+      year: 2
+      notes: 3
+      count: 4
+      started_at: 5
+      won_games_at: 6
+      was_shortened: 7
+      players_nested: 8
+      players_object: 9
+    next_number: 10
+  Widget:
+    fields:
+      id: 1
+      workspace_id: 2
+      amount_cents: 3
+      cost: 4
+      cost_currency_unit: 5
+      cost_currency_name: 6
+      cost_currency_symbol: 7
+      cost_currency_primary_continent: 8
+      cost_currency_introduced_on: 9
+      name: 10
+      internal_name: 11
+      internal_highlightable_name: 12
+      name_text: 13
+      description: 14
+      created_at: 15
+      created_at_time_of_day: 16
+      created_on: 17
+      release_timestamps: 18
+      release_dates: 19
+      component_ids: 20
+      options: 21
+      internal_details: 22
+      internal_highlightable_details: 23
+      the_options: 24
+      inventor: 25
+      named_inventor: 26
+      weight_in_ng_str: 27
+      weight_in_ng: 28
+      tags: 29
+      amounts: 30
+      fees: 31
+      metadata: 32
+      workspace_name: 33
+    next_number: 34
+  WidgetInternalDetails:
+    fields:
+      name: 1
+    next_number: 2
+  WidgetOptions:
+    fields:
+      size: 1
+      the_size: 2
+      color: 3
+      is_draft: 4
+    next_number: 5
+  WidgetWorkspace:
+    fields:
+      id: 1
+      name: 2
+      widget: 3
+    next_number: 4
+  WorkspaceWidget:
+    fields:
+      id: 1
+      created_at: 2
+    next_number: 3
+enums:
+  Color:
+    values:
+      RED: 1
+      BLUE: 2
+      GREEN: 3
+    next_number: 4
+  Material:
+    values:
+      ALLOY: 1
+      CARBON_FIBER: 2
+    next_number: 3
+  Size:
+    values:
+      SMALL: 1
+      MEDIUM: 2
+      LARGE: 3
+    next_number: 4

@@ -10,6 +10,7 @@ require "delegate"
 require "elastic_graph/apollo/schema_definition/api_extension"
 require "elastic_graph/json_ingestion/schema_definition/api_extension"
 require "elastic_graph/local/rake_tasks"
+require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/rake_tasks"
 require "elastic_graph/warehouse/schema_definition/api_extension"
 require "yaml"
@@ -93,6 +94,7 @@ configure_local_rake_tasks = ->(tasks) do
 
   ENV["DEMONSTRATE_WAREHOUSE_APIS"] = "true"
   tasks.schema_definition_extension_modules << ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension
+  tasks.schema_definition_extension_modules << ElasticGraph::ProtoIngestion::SchemaDefinition::APIExtension
   tasks.schema_definition_extension_modules << ElasticGraph::Warehouse::SchemaDefinition::APIExtension
 end
 
