@@ -9,6 +9,7 @@
 require "bundler"
 require "elastic_graph/constants"
 require "elastic_graph/json_ingestion/schema_definition/api_extension"
+require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 require "elastic_graph/schema_definition/rake_tasks"
 require "elastic_graph/schema_definition/schema_elements/type_namer"
 require "graphql"
@@ -307,7 +308,7 @@ module ElasticGraph
             "schema_artifacts:dump",
             path_to_schema: File.join(config_dir, "schema.rb"),
             include_extension_module: false,
-            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension]
+            extension_modules: [JSONIngestion::SchemaDefinition::APIExtension, ProtoIngestion::SchemaDefinition::APIExtension]
           )
 
           # simplecov:disable -- some branches below depend on pass vs fail or local vs CI.
@@ -424,6 +425,7 @@ module ElasticGraph
 
             gem "elasticgraph-schema_definition", path: "#{CommonSpecHelpers::REPO_ROOT}/elasticgraph-schema_definition"
             gem "elasticgraph-json_ingestion", path: "#{CommonSpecHelpers::REPO_ROOT}/elasticgraph-json_ingestion"
+            gem "elasticgraph-proto_ingestion", path: "#{CommonSpecHelpers::REPO_ROOT}/elasticgraph-proto_ingestion"
 
             register_gemspec_gems_with_path = lambda do |eg_gem_name|
               gemspec_contents = ::File.read("#{CommonSpecHelpers::REPO_ROOT}/\#{eg_gem_name}/\#{eg_gem_name}.gemspec")
@@ -442,6 +444,7 @@ module ElasticGraph
             project_root = "#{CommonSpecHelpers::REPO_ROOT}"
 
             require "elastic_graph/json_ingestion/schema_definition/api_extension"
+            require "elastic_graph/proto_ingestion/schema_definition/api_extension"
             require "elastic_graph/schema_definition/rake_tasks"
 
             ElasticGraph::SchemaDefinition::RakeTasks.new(
@@ -449,7 +452,7 @@ module ElasticGraph
               index_document_sizes: true,
               path_to_schema: "\#{project_root}/config/schema.rb",
               schema_artifacts_directory: "\#{project_root}/config/schema/artifacts",
-              extension_modules: [ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension]
+              extension_modules: [ElasticGraph::JSONIngestion::SchemaDefinition::APIExtension, ElasticGraph::ProtoIngestion::SchemaDefinition::APIExtension]
             )
           EOS
 

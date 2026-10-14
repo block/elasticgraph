@@ -54,4 +54,5 @@ Gem::Specification.new do |spec|
   # The test suite exercises the default JSON ingestion extension, but the gem remains optional at runtime.
   spec.add_development_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
+  spec.add_development_dependency "elasticgraph-proto_ingestion", ElasticGraph::VERSION
 end
