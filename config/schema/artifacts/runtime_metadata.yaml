@@ -3252,6 +3252,9 @@ object_types_by_name:
       full_address:
         resolver:
           name: object_with_lookahead
+      geo_location:
+        resolver:
+          name: object_with_lookahead
       timestamps:
         resolver:
           name: object_with_lookahead
@@ -4326,6 +4329,13 @@ object_types_by_name:
         name_in_index: lon
         resolver:
           name: get_record_field_value
+  GeoLocationGroupedBy:
+    elasticgraph_category: geo_location_grouped_by_object
+    graphql_fields_by_name:
+      as_geo_tile:
+        resolver:
+          name: object_with_lookahead
+    graphql_only_return_type: true
   GeoShape:
     graphql_fields_by_name:
       coordinates:
@@ -4334,6 +4344,58 @@ object_types_by_name:
       type:
         resolver:
           name: get_record_field_value
+  GeoTile:
+    elasticgraph_category: geo_tile
+    graphql_fields_by_name:
+      bounds:
+        resolver:
+          name: get_record_field_value
+      center_point:
+        resolver:
+          name: get_record_field_value
+      corners:
+        resolver:
+          name: get_record_field_value
+      x:
+        resolver:
+          name: get_record_field_value
+      "y":
+        resolver:
+          name: get_record_field_value
+      zoom_level:
+        resolver:
+          name: get_record_field_value
+    graphql_only_return_type: true
+  GeoTileBounds:
+    graphql_fields_by_name:
+      east:
+        resolver:
+          name: get_record_field_value
+      north:
+        resolver:
+          name: get_record_field_value
+      south:
+        resolver:
+          name: get_record_field_value
+      west:
+        resolver:
+          name: get_record_field_value
+    graphql_only_return_type: true
+  GeoTileCorners:
+    graphql_fields_by_name:
+      north_east:
+        resolver:
+          name: get_record_field_value
+      north_west:
+        resolver:
+          name: get_record_field_value
+      south_east:
+        resolver:
+          name: get_record_field_value
+      south_west:
+        resolver:
+          name: get_record_field_value
+    graphql_only_return_type: true
   IDListFilterInput:
     graphql_fields_by_name:
       count:
@@ -7271,6 +7333,9 @@ object_types_by_name:
       seasons_object:
         resolver:
           name: object_with_lookahead
+      stadium_location:
+        resolver:
+          name: object_with_lookahead
       staff:
         resolver:
           name: object_with_lookahead
@@ -9283,6 +9348,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       full_address:
+        resolver:
+          name: object_with_lookahead
+      geo_location:
         resolver:
           name: object_with_lookahead
       internal_details:

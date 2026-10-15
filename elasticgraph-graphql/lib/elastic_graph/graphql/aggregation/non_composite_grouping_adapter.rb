@@ -62,7 +62,10 @@ module ElasticGraph
           # - Converts bucket keys into hashes that can be used to resolve `grouped_by` fields.
           # - Recursively flattens multiple levels of aggregations (which happens when we need to mix multiple kinds of
           #   bucket aggregations to group in the way the client requested) into a single flat list.
-          def format_buckets(sub_agg, buckets_path, parent_key_fields: {}, parent_key_values: [])
+          #
+          # Geo-grid counts lack error bounds, so we carry the full scope count and uncertainty through
+          # every grouping layer to avoid reporting incomplete counts as exact.
+          def format_buckets(sub_agg, buckets_path, parent_key_fields: {}, parent_key_values: [], total_doc_count: sub_agg["doc_count"], count_error_unknown: false)
             agg_with_buckets = sub_agg.dig(*buckets_path)
 
             meta = agg_with_buckets.fetch("meta")
@@ -72,6 +75,7 @@ module ElasticGraph
             sub_buckets_path = meta["buckets_path"] # buckets_path is optional, so we don't use fetch.
             missing_values = meta["missing_values"] # missing_values is optional, so we don't use fetch.
             merge_into_bucket = meta.fetch("merge_into_bucket")
+            count_error_unknown ||= meta.fetch("count_error_unknown", false)
 
             raw_buckets = agg_with_buckets.fetch("buckets") # : ::Array[::Hash[::String, untyped]]
 
@@ -106,11 +110,19 @@ module ElasticGraph
               # If there's another level of aggregations, `buckets_path` will provide us with the path to that next level.
               # We can use it to recurse as we build a flat list of buckets.
               if sub_buckets_path
-                format_buckets(raw_bucket, sub_buckets_path, parent_key_fields: key_fields, parent_key_values: key_values)
+                format_buckets(raw_bucket, sub_buckets_path, parent_key_fields: key_fields, parent_key_values: key_values, total_doc_count: total_doc_count, count_error_unknown: count_error_unknown)
               else
-                [raw_bucket.merge(merge_into_bucket).merge({"key" => key_fields, "key_values" => key_values})]
+                [format_leaf_bucket(raw_bucket, merge_into_bucket: merge_into_bucket, key_fields: key_fields, key_values: key_values, total_doc_count: total_doc_count, count_error_unknown: count_error_unknown)]
               end
             end
+          end
+
+          # Formats a final bucket and supplies a conservative count-error bound when the datastore provides none.
+          def format_leaf_bucket(raw_bucket, merge_into_bucket:, key_fields:, key_values:, total_doc_count:, count_error_unknown:)
+            bucket = raw_bucket.merge(merge_into_bucket).merge({"key" => key_fields, "key_values" => key_values})
+            return bucket unless count_error_unknown
+
+            bucket.merge({"doc_count_error_upper_bound" => total_doc_count - bucket.fetch("doc_count")})
           end
 
           # A `terms` or `multi_terms` sub-aggregation is automatically sorted by `doc_count` and we pass

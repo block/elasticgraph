@@ -139,6 +139,9 @@ module ElasticGraph
         :as_date_time, :as_date, :as_time_of_day, :as_day_of_week,
         # Date/time grouping aggregation arguments
         :offset, :amount, :unit, :time_zone, :truncation_unit,
+        # Geographic grouping fields and arguments.
+        :as_geo_tile, :zoom_level, :x, :y, :center_point, :bounds, :corners,
+        :north, :south, :east, :west, :north_west, :north_east, :south_west, :south_east,
         # For aggregation counts.
         :approximate_value, :exact_value, :upper_bound,
         # For pagination.

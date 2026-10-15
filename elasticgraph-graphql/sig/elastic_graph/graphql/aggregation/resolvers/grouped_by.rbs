@@ -30,6 +30,11 @@ module ElasticGraph
 
           private
 
+          def resolve_geo_tile: (
+            ::Array[PathSegment],
+            names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames
+          ) -> ::Hash[::String, untyped]?
+
           def work_around_terms_aggregation_boolean_value: (untyped) -> untyped
         end
       end
