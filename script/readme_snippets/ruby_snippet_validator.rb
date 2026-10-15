@@ -14,6 +14,10 @@ class RubySnippetValidator < SnippetValidator
   # Constants for Ruby snippet validation
   RACK_TIMEOUT_SECONDS = 10
 
+  # Artifacts a previous snippet may have dumped into the shared temp project.
+  SCHEMA_ARTIFACTS_DIRECTORY = "config/schema/artifacts"
+  PROTO_FIELD_NUMBERS_GLOB = "config/**/proto_field_numbers.yaml"
+
   # Rack config detection patterns
   RACK_SUCCESS_INDICATORS = [
     "Listening on",
@@ -91,6 +95,13 @@ class RubySnippetValidator < SnippetValidator
   end
 
   def dump_artifacts
+    # Each snippet is an independent example, not the next step of one evolving schema. The
+    # snippets share a temp project, so artifacts dumped by an earlier snippet must be discarded
+    # first. Otherwise a snippet gets compared against an unrelated schema--for example, the
+    # protobuf compatibility check reads the previous snippet's `schema.proto` as its baseline.
+    FileUtils.rm_rf(SCHEMA_ARTIFACTS_DIRECTORY)
+    FileUtils.rm_f(Dir.glob(PROTO_FIELD_NUMBERS_GLOB))
+
     output = `bundle exec rake schema_artifacts:dump 2>&1`
     [$?.success?, output]
   end
