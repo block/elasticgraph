@@ -37,7 +37,6 @@ module ElasticGraph
           end
 
           expect(results.proto_schema).to include("string id = 7;", "string name = 10;")
-          expect(proto_type_def_from(results.proto_schema, "Account")).to include("// Next field number: 11")
           expect(results.proto_field_number_mappings.dig("messages", "Account", "next_number")).to eq(11)
         end
 
@@ -144,7 +143,7 @@ module ElasticGraph
           end
 
           expect(results3.proto_schema).to include(
-            "string id = 1;", "string legacy_field = 2;", "string name = 3;", "// Next field number: 4"
+            "string id = 1;", "string legacy_field = 2;", "string name = 3;"
           )
           expect(results3.proto_schema).not_to include("reserved 2;")
           expect(results3.proto_field_number_mappings).to eq(results2.proto_field_number_mappings)
@@ -231,8 +230,7 @@ module ElasticGraph
           expect(proto_type_def_from(results1.proto_schema, "Status")).to include(
             "STATUS_ACTIVE = 1;",
             "STATUS_PAUSED = 2;",
-            "STATUS_INACTIVE = 3;",
-            "// Next value number: 4"
+            "STATUS_INACTIVE = 3;"
           )
 
           # `PAUSED` has been removed and `ARCHIVED` added since the mappings were dumped.
@@ -252,8 +250,7 @@ module ElasticGraph
             "STATUS_ACTIVE = 1;",
             "STATUS_INACTIVE = 3;",
             "STATUS_ARCHIVED = 4;",
-            "reserved 2; // Previously used by PAUSED.",
-            "// Next value number: 5"
+            "reserved 2; // Previously used by PAUSED."
           )
 
           # `PAUSED` keeps its number reserved in the artifact so it is never reused for a new value.

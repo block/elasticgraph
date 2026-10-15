@@ -14,6 +14,16 @@ module ElasticGraph
         #
         # @api private
         module ProtoDocumentation
+          # Joins field or enum value definitions, separating documented entries with blank lines.
+          #
+          # @param definitions [Array<String>] declarations with any leading comments
+          # @return [String] formatted protobuf declarations
+          def self.join_definitions(definitions)
+            definitions.chunk_while do |previous, following|
+              !previous.include?("\n") && !following.include?("\n")
+            end.map { |group| group.join("\n") }.join("\n\n")
+          end
+
           # Formats documentation as line comments.
           #
           # @param doc_comment [String, nil] schema element documentation

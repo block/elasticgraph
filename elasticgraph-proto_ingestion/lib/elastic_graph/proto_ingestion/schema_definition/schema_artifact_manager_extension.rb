@@ -28,7 +28,7 @@ module ElasticGraph
           "",
           "Once generated protos have been used to serialize data or consumed by another codebase,",
           "you must NOT delete this file and regenerate it. The original number assignments would be",
-          "lost, and previously serialized protobuf messages would be misread."
+          "lost, and previously serialized protobuf messages could be misread."
         ].freeze
 
         private

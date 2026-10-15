@@ -30,7 +30,6 @@ module ElasticGraph
               optional string id = 1;
               optional google.protobuf.Timestamp created_at = 2;
               optional google.protobuf.Timestamp updated_at = 3;
-              // Next field number: 4
             }
           PROTO
         end
@@ -53,9 +52,9 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Event")).to eq(<<~PROTO.strip)
             message Event {
               optional string id = 1;
+
               // Must be formatted as an ISO 8601 timestamp.
               optional string created_at = 2;
-              // Next field number: 3
             }
           PROTO
         end
@@ -79,7 +78,6 @@ module ElasticGraph
             message Event {
               optional string id = 1;
               optional google.type.Date occurred_on = 2;
-              // Next field number: 3
             }
           PROTO
         end
@@ -160,13 +158,14 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Person")).to eq(<<~PROTO.strip)
             message Person {
               optional string id = 1;
+
               // The dates that matter to this person.
               //
               // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
               repeated string important_dates = 2;
+
               // Must be an IANA time zone identifier, e.g. "America/Los_Angeles".
               optional string time_zone = 3;
-              // Next field number: 4
             }
           PROTO
         end
@@ -234,13 +233,13 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "Order")).to eq(<<~PROTO.strip)
             message Order {
               optional string id = 1;
+
               // What the customer owes.
               //
               // Must be an amount and a currency.
               //
               // The amount is in minor units.
               optional string total = 2;
-              // Next field number: 3
             }
           PROTO
         end

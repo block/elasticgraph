@@ -54,7 +54,6 @@ module ElasticGraph
                 .elasticgraph.Car car = 1;
                 .elasticgraph.Bike bike = 2;
               }
-              // Next field number: 3
             }
           PROTO
           expect(proto_type_def_from(proto, "Inventor")).to eq(<<~PROTO.strip)
@@ -63,7 +62,6 @@ module ElasticGraph
                 .elasticgraph.Person person = 1;
                 .elasticgraph.Company company = 2;
               }
-              // Next field number: 3
             }
           PROTO
           expect(proto_type_def_from(proto, "Car")).to include("string id = 1;", "int32 doors = 2;")
@@ -97,7 +95,6 @@ module ElasticGraph
               oneof value {
                 .elasticgraph.Car car = 1;
               }
-              // Next field number: 2
             }
           PROTO
           expect(proto_type_def_from(proto, "Car")).to include("string id = 1;")
@@ -122,7 +119,6 @@ module ElasticGraph
               oneof value {
                 .elasticgraph.DeliveryVehicle delivery_vehicle = 1;
               }
-              // Next field number: 2
             }
           PROTO
         end

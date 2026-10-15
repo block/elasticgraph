@@ -91,8 +91,7 @@ module ElasticGraph
             "string id = 7;",
             ".elasticgraph.Status status = 8;",
             "STATUS_ACTIVE = 8;",
-            "STATUS_INACTIVE = 5;",
-            "// Next value number: 9"
+            "STATUS_INACTIVE = 5;"
           )
         end
 
