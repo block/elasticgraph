@@ -265,8 +265,14 @@ cursor are never filled:
 messages:
   Widget:
     fields:
-      id: 1
-      display_name: 2
+      id:
+        field_number: 1
+        proto_type: string
+        list_depth: 0
+      display_name:
+        field_number: 2
+        proto_type: string
+        list_depth: 0
     next_number: 3
 ```
 
@@ -279,6 +285,13 @@ lost. Commit it to version control alongside your schema definition; `schema_art
 reports it as out of date when your schema has changed but the file has not been dumped,
 so CI will catch a forgotten dump.
 
+Each message field retains its protobuf base type and list depth alongside its number.
+For example, `[[Int]]` records `proto_type: int32` and `list_depth: 2`, independent of
+its generated wrapper messages. Enum values continue to store their assigned numbers.
+Changing a retained field's wire type or list depth is rejected; use a new field name
+to allocate a fresh number. Changes to GraphQL nullability do not change the wire contract.
+The number-only message-field format is no longer accepted.
+
 The file is safe to hand-edit (e.g. when resolving a merge conflict), but it is strictly
 validated: unknown keys, non-integer numbers, out-of-range numbers, and duplicate numbers
 are all rejected at dump time rather than silently reassigning numbers.
@@ -290,7 +303,8 @@ remaining alternatives.
 Removed fields and `oneof` alternatives remain in the sidecar. Their numbers are explicitly
 reserved in `schema.proto`, with comments recording the prior names, while every generated
 message includes a comment identifying its next field number. If a removed field or alternative
-is restored under the same name, it reuses its original number and is no longer reserved.
+is restored under the same name with the same wire contract, it reuses its original number
+and is no longer reserved.
 
 Both `schema.proto` and the sidecar use public GraphQL field names. Index field names,
 including `name_in_index` overrides, are not part of the protobuf wire schema or its
