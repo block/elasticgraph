@@ -215,6 +215,8 @@ index_templates:
                 format: strict_date_time
               was_shortened:
                 type: boolean
+              stadium_location:
+                type: geo_point
               players_nested:
                 properties:
                   name:
@@ -414,6 +416,8 @@ index_templates:
                 format: strict_date_time
               was_shortened:
                 type: boolean
+              stadium_location:
+                type: geo_point
               players_nested:
                 properties:
                   name:
@@ -663,6 +667,8 @@ index_templates:
                     format: strict_date_time
                   was_shortened:
                     type: boolean
+                  stadium_location:
+                    type: geo_point
                   players_nested:
                     properties:
                       name:
@@ -950,6 +956,8 @@ index_templates:
                     format: strict_date_time
                   was_shortened:
                     type: boolean
+                  stadium_location:
+                    type: geo_point
                   players_nested:
                     properties:
                       name:
@@ -1215,6 +1223,12 @@ index_templates:
               seasons_object|won_games_at:
                 type: integer
               seasons_object|was_shortened:
+                type: integer
+              seasons_object|stadium_location:
+                type: integer
+              seasons_object|stadium_location|lat:
+                type: integer
+              seasons_object|stadium_location|lon:
                 type: integer
               seasons_object|players_nested:
                 type: integer

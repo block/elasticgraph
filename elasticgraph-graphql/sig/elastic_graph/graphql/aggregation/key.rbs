@@ -29,6 +29,7 @@ module ElasticGraph
         end
 
         def self.missing_value_bucket_key: (::String) -> ::String
+        def self.value_count_key: (::String) -> ::String
         def self.extract_aggregation_name_from: (::String) -> ::String
         def self.encode: (::Array[::String]) -> ::String
         def self.verify_no_delimiter_in: (*::String) -> void

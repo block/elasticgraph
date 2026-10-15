@@ -1437,6 +1437,13 @@ json_schema_version: 1
         ElasticGraph:
           type: Boolean
           nameInIndex: was_shortened
+      stadium_location:
+        anyOf:
+        - "$ref": "#/$defs/GeoLocation"
+        - type: 'null'
+        ElasticGraph:
+          type: GeoLocation
+          nameInIndex: stadium_location
       players_nested:
         type: array
         items:
@@ -1463,6 +1470,7 @@ json_schema_version: 1
     - started_at
     - won_games_at
     - was_shortened
+    - stadium_location
     - players_nested
     - players_object
   Untyped:

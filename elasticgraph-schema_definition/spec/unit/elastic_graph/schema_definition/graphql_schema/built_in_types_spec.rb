@@ -49,6 +49,123 @@ module ElasticGraph
           end
         end
 
+        it "defines geographic grouping options with documentation" do
+          expect(type_named("GeoLocationGroupedBy", include_docs: true)).to eq(<<~EOS.strip)
+            """
+            Offers geographic grouping representations for a location.
+            """
+            type GeoLocationGroupedBy {
+              """
+              Groups locations into Web Mercator [XYZ tiles](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames). Missing locations produce a `null` tile.
+              Points beyond ±85.0511° latitude are grouped into the northernmost or southernmost row,
+              so a point can be outside the bounds of the tile it is grouped into.
+              Boundary points are assigned to the tile to the east or south, subject to datastore coordinate encoding.
+              """
+              #{schema_elements.as_geo_tile}(
+                """
+                The Web Mercator zoom level, from 0 through 29.
+                At zoom level z, the map has 2^z rows and 2^z columns. Increasing the zoom level by 1
+                doubles both, producing four times as many tiles.
+                """
+                #{schema_elements.zoom_level}: Int! = 7): GeoTile
+            }
+          EOS
+        end
+
+        it "defines a geographic tile with documentation" do
+          expect(type_named("GeoTile", include_docs: true)).to eq(<<~EOS.strip)
+            """
+            A tile in the Web Mercator XYZ grid. Its coordinates identify a cell, not a fixed ground distance.
+            """
+            type GeoTile {
+              """
+              The zoom level of the tile, from 0 through 29.
+              """
+              #{schema_elements.zoom_level}: Int!
+              """
+              The zero-based tile coordinate, counted west to east, from 0 through 2^zoomLevel - 1.
+              """
+              x: Int!
+              """
+              The zero-based tile coordinate, counted north to south, from 0 through 2^zoomLevel - 1.
+              """
+              y: Int!
+              """
+              The center of the tile as drawn on a Web Mercator map, not the average record location or the midpoint
+              of the tile's latitude bounds. These differ noticeably only at low zoom levels: for tile 1/0/0,
+              the map center point is at about 66.51° latitude, but the bounds midpoint is at about 42.53°.
+              """
+              #{schema_elements.map_center_point}: GeoLocation!
+              """
+              The geographic bounds of the tile. Web Mercator excludes the poles and stops at approximately ±85.0511°.
+              """
+              bounds: GeoTileBounds!
+              """
+              The four corners of the tile, calculated from its geographic bounds.
+              """
+              corners: GeoTileCorners!
+            }
+          EOS
+        end
+
+        it "defines geographic tile bounds with documentation" do
+          expect(type_named("GeoTileBounds", include_docs: true)).to eq(<<~EOS.strip)
+            """
+            The geographic bounds of a Web Mercator XYZ tile. Tiles do not cross the antimeridian.
+            """
+            type GeoTileBounds {
+              """
+              The latitude of the northern boundary of the tile.
+              """
+              north: Float!
+              """
+              The latitude of the southern boundary of the tile.
+              """
+              south: Float!
+              """
+              The longitude of the eastern boundary of the tile.
+              """
+              east: Float!
+              """
+              The longitude of the western boundary of the tile.
+              """
+              west: Float!
+            }
+          EOS
+        end
+
+        it "defines geographic tile corners with full descriptions even when field names are abbreviated" do
+          names = SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(
+            form: schema_elements.form,
+            overrides: {northwest: "nw", northeast: "ne", southwest: "sw", southeast: "se"}
+          )
+          results = define_schema_with_schema_elements(names).graphql_schema_string
+
+          expect(type_def_from(results, "GeoTileCorners", include_docs: true)).to eq(<<~EOS.strip)
+            """
+            The geographic locations of the four corners of a Web Mercator XYZ tile.
+            """
+            type GeoTileCorners {
+              """
+              The northwest corner of the tile.
+              """
+              nw: GeoLocation!
+              """
+              The northeast corner of the tile.
+              """
+              ne: GeoLocation!
+              """
+              The southwest corner of the tile.
+              """
+              sw: GeoLocation!
+              """
+              The southeast corner of the tile.
+              """
+              se: GeoLocation!
+            }
+          EOS
+        end
+
         it "defines an `@eg_latency_slo` directive" do
           expect(type_named("@#{schema_elements.eg_latency_slo}", include_docs: true)).to eq(<<~EOS.strip)
             """

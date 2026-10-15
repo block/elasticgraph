@@ -339,6 +339,7 @@ message TeamSeason {
   optional google.protobuf.Timestamp started_at = 5;
   repeated google.protobuf.Timestamp won_games_at = 6;
   optional bool was_shortened = 7;
+  optional .elasticgraph.GeoLocation stadium_location = 10;
   repeated .elasticgraph.Player players_nested = 8;
   repeated .elasticgraph.Player players_object = 9;
 }

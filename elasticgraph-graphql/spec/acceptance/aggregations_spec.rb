@@ -1665,6 +1665,274 @@ module ElasticGraph
         [results.fetch(case_correctly("page_info")), nodes]
       end
 
+      it "supports grouping by geographic tile, including pagination" do
+        index_records(
+          build(:team, league: "MLB", current_name: "Dodgers", stadium_location: build(:geo_location, latitude: 34.0739, longitude: -118.2400)),
+          build(:team, league: "MLB", current_name: "Angels", stadium_location: build(:geo_location, latitude: 34.0739, longitude: -118.2400)),
+          build(:team, league: "MLB", current_name: "Yankees", stadium_location: build(:geo_location, latitude: 40.8296, longitude: -73.9262)),
+          build(:team, league: "MLB", current_name: "Red Sox", stadium_location: build(:geo_location, latitude: 42.3467, longitude: -71.0972)),
+          build(:team, league: "NRL", current_name: "Rabbitohs", stadium_location: build(:geo_location, latitude: -33.8474, longitude: 151.0634)),
+          # Web Mercator stops at about 85.05° latitude, so the datastore puts this location in the northernmost row of tiles.
+          build(:team, league: "NHL", current_name: "Polar Bears", stadium_location: build(:geo_location, latitude: 90, longitude: -180)),
+          build(:team, league: "NBA", current_name: "Nomads", stadium_location: nil)
+        )
+
+        # Tiles are sorted by x then y (as numbers, so 235 sorts after 77), with the missing-location group first.
+        expect(team_counts_by_stadium_tile(zoom_level: 8)).to eq [
+          [nil, 1], # Nomads
+          [[0, 0], 1], # Polar Bears
+          [[43, 102], 2], # Dodgers and Angels
+          [[75, 96], 1], # Yankees
+          [[77, 94], 1], # Red Sox
+          [[235, 153], 1] # Rabbitohs
+        ]
+
+        # Zoom level 2 has a 4x4 grid of tiles, so the Yankees and Red Sox are in the same tile.
+        expect(team_counts_by_stadium_tile(zoom_level: 2, groupings: ["league"])).to eq [
+          [{"league" => "MLB"}, [0, 1], 2], # Dodgers and Angels
+          [{"league" => "MLB"}, [1, 1], 2], # Yankees and Red Sox
+          [{"league" => "NBA"}, nil, 1], # Nomads
+          [{"league" => "NHL"}, [0, 0], 1], # Polar Bears
+          [{"league" => "NRL"}, [3, 2], 1] # Rabbitohs
+        ]
+
+        # With aliases, one query can group by tiles at two zoom levels.
+        expect(team_counts_by_stadium_tiles_at_zoom_levels_2_and_8).to eq [
+          [nil, nil, 1], # Nomads
+          [[0, 0], [0, 0], 1], # Polar Bears
+          [[0, 1], [43, 102], 2], # Dodgers and Angels
+          [[1, 1], [75, 96], 1], # Yankees
+          [[1, 1], [77, 94], 1], # Red Sox
+          [[3, 2], [235, 153], 1] # Rabbitohs
+        ]
+
+        # The default zoom level is 7.
+        nodes = list_team_stadium_tile_groupings(as_geo_tile_args: {}, tile_fields: "zoom_level x y")
+        expect(nodes.map { |node| stadium_tile_from(node)&.values }).to eq [nil, [7, 0, 0], [7, 21, 51], [7, 37, 48], [7, 38, 47], [7, 117, 76]]
+
+        nodes = list_team_stadium_tile_groupings(tile_fields: all_tile_fields, filter: {current_name: {equal_to_any_of: ["Dodgers"]}})
+        expect(nodes.map { |node| stadium_tile_from(node) }).to match [expected_tile(
+          zoom_level: 8, x: 43, y: 102,
+          map_center_point: [33.72433966174759, -118.828125],
+          north: 34.307143856288036, south: 33.13755119234615, east: -118.125, west: -119.53125
+        )]
+
+        # At the lowest zoom level, one tile covers the world. The Polar Bears' location (latitude 90) is outside its bounds.
+        nodes = list_team_stadium_tile_groupings(
+          as_geo_tile_args: {zoom_level: GEO_TILE_ZOOM_LEVELS.min},
+          tile_fields: all_tile_fields,
+          filter: {current_name: {equal_to_any_of: ["Polar Bears", "Rabbitohs"]}}
+        )
+        expect(nodes.map { |node| [stadium_tile_from(node), node.fetch("count")] }).to match [[expected_tile(
+          zoom_level: 0, x: 0, y: 0,
+          map_center_point: [0.0, 0.0],
+          north: 85.05112877980659, south: -85.05112877980659, east: 180.0, west: -180.0
+        ), 2]]
+
+        # Paginating at the highest zoom level (29) covers cursors with the largest tile coordinates.
+        nodes, page_info = list_team_stadium_tile_groupings_with_page_info(
+          as_geo_tile_args: {zoom_level: GEO_TILE_ZOOM_LEVELS.max},
+          first: 1,
+          filter: {current_name: {equal_to_any_of: ["Dodgers", "Yankees"]}}
+        )
+        expect(nodes.map { |node| stadium_x_and_y_from(node) }).to eq [[92103187, 214330019]]
+
+        nodes = list_team_stadium_tile_groupings(
+          as_geo_tile_args: {zoom_level: GEO_TILE_ZOOM_LEVELS.max},
+          first: 1,
+          after: page_info.fetch(case_correctly("end_cursor")),
+          filter: {current_name: {equal_to_any_of: ["Dodgers", "Yankees"]}}
+        )
+        expect(nodes.map { |node| stadium_x_and_y_from(node) }).to eq [[158188715, 201623153]]
+
+        expect_out_of_range_zoom_level_error(GEO_TILE_ZOOM_LEVELS.min - 1)
+        expect_out_of_range_zoom_level_error(GEO_TILE_ZOOM_LEVELS.max + 1)
+
+        forward_paginate_through_stadium_tile_groupings
+        backward_paginate_through_stadium_tile_groupings
+        paginate_between_stadium_tile_cursors
+      end
+
+      def expect_out_of_range_zoom_level_error(zoom_level)
+        message = "`#{case_correctly("zoom_level")}` must be between #{GEO_TILE_ZOOM_LEVELS.min} and #{GEO_TILE_ZOOM_LEVELS.max}, but is #{zoom_level}."
+        response = nil
+
+        expect {
+          response = list_team_stadium_tile_groupings_with_page_info(as_geo_tile_args: {zoom_level: zoom_level}, expect_errors: true)
+        }.to log_warning(a_string_including(message))
+
+        expect(response["errors"]).to contain_exactly(a_hash_including("message" => message))
+      end
+
+      def forward_paginate_through_stadium_tile_groupings
+        nodes, page_info = list_team_stadium_tile_groupings_with_page_info(first: 2)
+
+        expect(page_info).to match(page_info_of(has_next_page: true, has_previous_page: false))
+        expect(nodes.map { |node| stadium_x_and_y_from(node) }).to eq [nil, [0, 0]]
+
+        nodes, page_info = list_team_stadium_tile_groupings_with_page_info(first: 2, after: page_info.fetch(case_correctly("end_cursor")))
+
+        expect(page_info).to match(page_info_of(has_next_page: true, has_previous_page: true))
+        expect(nodes.map { |node| stadium_x_and_y_from(node) }).to eq [[43, 102], [75, 96]]
+
+        nodes, page_info = list_team_stadium_tile_groupings_with_page_info(first: 2, after: page_info.fetch(case_correctly("end_cursor")))
+
+        expect(page_info).to match(page_info_of(has_next_page: false, has_previous_page: true))
+        expect(nodes.map { |node| stadium_x_and_y_from(node) }).to eq [[77, 94], [235, 153]]
+      end
+
+      def backward_paginate_through_stadium_tile_groupings
+        nodes, page_info = list_team_stadium_tile_groupings_with_page_info(last: 2)
+
+        expect(page_info).to match(page_info_of(has_next_page: false, has_previous_page: true))
+        expect(nodes.map { |node| stadium_x_and_y_from(node) }).to eq [[77, 94], [235, 153]]
+
+        nodes, page_info = list_team_stadium_tile_groupings_with_page_info(last: 2, before: page_info.fetch(case_correctly("start_cursor")))
+
+        expect(page_info).to match(page_info_of(has_next_page: true, has_previous_page: true))
+        expect(nodes.map { |node| stadium_x_and_y_from(node) }).to eq [[43, 102], [75, 96]]
+
+        nodes, page_info = list_team_stadium_tile_groupings_with_page_info(last: 2, before: page_info.fetch(case_correctly("start_cursor")))
+
+        expect(page_info).to match(page_info_of(has_next_page: true, has_previous_page: false))
+        expect(nodes.map { |node| stadium_x_and_y_from(node) }).to eq [nil, [0, 0]]
+      end
+
+      # When a query has both `after` and `before`, ElasticGraph drops the groups on or after `before` itself, comparing
+      # tiles as numbers. Compared as strings, tile 8/235/153 would sort before tile 8/43/102.
+      def paginate_between_stadium_tile_cursors
+        _, first_page_info = list_team_stadium_tile_groupings_with_page_info(first: 1)
+        _, last_page_info = list_team_stadium_tile_groupings_with_page_info(last: 1)
+
+        nodes, page_info = list_team_stadium_tile_groupings_with_page_info(
+          after: first_page_info.fetch(case_correctly("end_cursor")),
+          before: last_page_info.fetch(case_correctly("start_cursor"))
+        )
+
+        expect(page_info).to match(page_info_of(has_next_page: true, has_previous_page: true))
+        expect(nodes.map { |node| stadium_x_and_y_from(node) }).to eq [[0, 0], [43, 102], [75, 96], [77, 94]]
+      end
+
+      # Returns `[x_and_y, count]` (or `[other_groupings, x_and_y, count]`) for each group, in order.
+      def team_counts_by_stadium_tile(zoom_level:, groupings: [])
+        nodes = list_team_stadium_tile_groupings(as_geo_tile_args: {zoom_level: zoom_level}, groupings: groupings)
+
+        nodes.map do |node|
+          other_groupings = node.fetch(grouped_by).except(case_correctly("stadium_location"))
+          [*([other_groupings] unless groupings.empty?), stadium_x_and_y_from(node), node.fetch("count")]
+        end
+      end
+
+      # Returns `[zoom_level_2_x_and_y, zoom_level_8_x_and_y, count]` for each group, in order.
+      def team_counts_by_stadium_tiles_at_zoom_levels_2_and_8
+        results = call_graphql_query(<<~QUERY)
+          query {
+            team_aggregations {
+              nodes {
+                grouped_by {
+                  stadium_location {
+                    zoom2: as_geo_tile(zoom_level: 2) { x y }
+                    zoom8: as_geo_tile(zoom_level: 8) { x y }
+                  }
+                }
+                count
+              }
+            }
+          }
+        QUERY
+
+        results.dig("data", case_correctly("team_aggregations"), "nodes").map do |node|
+          stadium_location = node.dig(grouped_by, case_correctly("stadium_location"))
+          [stadium_location.fetch("zoom2")&.values_at("x", "y"), stadium_location.fetch("zoom8")&.values_at("x", "y"), node.fetch("count")]
+        end
+      end
+
+      def list_team_stadium_tile_groupings(**args)
+        nodes, _ = list_team_stadium_tile_groupings_with_page_info(**args)
+        nodes
+      end
+
+      def list_team_stadium_tile_groupings_with_page_info(as_geo_tile_args: {zoom_level: 8}, tile_fields: "x y", groupings: [], expect_errors: false, **args)
+        results = call_graphql_query(<<~QUERY, allow_errors: expect_errors)
+          query {
+            team_aggregations#{graphql_args(args)} {
+              page_info {
+                end_cursor
+                start_cursor
+                has_next_page
+                has_previous_page
+              }
+
+              nodes {
+                grouped_by {
+                  #{groupings.join("\n")}
+                  stadium_location { as_geo_tile#{graphql_args(as_geo_tile_args)} { #{tile_fields} } }
+                }
+                count
+              }
+            }
+          }
+        QUERY
+
+        return results if expect_errors
+
+        results = results.dig("data", case_correctly("team_aggregations"))
+        [results.fetch("nodes"), results.fetch(case_correctly("page_info"))]
+      end
+
+      def stadium_tile_from(node)
+        node.dig(grouped_by, case_correctly("stadium_location"), case_correctly("as_geo_tile"))
+      end
+
+      def stadium_x_and_y_from(node)
+        stadium_tile_from(node)&.values_at("x", "y")
+      end
+
+      def page_info_of(has_next_page:, has_previous_page:)
+        {
+          case_correctly("end_cursor") => /\w+/,
+          case_correctly("start_cursor") => /\w+/,
+          case_correctly("has_next_page") => has_next_page,
+          case_correctly("has_previous_page") => has_previous_page
+        }
+      end
+
+      let(:all_tile_fields) do
+        <<~EOS
+          zoom_level
+          x
+          y
+          map_center_point { latitude longitude }
+          bounds { north south east west }
+          corners {
+            northwest { latitude longitude }
+            northeast { latitude longitude }
+            southwest { latitude longitude }
+            southeast { latitude longitude }
+          }
+        EOS
+      end
+
+      # Tile latitudes come from `sinh`/`atan`, which can differ in the last bit across platforms, so we compare coordinates with a tolerance.
+      def expected_tile(zoom_level:, x:, y:, map_center_point:, north:, south:, east:, west:)
+        degrees = ->(value) { a_value_within(1e-9).of(value) }
+        point = ->(latitude, longitude) { {"latitude" => degrees.call(latitude), "longitude" => degrees.call(longitude)} }
+
+        {
+          case_correctly("zoom_level") => zoom_level,
+          "x" => x,
+          "y" => y,
+          case_correctly("map_center_point") => point.call(*map_center_point),
+          "bounds" => {"north" => degrees.call(north), "south" => degrees.call(south), "east" => degrees.call(east), "west" => degrees.call(west)},
+          "corners" => {
+            "northwest" => point.call(north, west),
+            "northeast" => point.call(north, east),
+            "southwest" => point.call(south, west),
+            "southeast" => point.call(south, east)
+          }
+        }
+      end
+
       it "supports pagination on an ungrouped aggregation connection" do
         index_records(
           build(:widget, amount_cents: 100),
