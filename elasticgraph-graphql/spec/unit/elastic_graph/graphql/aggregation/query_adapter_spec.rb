@@ -761,6 +761,53 @@ module ElasticGraph
               )])
             end
 
+            it "groups on geo tiles without treating selected tile properties as grouping dimensions" do
+              aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
+                query {
+                  widget_aggregations {
+                    #{before_nodes}
+                      grouped_by {
+                        size
+                        position: location {
+                          tile: as_geo_tile(zoom_level: 8) {
+                            zoom_level
+                            x
+                            y
+                            center_point { latitude longitude }
+                            bounds { north south east west }
+                            corners { northwest { latitude longitude } }
+                          }
+                          coarse: as_geo_tile { x }
+                        }
+                      }
+                      count
+                    #{after_nodes}
+                  }
+                }
+              QUERY
+              groupings = aggregations.first.groupings.to_a
+              expect(groupings.map(&:key)).to eq(["size", "position.tile", "position.coarse"])
+              expect(groupings.drop(1).map(&:composite_clause)).to eq([
+                {"geotile_grid" => {"field" => "geo", "precision" => 8}},
+                {"geotile_grid" => {"field" => "geo", "precision" => 7}}
+              ])
+            end
+
+            [GEO_TILE_ZOOM_LEVELS.min - 1, GEO_TILE_ZOOM_LEVELS.max + 1].each do |zoom|
+              it "rejects zoom level #{zoom} before querying the datastore" do
+                error = single_graphql_error_for(<<~QUERY)
+                  query {
+                    widget_aggregations {
+                      #{before_nodes}
+                        grouped_by { location { as_geo_tile(zoom_level: #{zoom}) { x } } }
+                      #{after_nodes}
+                    }
+                  }
+                QUERY
+                expect(error.fetch("message")).to eq("`zoom_level` must be between #{GEO_TILE_ZOOM_LEVELS.min} and #{GEO_TILE_ZOOM_LEVELS.max}, but is #{zoom}.")
+              end
+            end
+
             it "can build an aggregations object with every `DateTimeGroupedBy` subfield" do
               # Verify that the fields we request in the query below are in fact all the subfields
               expect(sub_fields_of("DateTimeGroupedBy")).to contain_exactly("as_date_time", "as_date", "as_time_of_day", "as_day_of_week")
@@ -1966,6 +2013,7 @@ module ElasticGraph
             t.field "name", "String"
             t.field "created_at", "DateTime"
             t.field "created_on", "Date"
+            t.field "location", "GeoLocation", name_in_index: "geo"
             t.field "size", "String"
             t.field "color", "String"
             t.field "amount_cents", "Int", **amount_cents_opts

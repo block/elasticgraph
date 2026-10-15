@@ -31,6 +31,7 @@ module ElasticGraph
         def handles_missing_values?: () -> bool
         def composite_clause: (?grouping_options: ::Hash[::String, untyped]) -> ::Hash[::String, untyped]
         def non_composite_clause_for: (Query) -> ::Hash[::String, untyped]
+        def sort_value: (untyped) -> untyped
         def inner_meta: () -> ::Hash[::String, untyped]
 
         INNER_META: ::Hash[::String, untyped]

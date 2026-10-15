@@ -394,6 +394,121 @@ module ElasticGraph
           EOS
         end
 
+        it "supports geographic grouping without enabling arbitrary custom mappings" do
+          results = define_schema do |schema|
+            schema.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "location", "GeoLocation"
+              t.field "disabled_location", "GeoLocation", groupable: false
+              t.field "locations", "[GeoLocation!]!"
+              t.field "other_locations", "[GeoLocation!]!", singular: "other_location"
+              t.index "widgets"
+            end
+          end
+
+          expect(grouped_by_type_from(results, "Widget", include_docs: true)).to eq(<<~EOS.strip)
+            """
+            Type used to specify the `Widget` fields to group by for aggregations.
+            """
+            type WidgetGroupedBy {
+              """
+              Offers the different grouping options for the `location` value within this group.
+              """
+              location: GeoLocationGroupedBy
+              """
+              The individual value from `other_locations` for this group.
+
+              Note: `other_locations` is a collection field, but selecting this field will group on individual values of `other_locations`.
+              That means that a document may be grouped into multiple aggregation groupings (i.e. when its `other_locations`
+              field has multiple values) leading to some data duplication in the response. However, if a value shows
+              up in `other_locations` multiple times for a single document, that document will only be included in the group
+              once.
+              """
+              other_location: GeoLocationGroupedBy
+            }
+          EOS
+        end
+
+        it "supports geographic scalar and list grouping when built-in type names are overridden" do
+          results = define_schema(type_name_overrides: {GeoLocation: "Coordinates", GeoTile: "MapTile"}) do |schema|
+            schema.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "location", "GeoLocation"
+              t.field "disabled_location", "GeoLocation", groupable: false
+              t.field "locations", "[GeoLocation!]!"
+              t.field "other_locations", "[GeoLocation!]!", singular: "other_location"
+              t.index "widgets"
+            end
+          end
+
+          expect(grouped_by_type_from(results, "Widget")).to eq(<<~EOS.strip)
+            type WidgetGroupedBy {
+              location: GeoLocationGroupedBy
+              other_location: GeoLocationGroupedBy
+            }
+          EOS
+          expect(grouped_by_type_from(results, "GeoLocation")).to eq(<<~EOS.strip)
+            type GeoLocationGroupedBy {
+              #{schema_elements.as_geo_tile}(
+                #{schema_elements.zoom_level}: Int! = 7): MapTile
+            }
+          EOS
+        end
+
+        it "uses a user-defined grouping type for objects and singular-named lists, including name overrides" do
+          results = define_schema(type_name_overrides: {Spot: "Place"}) do |schema|
+            schema.object_type "Spot" do |t|
+              t.field "latitude", "Float"
+              t.field "longitude", "Float"
+              t.mapping type: "geo_point"
+            end
+
+            schema.object_type "SpotGroupedBy" do |t|
+              t.graphql_only true
+              t.field "as_cell", "String", graphql_only: true
+            end
+
+            schema.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "spot", "Spot"
+              t.field "disabled_spot", "Spot", groupable: false
+              t.field "spots", "[Spot!]!"
+              t.field "other_spots", "[Spot!]!", singular: "other_spot"
+              t.index "widgets"
+            end
+          end
+
+          expect(grouped_by_type_from(results, "Widget")).to eq(<<~EOS.strip)
+            type WidgetGroupedBy {
+              spot: SpotGroupedBy
+              other_spot: SpotGroupedBy
+            }
+          EOS
+        end
+
+        it "does not group custom-mapped objects without an explicitly defined grouping type" do
+          results = define_schema do |schema|
+            schema.object_type "Spot" do |t|
+              t.field "latitude", "Float"
+              t.field "longitude", "Float"
+              t.mapping type: "geo_point"
+            end
+
+            schema.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "spot", "Spot"
+              t.field "name", "String"
+              t.index "widgets"
+            end
+          end
+
+          expect(grouped_by_type_from(results, "Widget")).to eq(<<~EOS.strip)
+            type WidgetGroupedBy {
+              name: String
+            }
+          EOS
+        end
+
         it "does not make object fields with a custom mapping type groupable" do
           results = define_schema do |schema|
             schema.object_type "Point1" do |t|

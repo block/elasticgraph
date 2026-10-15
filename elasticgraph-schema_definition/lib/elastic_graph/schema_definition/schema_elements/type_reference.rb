@@ -159,12 +159,15 @@ module ElasticGraph
             .sub(/[\]!]+\z/, "") # strip `]` and `!` characters from the end: https://rubular.com/r/pC8C0i7EpvHDbf
         end
 
-        # Generally speaking, scalar types have `grouped_by` fields which are scalars of the same types,
-        # and object types have `grouped_by` fields which are special `[object_type]GroupedBy` types.
-        #
-        # ...except for some special cases (Date and DateTime), which this predicate detects.
-        def scalar_type_needing_grouped_by_object?
-          %w[Date DateTime].include?(type_namer.revert_override_for(name))
+        # Indicates if this type opts into specialized grouping by defining its own `[type]GroupedBy` type.
+        # Use the original type name, before overrides, since an overridden name may identify another type.
+        # Only call this after the user definition is complete, when all grouping types are known.
+        def grouped_by_type_defined?
+          unless schema_def_state.user_definition_complete
+            raise Errors::SchemaError, "Cannot call `grouped_by_type_defined?` until the schema definition is complete."
+          end
+
+          schema_def_state.types_by_name.key?(as_grouped_by.name)
         end
 
         # Returns a new `TypeReference` with any type name overrides reverted (to provide the "original" type name).
