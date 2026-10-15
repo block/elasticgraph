@@ -30,7 +30,6 @@ module ElasticGraph
               optional string id = 1;
               optional string component_id = 2;
               optional string designer_name = 3;
-              // Next field number: 4
             }
           PROTO
         end
@@ -54,7 +53,6 @@ module ElasticGraph
           expect(proto_type_def_from(proto, "DesignStudio")).to eq(<<~PROTO.strip)
             message DesignStudio {
               optional string name = 1;
-              // Next field number: 2
             }
           PROTO
         end
@@ -82,7 +80,6 @@ module ElasticGraph
               oneof value {
                 .elasticgraph.InternalComponentDesign internal_component_design = 1;
               }
-              // Next field number: 2
             }
           PROTO
 
@@ -91,7 +88,6 @@ module ElasticGraph
               optional string id = 1;
               optional string component_id = 2;
               optional string designer_name = 3;
-              // Next field number: 4
             }
           PROTO
         end

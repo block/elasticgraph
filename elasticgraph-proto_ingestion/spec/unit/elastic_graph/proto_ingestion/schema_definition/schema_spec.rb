@@ -51,16 +51,15 @@ module ElasticGraph
             message Account {
               // The account's unique identifier.
               optional string id = 1;
+
               optional .elasticgraph.Status status = 2;
               optional .elasticgraph.Address address = 3;
               repeated string tags = 4;
-              // Next field number: 5
             }
 
             message Address {
               optional string street = 1;
               optional string city = 2;
-              // Next field number: 3
             }
 
             message ElasticGraphEventBatch {
@@ -85,10 +84,11 @@ module ElasticGraph
               // The default value when no enum value has been explicitly set. Do not use this value.
               // See https://protobuf.dev/programming-guides/proto3/#enum-default.
               STATUS_UNSPECIFIED = 0;
+
               // The account is active.
               STATUS_ACTIVE = 1;
+
               STATUS_INACTIVE = 2;
-              // Next value number: 3
             }
           PROTO
         end
@@ -132,7 +132,6 @@ module ElasticGraph
             message Matrix {
               optional string id = 1;
               repeated .elasticgraph.Matrix.ValuesList values = 2;
-              // Next field number: 3
 
               message ValuesList {
                 repeated double values = 1;

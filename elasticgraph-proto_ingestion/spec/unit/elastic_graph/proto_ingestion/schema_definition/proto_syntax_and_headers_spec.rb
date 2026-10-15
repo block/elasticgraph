@@ -65,7 +65,6 @@ module ElasticGraph
                 .elasticgraph.Car car = 1;
                 .elasticgraph.Bike bike = 2;
               }
-              // Next field number: 3
             }
           PROTO
 

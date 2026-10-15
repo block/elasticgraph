@@ -13,31 +13,26 @@ message Address {
   optional .elasticgraph.GeoLocation geo_location = 4;
   repeated .elasticgraph.GeoShape shapes = 5;
   optional string manufacturer_id = 6;
-  // Next field number: 7
 }
 
 message AddressTimestamps {
   optional google.protobuf.Timestamp created_at = 1;
-  // Next field number: 2
 }
 
 message Affiliations {
   repeated .elasticgraph.Sponsorship sponsorships_nested = 1;
   repeated .elasticgraph.Sponsorship sponsorships_object = 2;
-  // Next field number: 3
 }
 
 message BrokerWholesaler {
   optional string id = 1;
   optional bool active = 2;
-  // Next field number: 3
 }
 
 message Coach {
   optional string id = 1;
   optional string name = 2;
   optional int32 salary = 3;
-  // Next field number: 4
 }
 
 message CoachProfile {
@@ -46,26 +41,25 @@ message CoachProfile {
   optional string coach_id = 3;
   optional int32 annual_salary = 4;
   optional string team_league = 5;
+
   // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
   optional string team_formed_on = 6;
-  // Next field number: 7
 }
 
 enum Color {
   // The default value when no enum value has been explicitly set. Do not use this value.
   // See https://protobuf.dev/programming-guides/proto3/#enum-default.
   COLOR_UNSPECIFIED = 0;
+
   COLOR_RED = 1;
   COLOR_BLUE = 2;
   COLOR_GREEN = 3;
-  // Next value number: 4
 }
 
 message Company {
   optional string id = 1;
   optional string name = 2;
   optional string stock_ticker = 3;
-  // Next field number: 4
 }
 
 message Component {
@@ -83,20 +77,17 @@ message Component {
   repeated string part_ids = 12;
   repeated string owner_ids = 13;
   optional string owner_id = 14;
-  // Next field number: 15
 }
 
 message ComponentDesign {
   optional string id = 1;
   optional string component_id = 2;
   optional string designer_name = 3;
-  // Next field number: 4
 }
 
 message DirectWholesaler {
   optional string id = 1;
   optional bool active = 2;
-  // Next field number: 3
 }
 
 message DistributionChannel {
@@ -106,7 +97,6 @@ message DistributionChannel {
     .elasticgraph.DirectWholesaler direct_wholesaler = 3;
     .elasticgraph.BrokerWholesaler broker_wholesaler = 4;
   }
-  // Next field number: 5
 }
 
 message ElasticGraphEventBatch {
@@ -149,14 +139,12 @@ message ElectricalPart {
   optional google.protobuf.Timestamp created_at = 3;
   optional int32 voltage = 4;
   optional string manufacturer_id = 5;
-  // Next field number: 6
 }
 
 message GeneralManager {
   optional string id = 1;
   optional string name = 2;
   optional int32 salary = 3;
-  // Next field number: 4
 }
 
 message GeneralManagerProfile {
@@ -164,24 +152,23 @@ message GeneralManagerProfile {
   optional string team_id = 2;
   optional int32 annual_salary = 3;
   optional string team_league = 4;
+
   // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
   optional string team_formed_on = 5;
-  // Next field number: 6
 }
 
 // Geographic coordinates representing a location on the Earth's surface.
 message GeoLocation {
   // Angular distance north or south of the Earth's equator, measured in degrees from -90 to +90.
   optional double latitude = 1;
+
   // Angular distance east or west of the Prime Meridian at Greenwich, UK, measured in degrees from -180 to +180.
   optional double longitude = 2;
-  // Next field number: 3
 }
 
 message GeoShape {
   optional string type = 1;
   repeated double coordinates = 2;
-  // Next field number: 3
 }
 
 message Inventor {
@@ -189,7 +176,6 @@ message Inventor {
     .elasticgraph.Person person = 1;
     .elasticgraph.Company company = 2;
   }
-  // Next field number: 3
 }
 
 message Manufacturer {
@@ -197,16 +183,15 @@ message Manufacturer {
   optional string name = 2;
   optional google.protobuf.Timestamp created_at = 3;
   optional .elasticgraph.Person ceo = 4;
-  // Next field number: 5
 }
 
 enum Material {
   // The default value when no enum value has been explicitly set. Do not use this value.
   // See https://protobuf.dev/programming-guides/proto3/#enum-default.
   MATERIAL_UNSPECIFIED = 0;
+
   MATERIAL_ALLOY = 1;
   MATERIAL_CARBON_FIBER = 2;
-  // Next value number: 3
 }
 
 message MechanicalPart {
@@ -215,13 +200,11 @@ message MechanicalPart {
   optional google.protobuf.Timestamp created_at = 3;
   optional .elasticgraph.Material material = 4;
   optional string manufacturer_id = 5;
-  // Next field number: 6
 }
 
 message Money {
   optional string currency = 1;
   optional int32 amount_cents = 2;
-  // Next field number: 3
 }
 
 message NamedInventor {
@@ -229,31 +212,31 @@ message NamedInventor {
     .elasticgraph.Person person = 1;
     .elasticgraph.Company company = 2;
   }
-  // Next field number: 3
 }
 
 message OnlineStore {
   optional string id = 1;
+
   // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
   optional string established_on = 2;
+
   optional bool active = 3;
   optional string name = 4;
-  // Next field number: 5
 }
 
 message Person {
   optional string id = 1;
   optional string name = 2;
   optional string nationality = 3;
-  // Next field number: 4
 }
 
 message PhysicalStore {
   optional string id = 1;
+
   // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
   optional string established_on = 2;
+
   optional bool active = 3;
-  // Next field number: 4
 }
 
 message Player {
@@ -262,48 +245,42 @@ message Player {
   optional .elasticgraph.Affiliations affiliations = 3;
   repeated .elasticgraph.PlayerSeason seasons_nested = 4;
   repeated .elasticgraph.PlayerSeason seasons_object = 5;
-  // Next field number: 6
 }
 
 message PlayerSeason {
   optional int32 year = 1;
   optional int32 games_played = 2;
   repeated string awards = 3;
-  // Next field number: 4
 }
 
 message Position {
   optional double x = 1;
   optional double y = 2;
-  // Next field number: 3
 }
 
 enum Size {
   // The default value when no enum value has been explicitly set. Do not use this value.
   // See https://protobuf.dev/programming-guides/proto3/#enum-default.
   SIZE_UNSPECIFIED = 0;
+
   SIZE_SMALL = 1;
   SIZE_MEDIUM = 2;
   SIZE_LARGE = 3;
-  // Next value number: 4
 }
 
 message Sponsor {
   optional string id = 1;
   optional string name = 2;
-  // Next field number: 3
 }
 
 message Sponsorship {
   optional string sponsor_id = 1;
   optional .elasticgraph.Money annual_total = 2;
-  // Next field number: 3
 }
 
 message Staff {
   repeated .elasticgraph.Coach coaches = 1;
   optional .elasticgraph.GeneralManager general_manager = 2;
-  // Next field number: 3
 }
 
 // For more performant queries on this type, please filter on `league` if possible.
@@ -311,8 +288,10 @@ message Team {
   optional string id = 1;
   optional string league = 2;
   optional string country_code = 3;
+
   // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
   optional string formed_on = 4;
+
   optional string current_name = 5;
   repeated string past_names = 6;
   repeated google.protobuf.Timestamp won_championships_at = 7;
@@ -328,30 +307,28 @@ message Team {
   optional .elasticgraph.TeamNestedFields nested_fields = 17;
   optional .elasticgraph.TeamNestedFields nested_fields2 = 18;
   optional .elasticgraph.Staff staff = 19;
-  // Next field number: 20
 }
 
 message TeamDetails {
   repeated string uniform_colors = 1;
   optional int32 count = 2;
-  // Next field number: 3
 }
 
 message TeamNestedFields {
   repeated .elasticgraph.Money forbes_valuation_moneys = 1;
   repeated .elasticgraph.Player current_players = 2;
   repeated .elasticgraph.TeamSeason seasons = 3;
-  // Next field number: 4
 }
 
 message TeamRecord {
   optional int32 wins = 1;
   optional int32 losses = 2;
+
   // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
   optional string last_win_on = 3;
+
   // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
   optional string first_win_on = 4;
-  // Next field number: 5
 }
 
 message TeamSeason {
@@ -364,7 +341,6 @@ message TeamSeason {
   optional bool was_shortened = 7;
   repeated .elasticgraph.Player players_nested = 8;
   repeated .elasticgraph.Player players_object = 9;
-  // Next field number: 10
 }
 
 // For more performant queries on this type, please filter on `workspace_id` if possible.
@@ -377,21 +353,28 @@ message Widget {
   optional string cost_currency_name = 6;
   optional string cost_currency_symbol = 7;
   optional string cost_currency_primary_continent = 8;
+
   // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
   optional string cost_currency_introduced_on = 9;
+
   optional string name = 10;
   optional string internal_name = 11;
   optional string internal_highlightable_name = 12;
   optional string name_text = 13;
   optional string description = 14;
   optional google.protobuf.Timestamp created_at = 15;
+
   // Must be formatted as an ISO 8601 local time, e.g. "14:23:12".
   optional string created_at_time_of_day = 16;
+
   // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
   optional string created_on = 17;
+
   repeated google.protobuf.Timestamp release_timestamps = 18;
+
   // Must be formatted as an ISO 8601 date, e.g. "2024-11-25".
   repeated string release_dates = 19;
+
   repeated string component_ids = 20;
   optional .elasticgraph.WidgetOptions options = 21;
   optional .elasticgraph.WidgetInternalDetails internal_details = 22;
@@ -406,12 +389,10 @@ message Widget {
   repeated .elasticgraph.Money fees = 31;
   optional string metadata = 32;
   optional string workspace_name = 33;
-  // Next field number: 34
 }
 
 message WidgetInternalDetails {
   optional string name = 1;
-  // Next field number: 2
 }
 
 message WidgetOptions {
@@ -419,18 +400,15 @@ message WidgetOptions {
   optional .elasticgraph.Size the_size = 2;
   optional .elasticgraph.Color color = 3;
   optional bool is_draft = 4;
-  // Next field number: 5
 }
 
 message WidgetWorkspace {
   optional string id = 1;
   optional string name = 2;
   optional .elasticgraph.WorkspaceWidget widget = 3;
-  // Next field number: 4
 }
 
 message WorkspaceWidget {
   optional string id = 1;
   optional google.protobuf.Timestamp created_at = 2;
-  // Next field number: 3
 }

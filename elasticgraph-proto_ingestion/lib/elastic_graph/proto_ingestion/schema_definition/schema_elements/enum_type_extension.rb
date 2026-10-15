@@ -110,11 +110,10 @@ module ElasticGraph
             schema.reserved_enum_value_numbers_for(proto_name, values_by_name.keys).each do |value_name, value_number|
               value_definitions << "  reserved #{value_number}; // Previously used by #{value_name}."
             end
-            value_definitions << "  // Next value number: #{schema.next_enum_value_number_for(proto_name)}"
 
             <<~PROTO.chomp
               #{documentation}enum #{proto_name} {
-              #{value_definitions.join("\n")}
+              #{ProtoDocumentation.join_definitions(value_definitions)}
               }
             PROTO
           end

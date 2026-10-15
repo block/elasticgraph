@@ -109,9 +109,8 @@ module ElasticGraph
             schema.reserved_field_numbers_for(message_name, active_field_names).each do |field_name, field_number|
               field_definitions << "  reserved #{field_number}; // Previously used by #{field_name}."
             end
-            field_definitions << "  // Next field number: #{schema.next_field_number_for(message_name)}"
 
-            body_sections = [field_definitions.join("\n"), *proto_list_wrapper_definitions(package_name)]
+            body_sections = [ProtoDocumentation.join_definitions(field_definitions), *proto_list_wrapper_definitions(package_name)]
             <<~PROTO.chomp
               #{documentation}message #{message_name} {
               #{body_sections.join("\n\n")}
@@ -139,7 +138,6 @@ module ElasticGraph
             schema.reserved_field_numbers_for(message_name, active_field_names).each do |field_name, field_number|
               body_lines << "  reserved #{field_number}; // Previously used by #{field_name}."
             end
-            body_lines << "  // Next field number: #{schema.next_field_number_for(message_name)}"
 
             <<~PROTO.chomp
               #{documentation}message #{message_name} {

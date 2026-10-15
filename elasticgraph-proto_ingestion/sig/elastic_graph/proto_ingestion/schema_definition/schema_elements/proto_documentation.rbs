@@ -3,6 +3,7 @@ module ElasticGraph
     module SchemaDefinition
       module SchemaElements
         module ProtoDocumentation
+          def self.join_definitions: (::Array[::String]) -> ::String
           def self.comment_lines_for: (::String?, ?indent: ::String) -> ::Array[::String]
         end
       end
