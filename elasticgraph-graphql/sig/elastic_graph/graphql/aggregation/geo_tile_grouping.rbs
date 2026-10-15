@@ -1,0 +1,23 @@
+module ElasticGraph
+  class GraphQL
+    module Aggregation
+      class GeoTileGroupingSuperclass
+        attr_reader field_path: fieldPath
+        attr_reader zoom_level: ::Integer
+
+        def initialize: (field_path: fieldPath, zoom_level: ::Integer) -> void
+        def with: (?field_path: fieldPath, ?zoom_level: ::Integer) -> GeoTileGrouping
+      end
+
+      class GeoTileGrouping < GeoTileGroupingSuperclass
+        attr_reader key: ::String
+        attr_reader encoded_index_field_path: ::String
+        def composite_clause: (?grouping_options: ::Hash[::String, untyped]) -> ::Hash[::String, untyped]
+        def non_composite_clause_for: (Query) -> ::Hash[::String, untyped]
+        def sort_value: (untyped) -> ::Integer?
+        def handles_missing_values?: () -> bool
+        def inner_meta: () -> ::Hash[::String, untyped]
+      end
+    end
+  end
+end

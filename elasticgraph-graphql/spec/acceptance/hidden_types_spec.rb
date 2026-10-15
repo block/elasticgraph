@@ -125,6 +125,7 @@ module ElasticGraph
               DateAggregatedValues DateTimeAggregatedValues LocalTimeAggregatedValues
               Company OnlineStore DirectWholesaler BrokerWholesaler
               PageInfo Query TextFilterInput GeoLocation
+              GeoLocationGroupedBy GeoTile GeoTileBounds GeoTileCorners
               DateTimeGroupingOffsetInput DateTimeUnitInput DateTimeTimeOfDayFilterInput
               DateGroupedBy DateGroupingOffsetInput DateGroupingTruncationUnitInput DateUnitInput
               DateTimeGroupedBy DateTimeGroupingTruncationUnitInput TimeZone

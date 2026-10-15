@@ -58,6 +58,22 @@ module ElasticGraph
         attr_reader time_zone: ::String
         attr_reader truncation_unit: ::String
 
+        attr_reader as_geo_tile: ::String
+        attr_reader zoom_level: ::String
+        attr_reader x: ::String
+        attr_reader y: ::String
+        attr_reader center_point: ::String
+        attr_reader bounds: ::String
+        attr_reader corners: ::String
+        attr_reader north: ::String
+        attr_reader south: ::String
+        attr_reader east: ::String
+        attr_reader west: ::String
+        attr_reader northwest: ::String
+        attr_reader northeast: ::String
+        attr_reader southwest: ::String
+        attr_reader southeast: ::String
+
         attr_reader approximate_value: ::String
         attr_reader exact_value: ::String
         attr_reader upper_bound: ::String

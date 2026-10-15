@@ -18,6 +18,7 @@ module ElasticGraph
 
           private
 
+
           def self.raw_nodes_for: (
             Query,
             ::Array[Query],

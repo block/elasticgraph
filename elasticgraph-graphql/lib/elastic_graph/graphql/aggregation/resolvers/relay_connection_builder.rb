@@ -31,8 +31,8 @@ module ElasticGraph
               to_sort_value: ->(node, decoded_cursor) do
                 query.groupings.map do |grouping|
                   DatastoreQuery::Paginator::SortValue.new(
-                    from_item: (_ = node).bucket.fetch("key").fetch(grouping.key),
-                    from_cursor: decoded_cursor.sort_values.fetch(grouping.key),
+                    from_item: grouping.sort_value((_ = node).bucket.fetch("key").fetch(grouping.key)),
+                    from_cursor: grouping.sort_value(decoded_cursor.sort_values.fetch(grouping.key)),
                     sort_direction: :asc # we don't yet support any alternate sorting.
                   )
                 end

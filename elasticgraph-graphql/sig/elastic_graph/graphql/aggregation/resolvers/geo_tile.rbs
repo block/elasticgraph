@@ -1,0 +1,51 @@
+module ElasticGraph
+  class GraphQL
+    module Aggregation
+      module Resolvers
+        class GeoTileSupertype < GraphQL::Resolvers::ResolvableValueClass
+          attr_reader zoom_level: ::Integer
+          attr_reader x: ::Integer
+          attr_reader y: ::Integer
+          def self.new: (Schema, ::Integer, ::Integer, ::Integer) -> instance
+        end
+
+        class GeoTile < GeoTileSupertype
+          def self.from_key: (Schema, ::String) -> GeoTile
+          def center_point: () -> ::Hash[::String, ::Float]
+          @bounds: GeoTileBounds?
+          def bounds: () -> GeoTileBounds
+          def corners: () -> GeoTileCorners
+
+          private
+
+          def longitude: (::Integer | ::Float) -> ::Float
+          def latitude: (::Integer | ::Float) -> ::Float
+          def tile_count_per_axis: () -> ::Float
+        end
+
+        class GeoTileBoundsSupertype < GraphQL::Resolvers::ResolvableValueClass
+          attr_reader north: ::Float
+          attr_reader south: ::Float
+          attr_reader east: ::Float
+          attr_reader west: ::Float
+          def self.new: (Schema, ::Float, ::Float, ::Float, ::Float) -> instance
+        end
+
+        class GeoTileBounds < GeoTileBoundsSupertype
+        end
+
+        class GeoTileCornersSupertype < GraphQL::Resolvers::ResolvableValueClass
+          attr_reader bounds: GeoTileBounds
+          def self.new: (Schema, GeoTileBounds) -> instance
+        end
+
+        class GeoTileCorners < GeoTileCornersSupertype
+          def northwest: () -> ::Hash[::String, ::Float]
+          def northeast: () -> ::Hash[::String, ::Float]
+          def southwest: () -> ::Hash[::String, ::Float]
+          def southeast: () -> ::Hash[::String, ::Float]
+        end
+      end
+    end
+  end
+end

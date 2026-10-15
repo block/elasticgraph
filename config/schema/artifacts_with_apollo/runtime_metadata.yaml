@@ -1841,6 +1841,11 @@ graphql_resolvers_by_name:
     resolver_ref:
       name: ElasticGraph::Apollo::GraphQL::ServiceFieldResolver
       require_path: elastic_graph/apollo/graphql/service_field_resolver
+  as_geo_tile:
+    needs_lookahead: true
+    resolver_ref:
+      name: ElasticGraph::GraphQL::Aggregation::Resolvers::AsGeoTile
+      require_path: elastic_graph/graphql/aggregation/resolvers/as_geo_tile
   get_record_field_value:
     needs_lookahead: false
     resolver_ref:
@@ -3281,6 +3286,9 @@ object_types_by_name:
       full_address:
         resolver:
           name: object_with_lookahead
+      geo_location:
+        resolver:
+          name: object_with_lookahead
       timestamps:
         resolver:
           name: object_with_lookahead
@@ -4428,6 +4436,13 @@ object_types_by_name:
         name_in_index: lon
         resolver:
           name: get_record_field_value
+  GeoLocationGroupedBy:
+    elasticgraph_category: geo_location_grouped_by_object
+    graphql_fields_by_name:
+      as_geo_tile:
+        resolver:
+          name: as_geo_tile
+    graphql_only_return_type: true
   GeoShape:
     graphql_fields_by_name:
       coordinates:
@@ -4436,6 +4451,57 @@ object_types_by_name:
       type:
         resolver:
           name: get_record_field_value
+  GeoTile:
+    graphql_fields_by_name:
+      bounds:
+        resolver:
+          name: object_without_lookahead
+      center_point:
+        resolver:
+          name: object_without_lookahead
+      corners:
+        resolver:
+          name: object_without_lookahead
+      x:
+        resolver:
+          name: object_without_lookahead
+      "y":
+        resolver:
+          name: object_without_lookahead
+      zoom_level:
+        resolver:
+          name: object_without_lookahead
+    graphql_only_return_type: true
+  GeoTileBounds:
+    graphql_fields_by_name:
+      east:
+        resolver:
+          name: object_without_lookahead
+      north:
+        resolver:
+          name: object_without_lookahead
+      south:
+        resolver:
+          name: object_without_lookahead
+      west:
+        resolver:
+          name: object_without_lookahead
+    graphql_only_return_type: true
+  GeoTileCorners:
+    graphql_fields_by_name:
+      northeast:
+        resolver:
+          name: object_without_lookahead
+      northwest:
+        resolver:
+          name: object_without_lookahead
+      southeast:
+        resolver:
+          name: object_without_lookahead
+      southwest:
+        resolver:
+          name: object_without_lookahead
+    graphql_only_return_type: true
   IDListFilterInput:
     graphql_fields_by_name:
       count:
@@ -7400,6 +7466,9 @@ object_types_by_name:
       seasons_object:
         resolver:
           name: object_with_lookahead
+      stadium_location:
+        resolver:
+          name: object_with_lookahead
       staff:
         resolver:
           name: object_with_lookahead
@@ -9412,6 +9481,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       full_address:
+        resolver:
+          name: object_with_lookahead
+      geo_location:
         resolver:
           name: object_with_lookahead
       internal_details:

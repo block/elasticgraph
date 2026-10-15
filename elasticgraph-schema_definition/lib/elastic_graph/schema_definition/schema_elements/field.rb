@@ -682,13 +682,14 @@ module ElasticGraph
           # instead.
           return false if parent_type.root_document_type? && name == "id"
 
-          return false if relationship || type.fully_unwrapped.as_object_type&.does_not_support?(&:groupable?)
+          return false if relationship || type_disallows_grouping?
 
           # We don't support grouping an entire list of values, but we do support grouping on individual values in a list.
           # However, we only do so when a `singular_name` has been provided (so that we know what to call the grouped_by field).
           # The semantics are a little odd (since one document can be duplicated in multiple grouping buckets) so we're ok
           # with not offering it by default--the user has to opt-in by telling us what to call the field in its singular form.
-          return list_field_groupable_by_single_values? if type.list? && type.fully_unwrapped.leaf?
+          # GeoLocation is a GraphQL object, but its list values are grouped as individual points, like scalars.
+          return list_field_groupable_by_single_values? if type.list? && (type.fully_unwrapped.leaf? || geo_location_type?(original_type))
 
           # Nested fields will be supported through specific nested aggregation support, and do not
           # work as expected when grouping on the root document type.
@@ -857,10 +858,13 @@ module ElasticGraph
           end
         end
 
+        # Returns the GraphQL type used for this field's grouped value. GeoLocation is an object,
+        # but uses a framework-defined grouping type like date/time scalars, so its original name
+        # must be restored before deriving that type name when type-name overrides are configured.
         # @private
         def grouped_by_field_type_name
           unwrapped_type = type_for_derived_types.fully_unwrapped
-          if unwrapped_type.scalar_type_needing_grouped_by_object?
+          if unwrapped_type.scalar_type_needing_grouped_by_object? || geo_location_type?(unwrapped_type)
             unwrapped_type.with_reverted_override.as_grouped_by.name
           elsif unwrapped_type.leaf?
             unwrapped_type.name
@@ -1146,6 +1150,16 @@ module ElasticGraph
           args_sdl = selected_args.map(&:to_sdl).flat_map { |s| s.split("\n") }.join(joiner)
           return nil if args_sdl.empty?
           "(#{after_opening_paren}#{args_sdl})"
+        end
+
+        # Identifies types that disallow grouping, except for GeoLocation's supported tile grouping.
+        def type_disallows_grouping?
+          !geo_location_type?(original_type) && type.fully_unwrapped.as_object_type&.does_not_support?(&:groupable?)
+        end
+
+        # Identifies geographic types by their unwrapped original name, accounting for public type-name overrides.
+        def geo_location_type?(type_reference)
+          type_reference.fully_unwrapped.with_reverted_override.name == "GeoLocation"
         end
 
         # Indicates if the field uses the `text` mapping type.
