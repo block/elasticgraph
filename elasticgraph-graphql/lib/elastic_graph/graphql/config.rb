@@ -6,15 +6,16 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/support/config"
 require "elastic_graph/graphql/client"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension_loader"
+require "elastic_graph/support/config"
 
 module ElasticGraph
   class GraphQL
     class Config < Support::Config.define(
       :default_page_size,
       :max_page_size,
+      :experimental_field_retrieval,
       :slow_query_latency_warning_threshold_in_ms,
       :client_resolver,
       :extension_modules,
@@ -40,6 +41,14 @@ module ElasticGraph
             minimum: 1,
             default: 500,
             examples: [100, 500, 1000]
+          },
+          experimental_field_retrieval: {
+            description: "Experimental retrieval policy. automatic uses doc values for eligible source-free scalar selections. " \
+              "Keep source stored, validate existing index mappings, and retain the default doc-value search limit (at least 100) before opting in.",
+            type: "string",
+            enum: ["source", "automatic"],
+            examples: ["source", "automatic"],
+            default: "source"
           },
           slow_query_latency_warning_threshold_in_ms: {
             description: "Queries that take longer than this configured threshold will have a sanitized version logged so that they can be investigated.",
