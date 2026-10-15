@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/proto_ingestion/runtime_metadata/type"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/proto_documentation"
 require "elastic_graph/support/casing"
 
@@ -50,6 +51,23 @@ module ElasticGraph
             end
 
             [list_depth, current]
+          end
+
+          # Returns metadata for fields whose index name differs from their public name, or whose
+          # scalar has ingestion rules beyond its protobuf wire type. Abstract types have no fields.
+          #
+          # @return [RuntimeMetadata::Type]
+          def proto_ingestion_metadata
+            return RuntimeMetadata::Type.new if abstract?
+
+            RuntimeMetadata::Type.new(fields_by_name: proto_fields.filter_map do |schema_field, field|
+              base_type = _ = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(field.type).last.resolved
+              scalar = base_type.is_a?(ScalarTypeExtension) && base_type.proto_ingestion_metadata.scalar
+              name_in_index = field.name_in_index unless field.name_in_index == schema_field.name
+              next unless name_in_index || scalar
+
+              [schema_field.name, RuntimeMetadata::Field.new(name_in_index: name_in_index, type: scalar ? base_type.name : nil)]
+            end.to_h)
           end
 
           # Returns this type's name in protobuf schemas.

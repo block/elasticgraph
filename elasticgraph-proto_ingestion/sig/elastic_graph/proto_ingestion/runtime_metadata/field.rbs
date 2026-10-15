@@ -1,0 +1,15 @@
+module ElasticGraph
+  module ProtoIngestion
+    module RuntimeMetadata
+      class Field < ::Data
+        attr_reader name_in_index: ::String?
+        attr_reader type: ::String?
+
+        def initialize: (?name_in_index: ::String?, ?type: ::String?) -> void
+        def self.new: (?name_in_index: ::String?, ?type: ::String?) -> Field
+        def self.from_hash: (::Hash[::String, untyped]) -> Field
+        def to_dumpable_hash: () -> ::Hash[::String, untyped]
+      end
+    end
+  end
+end

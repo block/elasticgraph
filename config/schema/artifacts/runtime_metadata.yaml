@@ -3118,6 +3118,197 @@ indexer_extension_modules:
 - extension_ref:
     name: ElasticGraph::JSONIngestion::IndexerExtension
     require_path: elastic_graph/json_ingestion/indexer_extension
+- extension_ref:
+    name: ElasticGraph::ProtoIngestion::IndexerExtension
+    require_path: elastic_graph/proto_ingestion/indexer_extension
+    config:
+      package_name: elasticgraph
+      types_by_name:
+        Address:
+          fields_by_name:
+            id:
+              type: ID
+            manufacturer_id:
+              type: ID
+        BrokerWholesaler:
+          fields_by_name:
+            id:
+              type: ID
+        Coach:
+          fields_by_name:
+            id:
+              type: ID
+        CoachProfile:
+          fields_by_name:
+            coach_id:
+              type: ID
+            id:
+              type: ID
+            team_formed_on:
+              type: Date
+            team_id:
+              type: ID
+        Company:
+          fields_by_name:
+            id:
+              type: ID
+        Component:
+          fields_by_name:
+            id:
+              type: ID
+            owner_id:
+              type: ID
+            owner_ids:
+              type: ID
+            part_ids:
+              type: ID
+            widget_workspace_id:
+              name_in_index: widget_workspace_id3
+              type: ID
+        ComponentDesign:
+          fields_by_name:
+            component_id:
+              type: ID
+            id:
+              type: ID
+        Date:
+          scalar: Date
+        DirectWholesaler:
+          fields_by_name:
+            id:
+              type: ID
+        ElectricalPart:
+          fields_by_name:
+            id:
+              type: ID
+            manufacturer_id:
+              type: ID
+        GeneralManager:
+          fields_by_name:
+            id:
+              type: ID
+        GeneralManagerProfile:
+          fields_by_name:
+            id:
+              type: ID
+            team_formed_on:
+              type: Date
+            team_id:
+              type: ID
+        GeoLocation:
+          fields_by_name:
+            latitude:
+              name_in_index: lat
+            longitude:
+              name_in_index: lon
+        ID:
+          scalar: ID
+        JsonSafeLong:
+          scalar: JsonSafeLong
+        LocalTime:
+          scalar: LocalTime
+        Manufacturer:
+          fields_by_name:
+            id:
+              type: ID
+        MechanicalPart:
+          fields_by_name:
+            id:
+              type: ID
+            manufacturer_id:
+              type: ID
+        OnlineStore:
+          fields_by_name:
+            established_on:
+              type: Date
+            id:
+              type: ID
+        Person:
+          fields_by_name:
+            id:
+              type: ID
+        PhysicalStore:
+          fields_by_name:
+            established_on:
+              type: Date
+            id:
+              type: ID
+        Sponsor:
+          fields_by_name:
+            id:
+              type: ID
+        Sponsorship:
+          fields_by_name:
+            sponsor_id:
+              type: ID
+        Team:
+          fields_by_name:
+            country_code:
+              type: ID
+            forbes_valuations:
+              type: JsonSafeLong
+            formed_on:
+              type: Date
+            id:
+              type: ID
+            nested_fields:
+              name_in_index: the_nested_fields
+        TeamNestedFields:
+          fields_by_name:
+            seasons:
+              name_in_index: the_seasons
+        TeamRecord:
+          fields_by_name:
+            first_win_on:
+              type: Date
+            last_win_on:
+              name_in_index: last_win_date
+              type: Date
+            losses:
+              name_in_index: loss_count
+            wins:
+              name_in_index: win_count
+        TeamSeason:
+          fields_by_name:
+            record:
+              name_in_index: the_record
+        Untyped:
+          scalar: Untyped
+        Widget:
+          fields_by_name:
+            component_ids:
+              type: ID
+            cost_currency_introduced_on:
+              type: Date
+            created_at_time_of_day:
+              type: LocalTime
+            created_on:
+              type: Date
+            id:
+              type: ID
+            metadata:
+              type: Untyped
+            release_dates:
+              type: Date
+            the_options:
+              name_in_index: the_opts
+            weight_in_ng:
+              type: JsonSafeLong
+            workspace_id:
+              name_in_index: workspace_id2
+              type: ID
+        WidgetOptions:
+          fields_by_name:
+            the_size:
+              name_in_index: the_sighs
+        WidgetWorkspace:
+          fields_by_name:
+            id:
+              type: ID
+        WorkspaceWidget:
+          fields_by_name:
+            id:
+              type: ID
 object_types_by_name:
   Address:
     graphql_fields_by_name:
