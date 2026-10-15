@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/aggregation/field_path_encoder"
+require "elastic_graph/graphql/aggregation/geo_tile"
 require "elastic_graph/support/hash_util"
 
 module ElasticGraph
@@ -16,6 +17,9 @@ module ElasticGraph
         class GroupedBy < ::Data.define(:bucket, :field_path)
           def resolve(field:, object:, args:, context:, lookahead:)
             new_field_path = field_path + [PathSegment.for(field: field, lookahead: lookahead)]
+            if field.type.elasticgraph_category == :geo_tile
+              return resolve_geo_tile(new_field_path, names: context.elastic_graph_schema.element_names)
+            end
             return with(field_path: new_field_path) if field.type.object?
 
             bucket_entry = Support::HashUtil.verbose_fetch(bucket, "key")
@@ -29,6 +33,12 @@ module ElasticGraph
           end
 
           private
+
+          # Resolves a tile bucket key into its GraphQL object, preserving null for missing locations.
+          def resolve_geo_tile(field_path, names:)
+            key = Support::HashUtil.verbose_fetch(bucket.fetch("key"), FieldPathEncoder.encode(field_path.map(&:name_in_graphql_query)))
+            key && GeoTile.decode(key, names: names)
+          end
 
           # Elasticsearch/OpenSearch generally return `true`/`false` for Boolean fields. However, there's one exception to that[^1]:
           #

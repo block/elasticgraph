@@ -1,0 +1,11 @@
+module ElasticGraph
+  class GraphQL
+    module Aggregation
+      module GeoTile
+        def self.decode: (::String, names: SchemaArtifacts::RuntimeMetadata::SchemaElementNames) -> ::Hash[::String, untyped]
+        def self.longitude: (::Integer | ::Float, ::Float) -> ::Float
+        def self.latitude: (::Integer | ::Float, ::Float) -> ::Float
+      end
+    end
+  end
+end

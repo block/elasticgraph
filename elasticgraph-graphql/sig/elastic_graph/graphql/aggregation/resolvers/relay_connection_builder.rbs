@@ -18,6 +18,8 @@ module ElasticGraph
 
           private
 
+          def self.sort_value_for: (grouping, untyped) -> untyped
+
           def self.raw_nodes_for: (
             Query,
             ::Array[Query],

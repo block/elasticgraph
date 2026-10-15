@@ -394,6 +394,57 @@ module ElasticGraph
           EOS
         end
 
+        it "supports geographic grouping without enabling arbitrary custom mappings" do
+          results = define_schema do |schema|
+            schema.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "location", "GeoLocation"
+              t.field "disabled_location", "GeoLocation", groupable: false
+              t.field "locations", "[GeoLocation!]!"
+              t.field "other_locations", "[GeoLocation!]!", singular: "other_location"
+              t.index "widgets"
+            end
+          end
+          expect(grouped_by_type_from(results, "Widget")).to eq(<<~EOS.strip)
+            type WidgetGroupedBy {
+              location: GeoLocationGroupedBy
+              other_location: GeoLocationGroupedBy
+            }
+          EOS
+          expect(grouped_by_type_from(results, "GeoLocation")).to eq(<<~EOS.strip)
+            type GeoLocationGroupedBy {
+              #{schema_elements.as_geo_tile}(
+                #{schema_elements.zoom_level}: Int! = 7): GeoTile
+            }
+          EOS
+        end
+
+        it "supports geographic scalar and list grouping when built-in type names are overridden" do
+          results = define_schema(type_name_overrides: {GeoLocation: "Coordinates", GeoTile: "MapTile"}) do |schema|
+            schema.object_type "Widget" do |t|
+              t.field "id", "ID"
+              t.field "location", "GeoLocation"
+              t.field "disabled_location", "GeoLocation", groupable: false
+              t.field "locations", "[GeoLocation!]!"
+              t.field "other_locations", "[GeoLocation!]!", singular: "other_location"
+              t.index "widgets"
+            end
+          end
+
+          expect(grouped_by_type_from(results, "Widget")).to eq(<<~EOS.strip)
+            type WidgetGroupedBy {
+              location: GeoLocationGroupedBy
+              other_location: GeoLocationGroupedBy
+            }
+          EOS
+          expect(grouped_by_type_from(results, "GeoLocation")).to eq(<<~EOS.strip)
+            type GeoLocationGroupedBy {
+              #{schema_elements.as_geo_tile}(
+                #{schema_elements.zoom_level}: Int! = 7): MapTile
+            }
+          EOS
+        end
+
         it "does not make object fields with a custom mapping type groupable" do
           results = define_schema do |schema|
             schema.object_type "Point1" do |t|

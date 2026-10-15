@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/graphql/aggregation/geo_tile_grouping"
 require "elastic_graph/graphql/aggregation/resolvers/node"
 require "elastic_graph/graphql/datastore_query"
 require "elastic_graph/graphql/resolvers/relay_connection/generic_adapter"
@@ -31,13 +32,18 @@ module ElasticGraph
               to_sort_value: ->(node, decoded_cursor) do
                 query.groupings.map do |grouping|
                   DatastoreQuery::Paginator::SortValue.new(
-                    from_item: (_ = node).bucket.fetch("key").fetch(grouping.key),
-                    from_cursor: decoded_cursor.sort_values.fetch(grouping.key),
+                    from_item: sort_value_for(grouping, (_ = node).bucket.fetch("key").fetch(grouping.key)),
+                    from_cursor: sort_value_for(grouping, decoded_cursor.sort_values.fetch(grouping.key)),
                     sort_direction: :asc # we don't yet support any alternate sorting.
                   )
                 end
               end
             )
+          end
+
+          # Returns a grouping value for pagination comparisons; geo tile keys require conversion to numeric datastore order.
+          private_class_method def self.sort_value_for(grouping, value)
+            grouping.is_a?(GeoTileGrouping) ? grouping.sort_value(value) : value
           end
 
           private_class_method def self.raw_nodes_for(query, parent_queries, schema, field_path)

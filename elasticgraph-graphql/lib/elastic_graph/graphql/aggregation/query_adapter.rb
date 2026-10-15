@@ -10,6 +10,7 @@ require "elastic_graph/graphql/aggregation/composite_grouping_adapter"
 require "elastic_graph/graphql/aggregation/computation"
 require "elastic_graph/graphql/aggregation/date_histogram_grouping"
 require "elastic_graph/graphql/aggregation/field_term_grouping"
+require "elastic_graph/graphql/aggregation/geo_tile_grouping"
 require "elastic_graph/graphql/aggregation/nested_sub_aggregation"
 require "elastic_graph/graphql/aggregation/path_segment"
 require "elastic_graph/graphql/aggregation/query"
@@ -220,11 +221,30 @@ module ElasticGraph
             # New date/time grouping API (DateGroupedBy, DateTimeGroupedBy)
             if field.type.elasticgraph_category == :date_grouped_by_object
               date_time_groupings_from(field_path: field_path, node: node)
+            elsif field.type.elasticgraph_category == :geo_location_grouped_by_object
+              geo_tile_groupings_from(field_path: field_path, node: node)
             elsif !field.type.object?
               # Non-date/time grouping
               missing_value_placeholder = field.type.unwrap_fully.grouping_missing_value_placeholder
               [FieldTermGrouping.new(field_path: field_path, missing_value_placeholder: missing_value_placeholder)]
             end
+          end
+        end
+
+        # Builds a grouping for each selected `as_geo_tile` operation, validating its zoom level
+        # without treating the selected tile properties as additional grouping dimensions.
+        def geo_tile_groupings_from(field_path:, node:)
+          get_children_nodes(node).map do |child_node|
+            args = Schema::Arguments.to_schema_form(child_node.arguments, child_node.field)
+            zoom_level = args.fetch(element_names.zoom_level)
+            unless (0..29).cover?(zoom_level)
+              raise ::GraphQL::ExecutionError, "`#{element_names.zoom_level}` must be between 0 and 29 (received #{zoom_level})."
+            end
+
+            GeoTileGrouping.new(
+              field_path: field_path + [PathSegment.for(lookahead: child_node)],
+              zoom_level: zoom_level
+            )
           end
         end
 

@@ -23,8 +23,19 @@ module ElasticGraph
           ::Hash[::String, untyped],
           ::Array[::String],
           ?parent_key_fields: ::Hash[::String, untyped],
-          ?parent_key_values: ::Array[untyped]
+          ?parent_key_values: ::Array[untyped],
+          ?total_doc_count: untyped,
+          ?count_error_unknown: bool
         ) -> ::Array[::Hash[::String, untyped]]
+
+        def self.format_leaf_bucket: (
+          ::Hash[::String, untyped],
+          merge_into_bucket: ::Hash[::String, untyped],
+          key_fields: ::Hash[::String, untyped],
+          key_values: ::Array[untyped],
+          total_doc_count: untyped,
+          count_error_unknown: bool
+        ) -> ::Hash[::String, untyped]
 
         def self.sort_and_truncate_buckets: (
           ::Array[::Hash[::String, untyped]],

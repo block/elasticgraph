@@ -146,6 +146,15 @@ module ElasticGraph
       # GeoLocation
       # : Geographic coordinates representing a location on the Earth's surface.
       #
+      # GeoTile
+      # : A tile in the Web Mercator XYZ grid. Its coordinates identify a cell, not a fixed ground distance.
+      #
+      # GeoTileBounds
+      # : The geographic bounds of a Web Mercator XYZ tile. Tiles do not cross the antimeridian.
+      #
+      # GeoTileCorners
+      # : The geographic locations of the four corners of a Web Mercator XYZ tile.
+      #
       # PageInfo
       # : Provides information about the specific fetched page. This implements the
       #   `PageInfo` specification from the [Relay GraphQL Cursor Connections
@@ -181,6 +190,7 @@ module ElasticGraph
           register_custom_elastic_graph_scalars
           register_enum_types
           register_date_and_time_grouped_by_types
+          register_geo_grouped_by_types
           register_standard_elastic_graph_types
           register_standard_graphql_resolvers
           register_root_query_type
@@ -1424,6 +1434,71 @@ module ElasticGraph
 
             t.value "SUNDAY" do |v|
               v.documentation "Sunday."
+            end
+          end
+        end
+
+        # Registers the geographic grouping operation and its tile, bounds, and corner output types.
+        def register_geo_grouped_by_types
+          register_framework_object_type schema_def_state.type_ref("GeoLocation").as_grouped_by.name do |t|
+            t.documentation "Offers geographic grouping representations for a location."
+            t.resolve_fields_with :object_with_lookahead
+            t.override_runtime_metadata(elasticgraph_category: :geo_location_grouped_by_object)
+
+            t.field names.as_geo_tile, "GeoTile", graphql_only: true do |f|
+              f.documentation <<~EOS
+                Groups locations into Web Mercator XYZ tiles. Missing locations produce a `null` tile.
+                Points beyond ±85.0511° latitude are grouped into the northernmost or southernmost row,
+                so a point can be outside the bounds of the tile it is grouped into.
+                Boundary points are assigned to the tile to the east or south, subject to datastore coordinate encoding.
+              EOS
+              f.argument names.zoom_level, "Int!" do |a|
+                a.documentation "The Web Mercator zoom level, from 0 through 29. Higher levels produce smaller tiles and more buckets."
+                a.default 7
+              end
+            end
+          end
+
+          register_framework_object_type "GeoTile" do |t|
+            t.documentation "A tile in the Web Mercator XYZ grid. Its coordinates identify a cell, not a fixed ground distance."
+            t.override_runtime_metadata(elasticgraph_category: :geo_tile)
+            t.field names.zoom_level, "Int!", graphql_only: true do |f|
+              f.documentation "The zoom level of the tile, from 0 through 29."
+            end
+            {names.x => "west to east", names.y => "north to south"}.each do |name, direction|
+              t.field name, "Int!", graphql_only: true do |f|
+                f.documentation "The zero-based tile coordinate, counted #{direction}, from 0 through 2^zoomLevel - 1."
+              end
+            end
+            t.field names.center_point, "GeoLocation!", graphql_only: true do |f|
+              f.documentation <<~EOS
+                The center of the tile in the Web Mercator projection, not the average location of the records
+                or the arithmetic midpoint of the northern and southern latitude bounds.
+              EOS
+            end
+            t.field names.bounds, "GeoTileBounds!", graphql_only: true do |f|
+              f.documentation "The geographic bounds of the tile. Web Mercator excludes the poles and stops at approximately ±85.0511°."
+            end
+            t.field names.corners, "GeoTileCorners!", graphql_only: true do |f|
+              f.documentation "The four corners of the tile, calculated from its geographic bounds."
+            end
+          end
+
+          register_framework_object_type "GeoTileBounds" do |t|
+            t.documentation "The geographic bounds of a Web Mercator XYZ tile. Tiles do not cross the antimeridian."
+            {names.north => "Northern latitude", names.south => "Southern latitude", names.east => "Eastern longitude", names.west => "Western longitude"}.each do |name, description|
+              t.field name, "Float!", graphql_only: true do |f|
+                f.documentation "#{description} of the tile, in degrees."
+              end
+            end
+          end
+
+          register_framework_object_type "GeoTileCorners" do |t|
+            t.documentation "The geographic locations of the four corners of a Web Mercator XYZ tile."
+            [names.north_west, names.north_east, names.south_west, names.south_east].each do |name|
+              t.field name, "GeoLocation!", graphql_only: true do |f|
+                f.documentation "The #{name} corner of the tile."
+              end
             end
           end
         end

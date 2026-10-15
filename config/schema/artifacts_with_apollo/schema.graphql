@@ -266,6 +266,11 @@ type AddressGroupedBy {
   full_address: String
 
   """
+  The `geo_location` field value for this group.
+  """
+  geo_location: GeoLocationGroupedBy
+
+  """
   The `timestamps` field value for this group.
   """
   timestamps: AddressTimestampsGroupedBy
@@ -4084,9 +4089,113 @@ input GeoLocationFilterInput {
   not: GeoLocationFilterInput
 }
 
+"""
+Offers geographic grouping representations for a location.
+"""
+type GeoLocationGroupedBy @shareable {
+  """
+  Groups locations into Web Mercator XYZ tiles. Missing locations produce a `null` tile.
+  Points beyond ±85.0511° latitude are grouped into the northernmost or southernmost row,
+  so a point can be outside the bounds of the tile it is grouped into.
+  Boundary points are assigned to the tile to the east or south, subject to datastore coordinate encoding.
+  """
+  as_geo_tile(
+    """
+    The Web Mercator zoom level, from 0 through 29. Higher levels produce smaller tiles and more buckets.
+    """
+    zoom_level: Int! = 7
+  ): GeoTile
+}
+
 type GeoShape {
   coordinates: [Float!]!
   type: String
+}
+
+"""
+A tile in the Web Mercator XYZ grid. Its coordinates identify a cell, not a fixed ground distance.
+"""
+type GeoTile @shareable {
+  """
+  The geographic bounds of the tile. Web Mercator excludes the poles and stops at approximately ±85.0511°.
+  """
+  bounds: GeoTileBounds!
+
+  """
+  The center of the tile in the Web Mercator projection, not the average location of the records
+  or the arithmetic midpoint of the northern and southern latitude bounds.
+  """
+  center_point: GeoLocation!
+
+  """
+  The four corners of the tile, calculated from its geographic bounds.
+  """
+  corners: GeoTileCorners!
+
+  """
+  The zero-based tile coordinate, counted west to east, from 0 through 2^zoomLevel - 1.
+  """
+  x: Int!
+
+  """
+  The zero-based tile coordinate, counted north to south, from 0 through 2^zoomLevel - 1.
+  """
+  y: Int!
+
+  """
+  The zoom level of the tile, from 0 through 29.
+  """
+  zoom_level: Int!
+}
+
+"""
+The geographic bounds of a Web Mercator XYZ tile. Tiles do not cross the antimeridian.
+"""
+type GeoTileBounds @shareable {
+  """
+  Eastern longitude of the tile, in degrees.
+  """
+  east: Float!
+
+  """
+  Northern latitude of the tile, in degrees.
+  """
+  north: Float!
+
+  """
+  Southern latitude of the tile, in degrees.
+  """
+  south: Float!
+
+  """
+  Western longitude of the tile, in degrees.
+  """
+  west: Float!
+}
+
+"""
+The geographic locations of the four corners of a Web Mercator XYZ tile.
+"""
+type GeoTileCorners @shareable {
+  """
+  The north_east corner of the tile.
+  """
+  north_east: GeoLocation!
+
+  """
+  The north_west corner of the tile.
+  """
+  north_west: GeoLocation!
+
+  """
+  The south_east corner of the tile.
+  """
+  south_east: GeoLocation!
+
+  """
+  The south_west corner of the tile.
+  """
+  south_west: GeoLocation!
 }
 
 """
@@ -14711,6 +14820,11 @@ type TeamGroupedBy {
   seasons_object: TeamSeasonGroupedBy
 
   """
+  The `stadium_location` field value for this group.
+  """
+  stadium_location: GeoLocationGroupedBy
+
+  """
   The `staff` field value for this group.
   """
   staff: StaffGroupedBy
@@ -19144,6 +19258,11 @@ type WidgetOrAddressGroupedBy {
   The `full_address` field value for this group.
   """
   full_address: String
+
+  """
+  The `geo_location` field value for this group.
+  """
+  geo_location: GeoLocationGroupedBy
 
   """
   The `internal_details` field value for this group.

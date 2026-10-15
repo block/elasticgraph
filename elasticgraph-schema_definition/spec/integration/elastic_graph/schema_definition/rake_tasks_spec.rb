@@ -292,6 +292,7 @@ module ElasticGraph
             DateTimeGroupedBy DateTimeGroupingOffsetInput DateTimeGroupingTruncationUnitInput
             DateTimeUnitInput DateUnitInput
             DayOfWeekGroupingOffsetInput
+            GeoLocationGroupedBy
             LocalTimeGroupingOffsetInput LocalTimeGroupingTruncationUnitInput LocalTimeUnitInput
             NonNumericAggregatedValues TextFilterInput
             MatchesQueryFilterInput MatchesQueryAllowedEditsPerTermInput MatchesPhraseFilterInput MatchesQueryWithPrefixFilterInput

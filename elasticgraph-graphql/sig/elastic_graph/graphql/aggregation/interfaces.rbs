@@ -3,7 +3,7 @@ module ElasticGraph
     module Aggregation
       type fieldPath = ::Array[PathSegment]
       type stringish = ::Symbol | ::String
-      type grouping = DateHistogramGrouping | FieldTermGrouping | ScriptTermGrouping
+      type grouping = DateHistogramGrouping | FieldTermGrouping | ScriptTermGrouping | GeoTileGrouping
     end
   end
 end
