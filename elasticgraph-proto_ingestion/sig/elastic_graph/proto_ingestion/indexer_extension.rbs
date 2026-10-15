@@ -1,0 +1,6 @@
+module ElasticGraph
+  module ProtoIngestion
+    module IndexerExtension : ::ElasticGraph::Indexer
+    end
+  end
+end

@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/proto_ingestion/runtime_metadata/schema"
 require "elastic_graph/proto_ingestion/schema_definition/field_number_mappings"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/enum_type_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/object_interface_and_union_extension"
@@ -113,6 +114,20 @@ module ElasticGraph
         # @return [Hash<String, Object>]
         def field_number_mappings_for_artifact
           @field_number_mappings.to_dumpable_hash
+        end
+
+        # Returns the ingestion facts the indexer needs that protobuf descriptors cannot express.
+        # Types with no additional metadata are omitted.
+        #
+        # @return [RuntimeMetadata::Schema]
+        def ingestion_metadata
+          RuntimeMetadata::Schema.new(
+            package_name: @package_name,
+            types_by_name: proto_types.filter_map do |type|
+              metadata = type.proto_ingestion_metadata
+              [type.name, metadata] unless metadata.empty?
+            end.to_h
+          )
         end
 
         # Returns the stable protobuf number for a message field.
