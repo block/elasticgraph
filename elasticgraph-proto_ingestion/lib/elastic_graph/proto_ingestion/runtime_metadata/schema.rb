@@ -10,6 +10,9 @@ require "elastic_graph/proto_ingestion/runtime_metadata/type"
 
 module ElasticGraph
   module ProtoIngestion
+    # Metadata that supplements protobuf descriptors with ElasticGraph ingestion facts.
+    #
+    # @private
     module RuntimeMetadata
       # Configuration stored with the protobuf indexer extension.
       #
