@@ -7,6 +7,8 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/proto_ingestion"
+require "elastic_graph/proto_ingestion/runtime_metadata/type"
 
 module ElasticGraph
   module ProtoIngestion
@@ -112,6 +114,16 @@ module ElasticGraph
           # @return [String]
           def proto_type_reference(_package_name)
             proto_name
+          end
+
+          # Returns the scalar's original name when it differs from the default for its protobuf type.
+          #
+          # @return [RuntimeMetadata::Type]
+          def proto_ingestion_metadata
+            default_scalar = DEFAULT_SCALARS_BY_PROTO_TYPE[proto_name]
+            scalar_name = type_ref.with_reverted_override.name
+
+            RuntimeMetadata::Type.new(scalar: (scalar_name == default_scalar) ? nil : scalar_name)
           end
         end
       end

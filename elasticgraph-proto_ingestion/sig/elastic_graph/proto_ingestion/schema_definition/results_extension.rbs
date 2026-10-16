@@ -7,6 +7,7 @@ module ElasticGraph
 
         private
 
+        def build_runtime_metadata: () -> SchemaArtifacts::RuntimeMetadata::Schema
         def protobuf_schema_generator: () -> Schema
 
         @proto_schema: ::String?

@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/proto_ingestion/runtime_metadata/type"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/proto_documentation"
 require "elastic_graph/support/casing"
 
@@ -87,6 +88,17 @@ module ElasticGraph
           # @return [String]
           def proto_enum_value_prefix
             @proto_enum_value_prefix ||= Support::Casing.to_upper_snake(name)
+          end
+
+          # Returns names that removing the protobuf enum value prefix cannot recover.
+          #
+          # @return [RuntimeMetadata::Type]
+          def proto_ingestion_metadata
+            RuntimeMetadata::Type.new(enum_values_by_name: values_by_name.values.filter_map do |raw_value|
+              value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
+              proto_name = value.proto_name(proto_enum_value_prefix)
+              [proto_name, value.name] unless proto_name == "#{proto_enum_value_prefix}_#{value.name}"
+            end.to_h)
           end
 
           # @private
