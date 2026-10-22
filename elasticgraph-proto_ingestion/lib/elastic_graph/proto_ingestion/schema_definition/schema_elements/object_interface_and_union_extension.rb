@@ -58,16 +58,18 @@ module ElasticGraph
           #
           # @return [RuntimeMetadata::Type]
           def proto_ingestion_metadata
-            return RuntimeMetadata::Type.new if abstract?
+            return RuntimeMetadata::Type.new(fields_by_name: {}, non_standard_enum_values_by_name: {}, scalar: nil) if abstract?
 
-            RuntimeMetadata::Type.new(fields_by_name: proto_fields.filter_map do |schema_field, field|
+            fields_by_name = proto_fields.filter_map do |schema_field, field|
               base_type = _ = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(field.type).last.resolved
-              scalar = base_type.is_a?(ScalarTypeExtension) && base_type.proto_ingestion_metadata.scalar
+              scalar = base_type.proto_ingestion_metadata.scalar if base_type.is_a?(ScalarTypeExtension)
               name_in_index = field.name_in_index unless field.name_in_index == schema_field.name
               next unless name_in_index || scalar
 
               [schema_field.name, RuntimeMetadata::Field.new(name_in_index: name_in_index, type: scalar ? base_type.name : nil)]
-            end.to_h)
+            end.to_h
+
+            RuntimeMetadata::Type.new(fields_by_name: fields_by_name, non_standard_enum_values_by_name: {}, scalar: nil)
           end
 
           # Returns this type's name in protobuf schemas.

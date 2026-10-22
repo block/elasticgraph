@@ -120,14 +120,13 @@ module ElasticGraph
         # Types with no additional metadata are omitted.
         #
         # @return [RuntimeMetadata::Schema]
-        def ingestion_metadata
-          RuntimeMetadata::Schema.new(
-            package_name: @package_name,
-            types_by_name: proto_types.filter_map do |type|
-              metadata = type.proto_ingestion_metadata
-              [type.name, metadata] unless metadata.empty?
-            end.to_h
-          )
+        def proto_ingestion_metadata
+          types_by_name = proto_types.filter_map do |type|
+            metadata = type.proto_ingestion_metadata
+            [type.name, metadata] unless metadata.empty?
+          end.to_h
+
+          RuntimeMetadata::Schema.new(package_name: @package_name, types_by_name: types_by_name)
         end
 
         # Returns the stable protobuf number for a message field.

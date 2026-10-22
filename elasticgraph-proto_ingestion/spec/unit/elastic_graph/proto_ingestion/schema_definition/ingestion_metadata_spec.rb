@@ -59,7 +59,7 @@ module ElasticGraph
                 "views" => {"type" => "JsonSafeLong"},
                 "payload" => {"type" => "Untyped"}
               }},
-              "Status" => {"enum_values_by_name" => {"STATUS_ON_HOLD" => "onHold"}},
+              "Status" => {"non_standard_enum_values_by_name" => {"STATUS_ON_HOLD" => "onHold"}},
               "Untyped" => {"scalar" => "Untyped"}
             }
           )
@@ -168,8 +168,8 @@ module ElasticGraph
             RuntimeMetadata::Field.new(name_in_index: "private_date", type: "Date")
           )
           expect(metadata.types_by_name.fetch("Date").scalar).to eq("Date")
-          expect(metadata.types_by_name.fetch("Status").enum_values_by_name).to eq("STATUS_ON_HOLD" => "onHold")
-          expect(metadata.to_dumpable_hash).to eq(extension.extension_ref.fetch("config"))
+          expect(metadata.types_by_name.fetch("Status").non_standard_enum_values_by_name).to eq("STATUS_ON_HOLD" => "onHold")
+          expect(RuntimeMetadata::Schema.from_hash(metadata.to_dumpable_hash)).to eq(metadata)
           expect(extension.load_extension.extension_class).to be(IndexerExtension)
         end
 
@@ -183,12 +183,13 @@ module ElasticGraph
 
           expect(config).to eq("package_name" => "elasticgraph")
           expect(RuntimeMetadata::Schema.from_hash(config).types_by_name).to eq({})
-          expect(RuntimeMetadata::Type.from_hash({})).to eq(RuntimeMetadata::Type.new)
-          expect(RuntimeMetadata::Field.from_hash({})).to eq(RuntimeMetadata::Field.new)
+          expect(RuntimeMetadata::Type.from_hash({})).to eq(RuntimeMetadata::Type.new(fields_by_name: {}, non_standard_enum_values_by_name: {}, scalar: nil))
+          expect(RuntimeMetadata::Field.from_hash({})).to eq(RuntimeMetadata::Field.new(name_in_index: nil, type: nil))
         end
 
         def ingestion_config(**options, &block)
-          extension = define_proto_schema_results(**options, &block).runtime_metadata.indexer_extension_modules.last.extension_ref
+          dumped = define_proto_schema_results(**options, &block).runtime_metadata.to_dumpable_hash
+          extension = dumped.fetch("indexer_extension_modules").last.fetch("extension_ref")
           expect(extension.except("config")).to eq(
             "name" => "ElasticGraph::ProtoIngestion::IndexerExtension",
             "require_path" => "elastic_graph/proto_ingestion/indexer_extension"

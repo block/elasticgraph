@@ -40,7 +40,7 @@ module ElasticGraph
           extension = SchemaArtifacts::RuntimeMetadata::ComponentExtension.new({
             "name" => "ElasticGraph::ProtoIngestion::IndexerExtension",
             "require_path" => "elastic_graph/proto_ingestion/indexer_extension",
-            "config" => protobuf_schema_generator.ingestion_metadata.to_dumpable_hash
+            "config" => protobuf_schema_generator.proto_ingestion_metadata.to_dumpable_hash
           })
           metadata.with(indexer_extension_modules: metadata.indexer_extension_modules + [extension])
         end

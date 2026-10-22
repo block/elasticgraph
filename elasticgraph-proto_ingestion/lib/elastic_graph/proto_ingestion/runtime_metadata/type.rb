@@ -14,33 +14,29 @@ module ElasticGraph
       # Ingestion facts for a scalar, enum, or message type.
       #
       # @private
-      Type = ::Data.define(:fields_by_name, :enum_values_by_name, :scalar) do
+      Type = ::Data.define(:fields_by_name, :non_standard_enum_values_by_name, :scalar) do
         # @implements Type
-
-        def initialize(fields_by_name: {}, enum_values_by_name: {}, scalar: nil)
-          super
-        end
 
         def self.from_hash(hash)
           fields = hash["fields_by_name"] || {} # : ::Hash[::String, untyped]
-          enum_values = hash["enum_values_by_name"] || {} # : ::Hash[::String, ::String]
+          enum_values = hash["non_standard_enum_values_by_name"] || {} # : ::Hash[::String, ::String]
           new(
             fields_by_name: fields.transform_values { |field| Field.from_hash(field) },
-            enum_values_by_name: enum_values,
+            non_standard_enum_values_by_name: enum_values,
             scalar: hash["scalar"]
           )
         end
 
         def to_dumpable_hash
           {
-            "enum_values_by_name" => enum_values_by_name,
             "fields_by_name" => fields_by_name.sort.to_h.transform_values(&:to_dumpable_hash),
+            "non_standard_enum_values_by_name" => non_standard_enum_values_by_name,
             "scalar" => scalar
-          }.reject { |_, value| value.nil? || value == {} }
+          }
         end
 
         def empty?
-          fields_by_name.empty? && enum_values_by_name.empty? && scalar.nil?
+          fields_by_name.empty? && non_standard_enum_values_by_name.empty? && scalar.nil?
         end
       end
     end

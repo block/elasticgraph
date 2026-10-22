@@ -29,9 +29,10 @@ module ElasticGraph
         end
 
         def to_dumpable_hash
-          hash = {"package_name" => package_name} # : ::Hash[::String, untyped]
-          hash["types_by_name"] = types_by_name.sort.to_h.transform_values(&:to_dumpable_hash) unless types_by_name.empty?
-          hash
+          {
+            "package_name" => package_name,
+            "types_by_name" => types_by_name.sort.to_h.transform_values(&:to_dumpable_hash)
+          }
         end
       end
     end
