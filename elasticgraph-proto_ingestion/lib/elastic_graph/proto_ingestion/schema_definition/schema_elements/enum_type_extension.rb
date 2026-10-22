@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/proto_ingestion/proto_conversions"
 require "elastic_graph/proto_ingestion/runtime_metadata/type"
 require "elastic_graph/proto_ingestion/schema_definition/schema_elements/proto_documentation"
 require "elastic_graph/support/casing"
@@ -94,11 +95,13 @@ module ElasticGraph
           #
           # @return [RuntimeMetadata::Type]
           def proto_ingestion_metadata
-            RuntimeMetadata::Type.new(enum_values_by_name: values_by_name.values.filter_map do |raw_value|
+            non_standard_enum_values_by_name = values_by_name.values.filter_map do |raw_value|
               value = raw_value # : ::ElasticGraph::SchemaDefinition::SchemaElements::EnumValue & EnumValueExtension
               proto_name = value.proto_name(proto_enum_value_prefix)
-              [proto_name, value.name] unless proto_name == "#{proto_enum_value_prefix}_#{value.name}"
-            end.to_h)
+              [proto_name, value.name] unless ProtoConversions.enum_value_to_eg_name(proto_name, proto_enum_value_prefix) == value.name
+            end.to_h
+
+            RuntimeMetadata::Type.new(fields_by_name: {}, non_standard_enum_values_by_name: non_standard_enum_values_by_name, scalar: nil)
           end
 
           # @private

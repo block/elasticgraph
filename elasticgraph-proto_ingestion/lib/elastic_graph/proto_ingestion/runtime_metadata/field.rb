@@ -11,20 +11,18 @@ module ElasticGraph
     module RuntimeMetadata
       # Ingestion facts for a protobuf field that its descriptor cannot express.
       #
+      # `type` references a key in Schema#types_by_name, whose scalar is the canonical name.
+      #
       # @private
       Field = ::Data.define(:name_in_index, :type) do
         # @implements Field
-
-        def initialize(name_in_index: nil, type: nil)
-          super
-        end
 
         def self.from_hash(hash)
           new(name_in_index: hash["name_in_index"], type: hash["type"])
         end
 
         def to_dumpable_hash
-          {"name_in_index" => name_in_index, "type" => type}.compact
+          {"name_in_index" => name_in_index, "type" => type}
         end
       end
     end
