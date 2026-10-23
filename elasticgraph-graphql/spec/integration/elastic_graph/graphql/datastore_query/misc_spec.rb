@@ -118,7 +118,7 @@ module ElasticGraph
         end
       end
 
-      context "when indices have not yet been configured", :builds_admin do
+      context "with a unique monthly rollover index", :builds_admin do
         let(:graphql) do
           build_graphql(schema_definition: lambda do |schema|
             schema.object_type "Widget" do |t|
@@ -131,7 +131,82 @@ module ElasticGraph
           end)
         end
 
-        it "raises a `GraphQL::ExecutionError` indicating they need to be configured" do
+        it "continues searching after a cached rollover index has been manually deleted", :expect_index_exclusions do
+          build_admin(datastore_core: graphql.datastore_core).cluster_configurator.configure_cluster(StringIO.new)
+
+          index_into(
+            graphql,
+            january_widget = build(:widget, created_at: "2024-01-15T12:00:00Z"),
+            february_widget = build(:widget, created_at: "2024-02-15T12:00:00Z")
+          )
+
+          pre_cache_index_state(graphql)
+          index_def = graphql.datastore_core.index_definitions_by_name.fetch(unique_index_name)
+          january_index_name = index_def.index_name_for_writes({"created_at" => january_widget.fetch(:created_at)})
+          main_datastore_client.delete_indices(january_index_name)
+
+          results = search_datastore(
+            index_def_name: unique_index_name,
+            graphql: graphql,
+            client_filters: [{"created_at" => {"gte" => "2024-02-01T00:00:00Z"}}]
+          )
+
+          expect(ids_of(results.to_a)).to eq(ids_of(february_widget))
+          expect(performed_search_metadata("main").last).to include(
+            "index" => "#{index_def.index_expression_for_search},-#{january_index_name}",
+            "ignore_unavailable" => true
+          )
+          expect_to_have_excluded_indices("main", [january_index_name])
+        end
+
+        it "continues aggregating after the only cached rollover index a filter can match has been manually deleted" do
+          build_admin(datastore_core: graphql.datastore_core).cluster_configurator.configure_cluster(StringIO.new)
+
+          index_into(graphql, january_widget = build(:widget, created_at: "2024-01-15T12:00:00Z"))
+
+          pre_cache_index_state(graphql)
+          index_def = graphql.datastore_core.index_definitions_by_name.fetch(unique_index_name)
+          january_index_name = index_def.index_name_for_writes({"created_at" => january_widget.fetch(:created_at)})
+          main_datastore_client.delete_indices(january_index_name)
+
+          # This filter is impossible to satisfy, so the time set is empty. The aggregation requires an index to
+          # search, so `IndexExpressionBuilder` names the first cached index directly, with no wildcard and no
+          # exclusions. That index has been deleted, so the datastore has nothing to resolve the name against.
+          results = search_datastore(
+            index_def_name: unique_index_name,
+            graphql: graphql,
+            aggregations: [aggregation_query_of(name: "counts", groupings: [date_histogram_grouping_of("created_at", "month")])],
+            client_filters: [{"created_at" => {"gte" => "2025-02-01T00:00:00Z", "lt" => "2025-01-01T00:00:00Z"}}]
+          )
+
+          expect(performed_search_metadata("main").last).to include("index" => january_index_name)
+          expect(results.aggregations).to eq({})
+        end
+
+        it "continues searching after every cached rollover index has been manually deleted", :expect_index_exclusions do
+          build_admin(datastore_core: graphql.datastore_core).cluster_configurator.configure_cluster(StringIO.new)
+
+          index_into(graphql, january_widget = build(:widget, created_at: "2024-01-15T12:00:00Z"))
+
+          pre_cache_index_state(graphql)
+          index_def = graphql.datastore_core.index_definitions_by_name.fetch(unique_index_name)
+          january_index_name = index_def.index_name_for_writes({"created_at" => january_widget.fetch(:created_at)})
+          main_datastore_client.delete_indices(*index_def.known_related_query_rollover_indices.map(&:name))
+
+          # With every index gone, the rollover wildcard resolves to nothing at all. That alone is fine (the
+          # datastore allows a wildcard to match no indices by default), but the expression also excludes the
+          # now-missing January index by name, and resolving that name is what fails.
+          results = search_datastore(
+            index_def_name: unique_index_name,
+            graphql: graphql,
+            client_filters: [{"created_at" => {"gte" => "2024-02-01T00:00:00Z"}}]
+          )
+
+          expect(results.to_a).to eq []
+          expect_to_have_excluded_indices("main", [january_index_name])
+        end
+
+        it "raises a `GraphQL::ExecutionError` indicating they need to be configured if they have not yet been" do
           widgets_def = graphql.datastore_core.index_definitions_by_name.fetch(unique_index_name)
 
           query = graphql.datastore_query_builder.new_query(
