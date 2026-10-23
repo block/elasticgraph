@@ -38,6 +38,11 @@ module ElasticGraph
           shard_routing_values.merge(queries.flat_map { |q| q.shard_routing_values || [] })
           search_index_expressions.merge(queries.map(&:search_index_expression))
           query_counts_per_datastore_request << queries.size
+          counts = extension_data["field_retrieval_counts"] ||= {}
+          queries.each do |query|
+            reason = query.field_retrieval_plan.reason
+            counts[reason] = counts.fetch(reason, 0) + 1
+          end
         end
       end
 
