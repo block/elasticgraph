@@ -1,0 +1,17 @@
+module ElasticGraph
+  module ProtoIngestion
+    module RuntimeMetadata
+      class Type < ::Data
+        attr_reader fields_by_name: ::Hash[::String, Field]
+        attr_reader non_standard_enum_values_by_name: ::Hash[::String, ::String]
+        attr_reader scalar: ::String?
+
+        def initialize: (fields_by_name: ::Hash[::String, Field], non_standard_enum_values_by_name: ::Hash[::String, ::String], scalar: ::String?) -> void
+        def self.new: (fields_by_name: ::Hash[::String, Field], non_standard_enum_values_by_name: ::Hash[::String, ::String], scalar: ::String?) -> Type
+        def self.from_hash: (::Hash[::String, untyped]) -> Type
+        def to_dumpable_hash: () -> ::Hash[::String, untyped]
+        def empty?: () -> bool
+      end
+    end
+  end
+end

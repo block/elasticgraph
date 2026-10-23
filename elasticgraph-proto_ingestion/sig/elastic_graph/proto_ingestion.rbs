@@ -2,5 +2,7 @@ module ElasticGraph
   module ProtoIngestion
     PROTO_SCHEMA_FILE: ::String
     PROTO_FIELD_NUMBERS_FILE: ::String
+    BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME: ::Hash[::String, {type: ::String, ?import: ::String, ?field_comment: ::String}]
+    DEFAULT_SCALARS_BY_PROTO_TYPE: ::Hash[::String, ::String]
   end
 end

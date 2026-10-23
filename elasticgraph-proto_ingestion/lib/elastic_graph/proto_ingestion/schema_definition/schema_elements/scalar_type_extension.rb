@@ -7,6 +7,8 @@
 # frozen_string_literal: true
 
 require "elastic_graph/errors"
+require "elastic_graph/proto_ingestion"
+require "elastic_graph/proto_ingestion/runtime_metadata/type"
 
 module ElasticGraph
   module ProtoIngestion
@@ -14,23 +16,6 @@ module ElasticGraph
       module SchemaElements
         # Extends ScalarType with proto field type conversion.
         module ScalarTypeExtension
-          # Default protobuf options applied to ElasticGraph's built-in scalar types as they are constructed.
-          BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME = {
-            "Boolean" => {type: "bool"},
-            "Cursor" => {type: "string"},
-            "Date" => {type: "string", field_comment: %(Must be formatted as an ISO 8601 date, e.g. "2024-11-25".)},
-            "DateTime" => {type: "google.protobuf.Timestamp", import: "google/protobuf/timestamp.proto"},
-            "Float" => {type: "double"},
-            "ID" => {type: "string"},
-            "Int" => {type: "int32"},
-            "JsonSafeLong" => {type: "int64"},
-            "LocalTime" => {type: "string", field_comment: %(Must be formatted as an ISO 8601 local time, e.g. "14:23:12".)},
-            "LongString" => {type: "int64"},
-            "String" => {type: "string"},
-            "TimeZone" => {type: "string", field_comment: %(Must be an IANA time zone identifier, e.g. "America/Los_Angeles".)},
-            "Untyped" => {type: "string"}
-          }.freeze # : ::Hash[::String, {type: ::String, ?import: ::String, ?field_comment: ::String}]
-
           # An `import` is rendered as `import "PATH";`, so a quote or newline in the path would
           # produce invalid proto. `protoc` also requires the path to name a `.proto` file.
           VALID_PROTOBUF_IMPORT_PATH = %r{\A[\w./-]+\.proto\z}
@@ -112,6 +97,20 @@ module ElasticGraph
           # @return [String]
           def proto_type_reference(_package_name)
             proto_name
+          end
+
+          # Returns the scalar's original name when it differs from the default for its protobuf type.
+          #
+          # @return [RuntimeMetadata::Type]
+          def proto_ingestion_metadata
+            default_scalar = DEFAULT_SCALARS_BY_PROTO_TYPE[proto_name]
+            scalar_name = type_ref.with_reverted_override.name
+
+            RuntimeMetadata::Type.new(
+              fields_by_name: {},
+              non_standard_enum_values_by_name: {},
+              scalar: (scalar_name == default_scalar) ? nil : scalar_name
+            )
           end
         end
       end

@@ -1,0 +1,7 @@
+module ElasticGraph
+  module ProtoIngestion
+    module ProtoConversions
+      def self.enum_value_to_eg_name: (::String proto_name, ::String enum_value_prefix) -> ::String
+    end
+  end
+end
