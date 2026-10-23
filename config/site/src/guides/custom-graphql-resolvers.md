@@ -40,7 +40,7 @@ TODO: link to the API docs for the different `ElasticGraph::GraphQL` types once 
   * `field`: the `ElasticGraph::GraphQL::Schema::Field` object representing the field being resolved.
   * `object`: the value returned by the resolver of the parent field.
   * `args`: arguments passed in the query.
-  * `context`: a hash-like object provided by the [GraphQL gem](https://graphql-ruby.org/queries/executing_queries.html#context)
+  * `context`: a hash-like object provided by the [GraphQL gem](https://graphql-ruby.org/guides/queries/executing_queries_md.html#context)
     that is scoped to the execution of a single query.
 
 {: .alert-note}
