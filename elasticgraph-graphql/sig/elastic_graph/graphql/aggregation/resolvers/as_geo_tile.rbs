@@ -1,0 +1,18 @@
+module ElasticGraph
+  class GraphQL
+    module Aggregation
+      module Resolvers
+        class AsGeoTile
+          def initialize: (elasticgraph_graphql: GraphQL, config: ::Hash[::Symbol, untyped]) -> void
+          def resolve: (
+            field: Schema::Field,
+            object: GroupedBy,
+            args: ::Hash[::String, untyped],
+            context: QueryContext,
+            lookahead: ::GraphQL::Execution::Lookahead
+          ) -> GeoTile?
+        end
+      end
+    end
+  end
+end

@@ -682,13 +682,14 @@ module ElasticGraph
           # instead.
           return false if parent_type.root_document_type? && name == "id"
 
-          return false if relationship || type.fully_unwrapped.as_object_type&.does_not_support?(&:groupable?)
+          return false if relationship || type_disallows_grouping?
 
           # We don't support grouping an entire list of values, but we do support grouping on individual values in a list.
           # However, we only do so when a `singular_name` has been provided (so that we know what to call the grouped_by field).
           # The semantics are a little odd (since one document can be duplicated in multiple grouping buckets) so we're ok
           # with not offering it by default--the user has to opt-in by telling us what to call the field in its singular form.
-          return list_field_groupable_by_single_values? if type.list? && type.fully_unwrapped.leaf?
+          # Types with their own `GroupedBy` type are grouped as individual values, like scalars.
+          return list_field_groupable_by_single_values? if type.list? && (type.fully_unwrapped.leaf? || original_type.fully_unwrapped.grouped_by_type_defined?)
 
           # Nested fields will be supported through specific nested aggregation support, and do not
           # work as expected when grouping on the root document type.
@@ -857,11 +858,14 @@ module ElasticGraph
           end
         end
 
+        # Returns the GraphQL type used for this field's grouped value. Types with their own `GroupedBy` type
+        # use it, derived from the original type name before any type-name overrides are applied.
         # @private
         def grouped_by_field_type_name
           unwrapped_type = type_for_derived_types.fully_unwrapped
-          if unwrapped_type.scalar_type_needing_grouped_by_object?
-            unwrapped_type.with_reverted_override.as_grouped_by.name
+          original_unwrapped_type = original_type_for_derived_types.fully_unwrapped
+          if original_unwrapped_type.grouped_by_type_defined?
+            original_unwrapped_type.as_grouped_by.name
           elsif unwrapped_type.leaf?
             unwrapped_type.name
           else
@@ -881,7 +885,7 @@ module ElasticGraph
               "The `#{name}` field value for this group",
               list_field_grouped_by_doc_note("the selected subfields of `#{name}`")
             )
-          elsif type_for_derived_types.fully_unwrapped.scalar_type_needing_grouped_by_object?
+          elsif original_type_for_derived_types.fully_unwrapped.grouped_by_type_defined?
             derived_documentation("Offers the different grouping options for the `#{name}` value within this group")
           else
             derived_documentation("The `#{name}` field value for this group")
@@ -1146,6 +1150,11 @@ module ElasticGraph
           args_sdl = selected_args.map(&:to_sdl).flat_map { |s| s.split("\n") }.join(joiner)
           return nil if args_sdl.empty?
           "(#{after_opening_paren}#{args_sdl})"
+        end
+
+        # Identifies types that disallow grouping, except for types that define their own `GroupedBy` type.
+        def type_disallows_grouping?
+          !original_type.fully_unwrapped.grouped_by_type_defined? && !!type.fully_unwrapped.as_object_type&.does_not_support?(&:groupable?)
         end
 
         # Indicates if the field uses the `text` mapping type.

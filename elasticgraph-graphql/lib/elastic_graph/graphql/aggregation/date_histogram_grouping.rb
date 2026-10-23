@@ -26,6 +26,11 @@ module ElasticGraph
           @encoded_index_field_path ||= FieldPathEncoder.join(field_path.filter_map(&:name_in_index))
         end
 
+        # ISO 8601 date/time keys sort the same way in Ruby as in the datastore.
+        def sort_value(key_value)
+          key_value
+        end
+
         def composite_clause(grouping_options: {})
           interval_options = INTERVAL_OPTIONS_BY_NAME.fetch(interval) do
             raise ArgumentError, "#{interval.inspect} is an unsupported interval. Valid values: #{INTERVAL_OPTIONS_BY_NAME.keys.inspect}."
