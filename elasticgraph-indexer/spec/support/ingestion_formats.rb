@@ -79,17 +79,10 @@ module ElasticGraph
       # to `pending` metadata on the examples that still expose gaps.
       METADATA = {ingests_proto_data: true, pending: "`elasticgraph-indexer` cannot ingest protobuf events yet."}
 
-      # The stock schema takes a couple of seconds to define, so we define it once per process.
-      def self.stock_schema_artifacts
-        @stock_schema_artifacts ||= yield
-      end
-
+      # The stock schema artifacts are dumped with the protobuf extension. Using them avoids re-loading `config/schema.rb`:
+      # Ruby resets a file's coverage each time it is loaded, so a re-load would discard coverage from earlier loads.
       def ingestion_schema_artifacts
-        ProtoFormat.stock_schema_artifacts do
-          generate_schema_artifacts(extension_modules: ingestion_schema_definition_extension_modules) do |schema|
-            schema.as_active_instance { load ::File.join(CommonSpecHelpers::REPO_ROOT, "config", "schema.rb") }
-          end
-        end
+        stock_schema_artifacts
       end
 
       def ingestion_schema_definition_extension_modules
