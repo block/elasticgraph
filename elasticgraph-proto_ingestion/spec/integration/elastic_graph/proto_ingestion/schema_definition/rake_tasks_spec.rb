@@ -77,8 +77,8 @@ module ElasticGraph
                 "ElasticGraphEventEnvelope" => envelope_field_number_mapping("product"),
                 "Product" => {
                   "fields" => {
-                    "id" => 1,
-                    "name" => 2
+                    "id" => proto_field_contract(1),
+                    "name" => proto_field_contract(2)
                   },
                   "next_number" => 3
                 }
