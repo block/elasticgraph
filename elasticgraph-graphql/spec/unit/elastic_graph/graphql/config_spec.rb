@@ -20,6 +20,7 @@ module ElasticGraph
 
       it "sets config values from the given parsed YAML" do
         config = Config.from_parsed_yaml("graphql" => {
+          "experimental_field_retrieval" => "automatic",
           "default_page_size" => 27,
           "max_page_size" => 270,
           "slow_query_latency_warning_threshold_in_ms" => 3200,
@@ -31,6 +32,7 @@ module ElasticGraph
           }
         })
 
+        expect(config.experimental_field_retrieval).to eq "automatic"
         expect(config.default_page_size).to eq 27
         expect(config.max_page_size).to eq 270
         expect(config.slow_query_latency_warning_threshold_in_ms).to eq 3200
@@ -46,6 +48,7 @@ module ElasticGraph
 
         expect(config.default_page_size).to eq 27
         expect(config.max_page_size).to eq 270
+        expect(config.experimental_field_retrieval).to eq "source"
         expect(config.slow_query_latency_warning_threshold_in_ms).to eq 5000
         expect(config.extension_modules).to eq []
         expect(config.client_resolver).to be_a Client::DefaultResolver
@@ -59,6 +62,10 @@ module ElasticGraph
             "fake_setting" => 23
           })
         }.to raise_error Errors::ConfigError, a_string_including("fake_setting")
+      end
+
+      it "rejects unknown retrieval policies" do
+        expect { Config.new(experimental_field_retrieval: "doc_values") }.to raise_error(Errors::ConfigError, /experimental_field_retrieval/)
       end
 
       describe "#client_resolver" do
