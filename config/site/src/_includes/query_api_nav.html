@@ -50,9 +50,31 @@
               <div class="hidden group-hover/aggregations:block absolute left-full top-0 ml-0.5 w-48">
                 <div class="{{site.style.navbar_dropdown}} py-1">
                   {% for page in subpages %}
-                    <a href="{{ page.url | relative_url }}" class="{{site.style.dropdown_item}}">
-                      {{ page.nav_title }}
-                    </a>
+                    {% assign page_path_parts = page.url | split: '/' %}
+                    {% if page_path_parts.size == 4 %}
+                      {% assign child_pages = site.pages | where_exp: "child", "child.url contains page.url" | where_exp: "child", "child.url != page.url" | sort: "menu_order" %}
+                      {% if child_pages.size == 0 %}
+                        <a href="{{ page.url | relative_url }}" class="{{site.style.dropdown_item}}">
+                          {{ page.nav_title }}
+                        </a>
+                      {% else %}
+                        <div class="relative group/grouping">
+                          <a href="{{ page.url | relative_url }}" class="{{site.style.dropdown_item}} flex items-center justify-between">
+                            <span>{{ page.nav_title }}</span>
+                            {% include icons/chevron-right.svg %}
+                          </a>
+                          <div class="hidden group-hover/grouping:block absolute left-full top-0 ml-0.5 w-48">
+                            <div class="{{site.style.navbar_dropdown}} py-1">
+                              {% for child in child_pages %}
+                                <a href="{{ child.url | relative_url }}" class="{{site.style.dropdown_item}}">
+                                  {{ child.nav_title }}
+                                </a>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                      {% endif %}
+                    {% endif %}
                   {% endfor %}
                 </div>
               </div>

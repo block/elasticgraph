@@ -25,6 +25,11 @@ module ElasticGraph
           @encoded_index_field_path ||= FieldPathEncoder.join(field_path.filter_map(&:name_in_index))
         end
 
+        # Term keys sort the same way in Ruby as in the datastore.
+        def sort_value(key_value)
+          key_value
+        end
+
         def composite_clause(grouping_options: {})
           {"terms" => terms_subclause.merge(grouping_options)}
         end
@@ -43,6 +48,10 @@ module ElasticGraph
 
         def inner_meta
           INNER_META
+        end
+
+        def bounds_count_error_with_value_count?
+          false
         end
 
         private

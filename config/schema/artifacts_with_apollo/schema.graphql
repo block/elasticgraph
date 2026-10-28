@@ -266,6 +266,11 @@ type AddressGroupedBy {
   full_address: String
 
   """
+  Offers the different grouping options for the `geo_location` value within this group.
+  """
+  geo_location: GeoLocationGroupedBy
+
+  """
   The `timestamps` field value for this group.
   """
   timestamps: AddressTimestampsGroupedBy
@@ -4084,9 +4089,204 @@ input GeoLocationFilterInput {
   not: GeoLocationFilterInput
 }
 
+"""
+Offers geographic grouping representations for a location.
+"""
+type GeoLocationGroupedBy @shareable {
+  """
+  Groups locations into Web Mercator [XYZ
+  tiles](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames). Missing
+  locations produce a `null` tile.
+  Points beyond ±85.0511° latitude are grouped into the northernmost or southernmost row,
+  so a point can be outside the bounds of the tile it is grouped into.
+  Boundary points are assigned to the tile to the east or south, subject to datastore coordinate encoding.
+  """
+  as_geo_tile(
+    """
+    The Web Mercator zoom level, from 0 through 29.
+    At zoom level z, the map has 2^z rows and 2^z columns. Increasing the zoom level by 1
+    doubles both, producing four times as many tiles.
+    """
+    zoom_level: Int! = 7
+  ): GeoTile
+}
+
+"""
+Input type used to specify filters on elements of a `[GeoLocation]` field.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input GeoLocationListElementFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `GeoLocationListElementFilterInput` input because of
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [GeoLocationListElementFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [GeoLocationListElementFilterInput!]
+
+  """
+  Matches records where the field's geographic location is within a specified distance from the
+  location identified by `latitude` and `longitude`.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  near: GeoLocationDistanceFilterInput
+}
+
+"""
+Input type used to specify filters on `[GeoLocation]` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input GeoLocationListFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `GeoLocationListFilterInput` input because of
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [GeoLocationListFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [GeoLocationListFilterInput!]
+
+  """
+  Matches records where any of the list elements match the provided sub-filter.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  any_satisfy: GeoLocationListElementFilterInput
+
+  """
+  Used to filter on the number of non-null elements in this list field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  count: IntFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: GeoLocationListFilterInput
+}
+
 type GeoShape {
   coordinates: [Float!]!
   type: String
+}
+
+"""
+A tile in the Web Mercator XYZ grid. Its coordinates identify a cell, not a fixed ground distance.
+"""
+type GeoTile @shareable {
+  """
+  The geographic bounds of the tile. Web Mercator excludes the poles and stops at approximately ±85.0511°.
+  """
+  bounds: GeoTileBounds!
+
+  """
+  The four corners of the tile, calculated from its geographic bounds.
+  """
+  corners: GeoTileCorners!
+
+  """
+  The center of the tile as drawn on a Web Mercator map, not the average record location or the midpoint
+  of the tile's latitude bounds. These differ noticeably only at low zoom levels: for tile 1/0/0,
+  the map center point is at about 66.51° latitude, but the bounds midpoint is at about 42.53°.
+  """
+  map_center_point: GeoLocation!
+
+  """
+  The zero-based tile coordinate, counted west to east, from 0 through 2^zoomLevel - 1.
+  """
+  x: Int!
+
+  """
+  The zero-based tile coordinate, counted north to south, from 0 through 2^zoomLevel - 1.
+  """
+  y: Int!
+
+  """
+  The zoom level of the tile, from 0 through 29.
+  """
+  zoom_level: Int!
+}
+
+"""
+The geographic bounds of a Web Mercator XYZ tile. Tiles do not cross the antimeridian.
+"""
+type GeoTileBounds @shareable {
+  """
+  The longitude of the eastern boundary of the tile.
+  """
+  east: Float!
+
+  """
+  The latitude of the northern boundary of the tile.
+  """
+  north: Float!
+
+  """
+  The latitude of the southern boundary of the tile.
+  """
+  south: Float!
+
+  """
+  The longitude of the western boundary of the tile.
+  """
+  west: Float!
+}
+
+"""
+The geographic locations of the four corners of a Web Mercator XYZ tile.
+"""
+type GeoTileCorners @shareable {
+  """
+  The northeast corner of the tile.
+  """
+  northeast: GeoLocation!
+
+  """
+  The northwest corner of the tile.
+  """
+  northwest: GeoLocation!
+
+  """
+  The southeast corner of the tile.
+  """
+  southeast: GeoLocation!
+
+  """
+  The southwest corner of the tile.
+  """
+  southwest: GeoLocation!
 }
 
 """
@@ -14711,6 +14911,11 @@ type TeamGroupedBy {
   seasons_object: TeamSeasonGroupedBy
 
   """
+  Offers the different grouping options for the `stadium_location` value within this group.
+  """
+  stadium_location: GeoLocationGroupedBy
+
+  """
   The `staff` field value for this group.
   """
   staff: StaffGroupedBy
@@ -15304,6 +15509,7 @@ type TeamSeason {
   players_nested: [Player!]!
   players_object: [Player!]!
   record: TeamRecord
+  stadium_location: GeoLocation
   started_at: DateTime
   was_shortened: Boolean
   won_games_at: [DateTime!]!
@@ -15333,6 +15539,11 @@ type TeamSeasonAggregatedValues {
   Computed aggregate values for the `record` field.
   """
   record: TeamRecordAggregatedValues
+
+  """
+  Computed aggregate values for the `stadium_location` field.
+  """
+  stadium_location: NonNumericAggregatedValues
 
   """
   Computed aggregate values for the `started_at` field.
@@ -15426,6 +15637,13 @@ input TeamSeasonFieldsListFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   record: TeamRecordFieldsListFilterInput
+
+  """
+  Used to filter on the `stadium_location` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  stadium_location: GeoLocationListFilterInput
 
   """
   Used to filter on the `started_at` field.
@@ -15527,6 +15745,13 @@ input TeamSeasonFilterInput {
   record: TeamRecordFilterInput
 
   """
+  Used to filter on the `stadium_location` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  stadium_location: GeoLocationFilterInput
+
+  """
   Used to filter on the `started_at` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -15591,6 +15816,11 @@ type TeamSeasonGroupedBy {
   The `record` field value for this group.
   """
   record: TeamRecordGroupedBy
+
+  """
+  Offers the different grouping options for the `stadium_location` value within this group.
+  """
+  stadium_location: GeoLocationGroupedBy
 
   """
   Offers the different grouping options for the `started_at` value within this group.
@@ -19144,6 +19374,11 @@ type WidgetOrAddressGroupedBy {
   The `full_address` field value for this group.
   """
   full_address: String
+
+  """
+  Offers the different grouping options for the `geo_location` value within this group.
+  """
+  geo_location: GeoLocationGroupedBy
 
   """
   The `internal_details` field value for this group.

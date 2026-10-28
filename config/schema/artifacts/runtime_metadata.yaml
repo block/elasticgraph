@@ -1812,6 +1812,11 @@ enum_types_by_name:
           direction: desc
           field_path: widget.id
 graphql_resolvers_by_name:
+  as_geo_tile:
+    needs_lookahead: true
+    resolver_ref:
+      name: ElasticGraph::GraphQL::Aggregation::Resolvers::AsGeoTile
+      require_path: elastic_graph/graphql/aggregation/resolvers/as_geo_tile
   get_record_field_value:
     needs_lookahead: false
     resolver_ref:
@@ -2122,6 +2127,12 @@ index_definitions_by_name:
       __counts.seasons_object|players_object|seasons_object|games_played:
         source: __self
       __counts.seasons_object|players_object|seasons_object|year:
+        source: __self
+      __counts.seasons_object|stadium_location:
+        source: __self
+      __counts.seasons_object|stadium_location|lat:
+        source: __self
+      __counts.seasons_object|stadium_location|lon:
         source: __self
       __counts.seasons_object|started_at:
         source: __self
@@ -2441,6 +2452,10 @@ index_definitions_by_name:
         source: __self
       nested_fields2.the_seasons.players_object.seasons_object.year:
         source: __self
+      nested_fields2.the_seasons.stadium_location.lat:
+        source: __self
+      nested_fields2.the_seasons.stadium_location.lon:
+        source: __self
       nested_fields2.the_seasons.started_at:
         source: __self
       nested_fields2.the_seasons.the_record.first_win_on:
@@ -2583,6 +2598,10 @@ index_definitions_by_name:
         source: __self
       seasons_nested.players_object.seasons_object.year:
         source: __self
+      seasons_nested.stadium_location.lat:
+        source: __self
+      seasons_nested.stadium_location.lon:
+        source: __self
       seasons_nested.started_at:
         source: __self
       seasons_nested.the_record.first_win_on:
@@ -2686,6 +2705,10 @@ index_definitions_by_name:
       seasons_object.players_object.seasons_object.games_played:
         source: __self
       seasons_object.players_object.seasons_object.year:
+        source: __self
+      seasons_object.stadium_location.lat:
+        source: __self
+      seasons_object.stadium_location.lon:
         source: __self
       seasons_object.started_at:
         source: __self
@@ -2900,6 +2923,10 @@ index_definitions_by_name:
       the_nested_fields.the_seasons.players_object.seasons_object.games_played:
         source: __self
       the_nested_fields.the_seasons.players_object.seasons_object.year:
+        source: __self
+      the_nested_fields.the_seasons.stadium_location.lat:
+        source: __self
+      the_nested_fields.the_seasons.stadium_location.lon:
         source: __self
       the_nested_fields.the_seasons.started_at:
         source: __self
@@ -3441,6 +3468,9 @@ object_types_by_name:
   AddressGroupedBy:
     graphql_fields_by_name:
       full_address:
+        resolver:
+          name: object_with_lookahead
+      geo_location:
         resolver:
           name: object_with_lookahead
       timestamps:
@@ -4517,6 +4547,17 @@ object_types_by_name:
         name_in_index: lon
         resolver:
           name: get_record_field_value
+  GeoLocationGroupedBy:
+    elasticgraph_category: geo_location_grouped_by_object
+    graphql_fields_by_name:
+      as_geo_tile:
+        resolver:
+          name: as_geo_tile
+    graphql_only_return_type: true
+  GeoLocationListFilterInput:
+    graphql_fields_by_name:
+      count:
+        name_in_index: __counts
   GeoShape:
     graphql_fields_by_name:
       coordinates:
@@ -4525,6 +4566,57 @@ object_types_by_name:
       type:
         resolver:
           name: get_record_field_value
+  GeoTile:
+    graphql_fields_by_name:
+      bounds:
+        resolver:
+          name: object_without_lookahead
+      corners:
+        resolver:
+          name: object_without_lookahead
+      map_center_point:
+        resolver:
+          name: object_without_lookahead
+      x:
+        resolver:
+          name: object_without_lookahead
+      "y":
+        resolver:
+          name: object_without_lookahead
+      zoom_level:
+        resolver:
+          name: object_without_lookahead
+    graphql_only_return_type: true
+  GeoTileBounds:
+    graphql_fields_by_name:
+      east:
+        resolver:
+          name: object_without_lookahead
+      north:
+        resolver:
+          name: object_without_lookahead
+      south:
+        resolver:
+          name: object_without_lookahead
+      west:
+        resolver:
+          name: object_without_lookahead
+    graphql_only_return_type: true
+  GeoTileCorners:
+    graphql_fields_by_name:
+      northeast:
+        resolver:
+          name: object_without_lookahead
+      northwest:
+        resolver:
+          name: object_without_lookahead
+      southeast:
+        resolver:
+          name: object_without_lookahead
+      southwest:
+        resolver:
+          name: object_without_lookahead
+    graphql_only_return_type: true
   IDListFilterInput:
     graphql_fields_by_name:
       count:
@@ -7462,6 +7554,9 @@ object_types_by_name:
       seasons_object:
         resolver:
           name: object_with_lookahead
+      stadium_location:
+        resolver:
+          name: object_with_lookahead
       staff:
         resolver:
           name: object_with_lookahead
@@ -7744,6 +7839,9 @@ object_types_by_name:
         name_in_index: the_record
         resolver:
           name: get_record_field_value
+      stadium_location:
+        resolver:
+          name: get_record_field_value
       started_at:
         resolver:
           name: get_record_field_value
@@ -7769,6 +7867,9 @@ object_types_by_name:
           name: object_with_lookahead
       record:
         name_in_index: the_record
+        resolver:
+          name: object_with_lookahead
+      stadium_location:
         resolver:
           name: object_with_lookahead
       started_at:
@@ -7805,6 +7906,9 @@ object_types_by_name:
           name: object_with_lookahead
       record:
         name_in_index: the_record
+        resolver:
+          name: object_with_lookahead
+      stadium_location:
         resolver:
           name: object_with_lookahead
       started_at:
@@ -9474,6 +9578,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       full_address:
+        resolver:
+          name: object_with_lookahead
+      geo_location:
         resolver:
           name: object_with_lookahead
       internal_details:

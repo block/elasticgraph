@@ -31,6 +31,10 @@ module ElasticGraph
   # @private
   DATE_TIME_PRECISION = 3
 
+  # Zoom levels supported by datastore Web Mercator XYZ tile aggregations.
+  # @private
+  GEO_TILE_ZOOM_LEVELS = 0..29
+
   # HTTP header that ElasticGraph HTTP implementations (e.g. elasticgraph-rack, elasticgraph-lambda)
   # look at to determine a client-specified request timeout.
   # @private

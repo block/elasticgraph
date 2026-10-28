@@ -55,7 +55,7 @@ module ElasticGraph
               current_players: [build(:player, name: "Bob")],
               formed_on: "1903-01-01",
               seasons: [
-                build(:team_season, year: 2020, was_shortened: true, record: build(:team_record, wins: 50, losses: 12, first_win_on: "2020-03-02", last_win_on: "2020-11-12"), notes: ["pandemic", "shortened"], started_at: "2020-01-15T12:02:20Z", players: [
+                build(:team_season, year: 2020, was_shortened: true, record: build(:team_record, wins: 50, losses: 12, first_win_on: "2020-03-02", last_win_on: "2020-11-12"), notes: ["pandemic", "shortened"], started_at: "2020-01-15T12:02:20Z", stadium_location: yankee_stadium, players: [
                   build(:player, name: "Ted", seasons: [build(:player_season, year: 2018, games_played: 20), build(:player_season, year: 2018, games_played: 30)]),
                   build(:player, name: "Dave", seasons: [build(:player_season, year: 2022, games_played: 10)])
                 ])
@@ -67,10 +67,10 @@ module ElasticGraph
               formed_on: "1883-01-01",
               current_players: [build(:player, name: "Kat", seasons: []), build(:player, name: "Sue", seasons: [])],
               seasons: [
-                build(:team_season, year: 2020, was_shortened: true, record: build(:team_record, wins: 30, losses: 22, first_win_on: "2020-05-02", last_win_on: "2020-12-12"), notes: ["pandemic", "covid"], started_at: "2020-01-15T12:02:20Z", players: []),
-                build(:team_season, year: 2021, was_shortened: false, record: build(:team_record, wins: nil, losses: 22, first_win_on: nil, last_win_on: "2021-12-12"), notes: [], started_at: "2021-02-16T13:03:30Z", players: []),
-                build(:team_season, year: 2022, was_shortened: false, record: build(:team_record, wins: 40, losses: 15, first_win_on: "2022-06-02", last_win_on: "2022-08-12"), notes: [], started_at: "2022-03-17T14:04:40Z", players: []),
-                build(:team_season, year: 2023, was_shortened: false, record: build(:team_record, wins: 50, losses: nil, first_win_on: "2023-01-06", last_win_on: nil), notes: [], started_at: "2023-04-18T12:02:59Z", players: [])
+                build(:team_season, year: 2020, was_shortened: true, record: build(:team_record, wins: 30, losses: 22, first_win_on: "2020-05-02", last_win_on: "2020-12-12"), notes: ["pandemic", "covid"], started_at: "2020-01-15T12:02:20Z", stadium_location: dodger_stadium, players: []),
+                build(:team_season, year: 2021, was_shortened: false, record: build(:team_record, wins: nil, losses: 22, first_win_on: nil, last_win_on: "2021-12-12"), notes: [], started_at: "2021-02-16T13:03:30Z", stadium_location: nil, players: []),
+                build(:team_season, year: 2022, was_shortened: false, record: build(:team_record, wins: 40, losses: 15, first_win_on: "2022-06-02", last_win_on: "2022-08-12"), notes: [], started_at: "2022-03-17T14:04:40Z", stadium_location: dodger_stadium, players: []),
+                build(:team_season, year: 2023, was_shortened: false, record: build(:team_record, wins: 50, losses: nil, first_win_on: "2023-01-06", last_win_on: nil), notes: [], started_at: "2023-04-18T12:02:59Z", stadium_location: dodger_stadium, players: [])
               ]
             ),
             build(
@@ -79,7 +79,7 @@ module ElasticGraph
               formed_on: "1901-01-01",
               current_players: [build(:player, name: "Ed", seasons: []), build(:player, name: "Ty", seasons: [])],
               seasons: [
-                build(:team_season, year: 2019, was_shortened: false, record: build(:team_record, wins: 40, losses: 7, first_win_on: "2019-04-02", last_win_on: "2019-07-12"), notes: ["old rules"], started_at: "2019-01-15T12:02:20Z", players: [])
+                build(:team_season, year: 2019, was_shortened: false, record: build(:team_record, wins: 40, losses: 7, first_win_on: "2019-04-02", last_win_on: "2019-07-12"), notes: ["old rules"], started_at: "2019-01-15T12:02:20Z", stadium_location: fenway_park, players: [])
               ]
             ),
             build(
@@ -358,6 +358,7 @@ module ElasticGraph
             {"record" => {case_correctly("last_win_on") => {case_correctly("as_day_of_week") => nil}}} => count_detail_of(1)
           })
 
+          verify_geo_tile_sub_aggregations
           test_optimizable_aggregations_with_sub_aggregations
           verify_2_subaggregations_on_same_field_under_different_parent_fields
 
@@ -407,6 +408,15 @@ module ElasticGraph
             {"record" => {case_correctly("first_win_on") => {case_correctly("as_date") => "2020-05-01"}, case_correctly("last_win_on") => {case_correctly("as_date") => "2020-12-01"}, "wins" => 30}} => count_detail_of(1)
           }
         end
+
+        # Composite buckets are sorted by tile, with the missing-location bucket first. Composite counts are always exact.
+        let(:first_count_grouped_by_stadium_tile) do
+          {stadium_tile(nil) => count_detail_of(1)}
+        end
+
+        let(:first_count_grouped_by_stadium_tile_and_was_shortened) do
+          {{**stadium_tile(nil), case_correctly("was_shortened") => false} => count_detail_of(1)}
+        end
       end
 
       context "when sub-aggregations use the `NonCompositeGroupingAdapter`" do
@@ -433,6 +443,18 @@ module ElasticGraph
             {"record" => {case_correctly("first_win_on") => {case_correctly("as_date") => "2020-03-01"}, case_correctly("last_win_on") => {case_correctly("as_date") => "2020-11-01"}, "wins" => 50}} => count_detail_of(1)
           }
         end
+
+        # Tile buckets are sorted by count. We request 2 tiles from the datastore (1 extra to detect `has_next_page`), and they
+        # account for 4 of the 5 locations. The other location could be in any tile, so each count could be too low by 1.
+        let(:first_count_grouped_by_stadium_tile) do
+          {stadium_tile([43, 102]) => count_detail_of(3, upper_bound: 4)}
+        end
+
+        # The datastore returns 2 tiles, which account for 4 of the 5 locations, so the count of tile 43/102 could be too low
+        # by 1. Its `was_shortened: false` child has no count error of its own, but its count could be too low by 1, too.
+        let(:first_count_grouped_by_stadium_tile_and_was_shortened) do
+          {{**stadium_tile([43, 102]), case_correctly("was_shortened") => false} => count_detail_of(2, upper_bound: 3)}
+        end
       end
 
       let(:page_info_snippet) do
@@ -444,6 +466,88 @@ module ElasticGraph
             end_cursor
           }
         EOS
+      end
+
+      let(:yankee_stadium) { build(:geo_location, latitude: 40.8296, longitude: -73.9262) }
+      let(:dodger_stadium) { build(:geo_location, latitude: 34.0739, longitude: -118.2400) }
+      let(:fenway_park) { build(:geo_location, latitude: 42.3467, longitude: -71.0972) }
+
+      def verify_geo_tile_sub_aggregations
+        # At zoom level 8, each stadium is in its own tile.
+        team_seasons_nodes = aggregate_season_counts_grouped_by("stadium_location { as_geo_tile(zoom_level: 8) { x y } }")
+        expect(indexed_counts_from(team_seasons_nodes)).to eq({
+          stadium_tile(nil) => count_detail_of(1), # Dodgers 2021
+          stadium_tile([43, 102]) => count_detail_of(3), # Dodger Stadium
+          stadium_tile([75, 96]) => count_detail_of(1), # Yankee Stadium
+          stadium_tile([77, 94]) => count_detail_of(1) # Fenway Park
+        })
+
+        # Zoom level 2 has a 4x4 grid of tiles, so Yankee Stadium and Fenway Park are in the same tile.
+        team_seasons_nodes = aggregate_season_counts_grouped_by("stadium_location { as_geo_tile(zoom_level: 2) { x y } }")
+        expect(indexed_counts_from(team_seasons_nodes)).to eq({
+          stadium_tile(nil) => count_detail_of(1), # Dodgers 2021
+          stadium_tile([0, 1]) => count_detail_of(3), # Dodger Stadium
+          stadium_tile([1, 1]) => count_detail_of(2) # Yankee Stadium and Fenway Park
+        })
+
+        # At the lowest zoom level, one tile covers the world.
+        team_seasons_nodes = aggregate_season_counts_grouped_by("stadium_location { as_geo_tile(zoom_level: #{GEO_TILE_ZOOM_LEVELS.min}) { x y } }")
+        expect(indexed_counts_from(team_seasons_nodes)).to eq({
+          stadium_tile(nil) => count_detail_of(1), # Dodgers 2021
+          stadium_tile([0, 0]) => count_detail_of(5)
+        })
+
+        # Tiles at the highest zoom level (29).
+        team_seasons_nodes = aggregate_season_counts_grouped_by("stadium_location { as_geo_tile(zoom_level: #{GEO_TILE_ZOOM_LEVELS.max}) { x y } }")
+        expect(indexed_counts_from(team_seasons_nodes)).to eq({
+          stadium_tile(nil) => count_detail_of(1), # Dodgers 2021
+          stadium_tile([92103187, 214330019]) => count_detail_of(3), # Dodger Stadium
+          stadium_tile([158188715, 201623153]) => count_detail_of(1), # Yankee Stadium
+          stadium_tile([162407626, 198597980]) => count_detail_of(1) # Fenway Park
+        })
+
+        expect_out_of_range_zoom_level_error(GEO_TILE_ZOOM_LEVELS.min - 1)
+        expect_out_of_range_zoom_level_error(GEO_TILE_ZOOM_LEVELS.max + 1)
+
+        # Combine a tile grouping with a term grouping.
+        team_seasons_nodes = aggregate_season_counts_grouped_by("was_shortened", "stadium_location { as_geo_tile(zoom_level: 2) { x y } }")
+        expect(indexed_counts_from(team_seasons_nodes)).to eq({
+          {case_correctly("was_shortened") => true, **stadium_tile([0, 1])} => count_detail_of(1), # Dodgers 2020
+          {case_correctly("was_shortened") => true, **stadium_tile([1, 1])} => count_detail_of(1), # Yankees 2020
+          {case_correctly("was_shortened") => false, **stadium_tile(nil)} => count_detail_of(1), # Dodgers 2021
+          {case_correctly("was_shortened") => false, **stadium_tile([0, 1])} => count_detail_of(2), # Dodgers 2022 and 2023
+          {case_correctly("was_shortened") => false, **stadium_tile([1, 1])} => count_detail_of(1) # Red Sox 2019
+        })
+
+        # Use the default zoom level (7).
+        team_seasons_nodes = aggregate_season_counts_grouped_by("stadium_location { as_geo_tile { zoom_level x y } }", team_aggregations_args: {filter: {current_name: {equal_to_any_of: ["Red Sox"]}}})
+        expect(indexed_counts_from(team_seasons_nodes)).to eq({
+          {case_correctly("stadium_location") => {case_correctly("as_geo_tile") => {case_correctly("zoom_level") => 7, "x" => 38, "y" => 47}}} => count_detail_of(1)
+        })
+
+        team_seasons_nodes = aggregate_season_counts_grouped_by("stadium_location { as_geo_tile(zoom_level: 8) { x y } }", first: 1, seasons_has_next_page: true)
+        expect(indexed_counts_from(team_seasons_nodes)).to eq(first_count_grouped_by_stadium_tile)
+
+        # The tile grouping comes first, so it is the parent of the `was_shortened` grouping. A child's count can be too
+        # low by the count error of its parent.
+        team_seasons_nodes = aggregate_season_counts_grouped_by("stadium_location { as_geo_tile(zoom_level: 8) { x y } }", "was_shortened", first: 1, seasons_has_next_page: true)
+        expect(indexed_counts_from(team_seasons_nodes)).to eq(first_count_grouped_by_stadium_tile_and_was_shortened)
+      end
+
+      def expect_out_of_range_zoom_level_error(zoom_level)
+        message = "`#{case_correctly("zoom_level")}` must be between #{GEO_TILE_ZOOM_LEVELS.min} and #{GEO_TILE_ZOOM_LEVELS.max}, but is #{zoom_level}."
+        response = nil
+
+        expect {
+          response = aggregate_season_counts_grouped_by("stadium_location { as_geo_tile(zoom_level: #{zoom_level}) { x y } }", allow_errors: true)
+        }.to log_warning(a_string_including(message))
+
+        expect(response["errors"]).to contain_exactly(a_hash_including("message" => message))
+      end
+
+      def stadium_tile(x_and_y)
+        tile = x_and_y&.then { |x, y| {"x" => x, "y" => y} }
+        {case_correctly("stadium_location") => {case_correctly("as_geo_tile") => tile}}
       end
 
       def aggregate_sibling_and_deeply_nested_counts(allow_errors: false)
@@ -1099,11 +1203,11 @@ module ElasticGraph
         end
       end
 
-      def count_detail_of(count)
+      def count_detail_of(count, upper_bound: count)
         {
           case_correctly("approximate_value") => count,
-          case_correctly("exact_value") => count,
-          case_correctly("upper_bound") => count
+          case_correctly("exact_value") => (count if upper_bound == count),
+          case_correctly("upper_bound") => upper_bound
         }
       end
 

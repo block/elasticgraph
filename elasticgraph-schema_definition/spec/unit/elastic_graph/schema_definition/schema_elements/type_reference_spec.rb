@@ -24,10 +24,12 @@ module ElasticGraph
           }
         end
 
-        let(:state) do
+        let(:api) do
           schema_elements = SchemaArtifacts::RuntimeMetadata::SchemaElementNames.new(form: "snake_case")
-          API.new(schema_elements, true, type_name_overrides: type_name_overrides).state
+          API.new(schema_elements, true, type_name_overrides: type_name_overrides)
         end
+
+        let(:state) { api.state }
 
         describe "#unwrap_list" do
           it "unwraps a type that has an outer list wrapping" do
@@ -67,30 +69,47 @@ module ElasticGraph
           end
         end
 
-        describe "#scalar_type_needing_grouped_by_object?" do
+        describe "#grouped_by_type_defined?" do
           let(:type_name_overrides) do
             {
               "Date" => "MyDate",
-              "DateTime" => "MyDateTime",
-              "LocalTime" => "MyLocalTime",
-              "Widget" => "MyWidget"
+              "Spot" => "MySpot",
+              "Widget" => "Date"
             }
           end
 
-          it "returns true for Date and DateTime types only" do
-            expect(type_ref("Date").scalar_type_needing_grouped_by_object?).to eq(true)
-            expect(type_ref("DateTime").scalar_type_needing_grouped_by_object?).to eq(true)
+          before do
+            api.object_type "SpotGroupedBy" do |t|
+              t.graphql_only true
+              t.field "as_cell", "String", graphql_only: true
+            end
 
-            expect(type_ref("LocalTime").scalar_type_needing_grouped_by_object?).to eq(false)
-            expect(type_ref("Widget").scalar_type_needing_grouped_by_object?).to eq(false)
+            state.user_definition_complete = true
           end
 
-          it "returns true for Date and DateTime types only when overridden" do
-            expect(type_ref("MyDate").scalar_type_needing_grouped_by_object?).to eq(true)
-            expect(type_ref("MyDateTime").scalar_type_needing_grouped_by_object?).to eq(true)
+          it "detects built-in and user-defined grouped-by types" do
+            %w[Date DateTime GeoLocation Spot].each do |name|
+              expect(type_ref(name).grouped_by_type_defined?).to eq(true)
+            end
 
-            expect(type_ref("MyLocalTime").scalar_type_needing_grouped_by_object?).to eq(false)
-            expect(type_ref("MyWidget").scalar_type_needing_grouped_by_object?).to eq(false)
+            %w[LocalTime Widget].each do |name|
+              expect(type_ref(name).grouped_by_type_defined?).to eq(false)
+            end
+          end
+
+          it "uses original names even when another type is renamed to a built-in name" do
+            expect(type_ref("Date").grouped_by_type_defined?).to eq(true)
+            expect(type_ref("Widget").grouped_by_type_defined?).to eq(false)
+            expect(type_ref("MyDate").grouped_by_type_defined?).to eq(false)
+            expect(type_ref("MySpot").grouped_by_type_defined?).to eq(false)
+          end
+
+          it "requires the user definition to be complete" do
+            state.user_definition_complete = false
+
+            expect {
+              type_ref("Spot").grouped_by_type_defined?
+            }.to raise_error Errors::SchemaError, a_string_including("grouped_by_type_defined?", "schema definition is complete")
           end
         end
 
