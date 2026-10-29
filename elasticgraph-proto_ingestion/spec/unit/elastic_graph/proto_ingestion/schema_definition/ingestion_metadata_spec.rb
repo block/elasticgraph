@@ -11,116 +11,53 @@ require "elastic_graph/proto_ingestion/schema_definition/api_extension"
 module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
-      # The indexer reads record structure from protobuf descriptors, so runtime metadata carries only
-      # the ingestion facts those descriptors can't express.
       RSpec.describe Schema, "ingestion metadata" do
-        it "registers the indexer extension with only the facts protobuf descriptors cannot express" do
+        it "generates complete field, scalar, enum, and abstract-type metadata" do
           config = ingestion_config do |s|
             s.scalar_type("Money") do |t|
               t.mapping type: "keyword"
               t.protobuf type: "string"
             end
-            s.enum_type("Color") { |t| t.values "RED", "BLUE" }
             s.enum_type("Status") { |t| t.values "ACTIVE", "onHold" }
             s.object_type("Box") { |t| t.field "size", "Int", name_in_index: "private_size" }
-            s.object_type("Sphere") { |t| t.field "radius", "Float" }
-            s.union_type("Shape") { |t| t.subtypes "Box", "Sphere" }
+            s.object_type("RoundSphere") { |t| t.field "radius", "Float" }
+            s.union_type("Shape") { |t| t.subtypes "Box", "RoundSphere" }
             s.object_type "Product" do |t|
               t.field "id", "ID!"
               t.field "name", "String!", name_in_index: "private_name"
               t.field "price", "Money"
-              t.field "released", "Date"
-              t.field "released_dates", "[[Date]]"
-              t.field "views", "JsonSafeLong"
-              t.field "large", "LongString"
-              t.field "created_at", "DateTime"
-              t.field "payload", "Untyped"
-              t.field "color", "Color"
+              t.field "released_dates", "[[Date!]!]!"
               t.field "status", "Status"
               t.field "shape", "Shape"
               t.index "products"
             end
           end
 
-          expect(config).to eq(
-            "package_name" => "elasticgraph",
-            "types_by_name" => {
-              "Box" => {"fields_by_name" => {"size" => {"name_in_index" => "private_size"}}},
-              "Date" => {"scalar" => "Date"},
-              "ID" => {"scalar" => "ID"},
-              "JsonSafeLong" => {"scalar" => "JsonSafeLong"},
-              "Money" => {"scalar" => "Money"},
-              "Product" => {"fields_by_name" => {
-                "id" => {"type" => "ID"},
-                "price" => {"type" => "Money"},
-                "name" => {"name_in_index" => "private_name"},
-                "released" => {"type" => "Date"},
-                "released_dates" => {"type" => "Date"},
-                "views" => {"type" => "JsonSafeLong"},
-                "payload" => {"type" => "Untyped"}
-              }},
-              "Status" => {"non_standard_enum_values_by_name" => {"STATUS_ON_HOLD" => "onHold"}},
-              "Untyped" => {"scalar" => "Untyped"}
-            }
+          expect(config.fetch("package_name")).to eq("elasticgraph")
+          types = config.fetch("types_by_name")
+          expect(types.keys).to contain_exactly("Box", "Date", "Float", "ID", "Int", "Money", "Product", "Shape", "RoundSphere", "Status", "String")
+          expect(types.fetch("Product")).to eq("fields_by_name" => {
+            "id" => {"type" => "ID!", "name_in_index" => "id"},
+            "name" => {"type" => "String!", "name_in_index" => "private_name"},
+            "price" => {"type" => "Money", "name_in_index" => "price"},
+            "released_dates" => {"type" => "[[Date!]!]!", "name_in_index" => "released_dates"},
+            "status" => {"type" => "Status", "name_in_index" => "status"},
+            "shape" => {"type" => "Shape", "name_in_index" => "shape"}
+          })
+          expect(types.fetch("Box")).to eq("fields_by_name" => {"size" => {"type" => "Int", "name_in_index" => "private_size"}})
+          expect(types.fetch("RoundSphere")).to eq("fields_by_name" => {"radius" => {"type" => "Float", "name_in_index" => "radius"}})
+          expect(types.fetch("Shape")).to eq("subtypes_by_field_name" => {"box" => "Box", "round_sphere" => "RoundSphere"})
+          expect(types.fetch("Status")).to eq(
+            "enum_values_by_name" => {"STATUS_ACTIVE" => "ACTIVE", "STATUS_ON_HOLD" => "onHold"},
+            "enum_zero_value" => "STATUS_UNSPECIFIED"
           )
+          expect(types.fetch("Money")).to eq("scalar" => "Money")
+          expect(types.fetch("String")).to eq("scalar" => "String")
         end
 
-        it "names a scalar whose ingestion rules differ from its wire type's default scalar" do
-          config = ingestion_config do |s|
-            s.on_built_in_types { |type| type.protobuf type: "string" if type.name == "DateTime" }
-            s.object_type "Event" do |t|
-              t.field "id", "ID"
-              t.field "at", "DateTime"
-              t.field "time", "LocalTime"
-              t.index "events"
-            end
-          end
-
-          expect(config.fetch("types_by_name")).to eq(
-            "DateTime" => {"scalar" => "DateTime"},
-            "Event" => {"fields_by_name" => {"id" => {"type" => "ID"}, "at" => {"type" => "DateTime"}, "time" => {"type" => "LocalTime"}}},
-            "ID" => {"scalar" => "ID"},
-            "LocalTime" => {"scalar" => "LocalTime"}
-          )
-        end
-
-        it "records the canonical scalar of a renamed built-in scalar" do
+        it "records every built-in scalar, preserving its canonical name after a rename or wire-type override" do
           config = ingestion_config(type_name_overrides: {"JsonSafeLong" => "SafeLong"}) do |s|
-            s.object_type "Event" do |t|
-              t.field "id", "ID"
-              t.field "visits", "SafeLong"
-              t.index "events"
-            end
-          end
-
-          expect(config.fetch("types_by_name")).to eq(
-            "Event" => {"fields_by_name" => {"id" => {"type" => "ID"}, "visits" => {"type" => "SafeLong"}}},
-            "ID" => {"scalar" => "ID"},
-            "SafeLong" => {"scalar" => "JsonSafeLong"}
-          )
-        end
-
-        it "names `TimeZone` fields so the indexer can validate them against `Support::VALID_TIME_ZONES`" do
-          config = ingestion_config do |s|
-            s.object_type "Event" do |t|
-              t.field "id", "ID"
-              t.field "zone", "TimeZone"
-              t.index "events"
-            end
-          end
-
-          expect(config).to eq(
-            "package_name" => "elasticgraph",
-            "types_by_name" => {
-              "Event" => {"fields_by_name" => {"id" => {"type" => "ID"}, "zone" => {"type" => "TimeZone"}}},
-              "ID" => {"scalar" => "ID"},
-              "TimeZone" => {"scalar" => "TimeZone"}
-            }
-          )
-        end
-
-        it "covers every built-in scalar, including those with no metadata beyond their wire type" do
-          config = ingestion_config do |s|
+            s.on_built_in_types { |type| type.protobuf type: "string" if type.name == "DateTime" }
             scalar_names = s.state.scalar_types_by_name.keys
             s.object_type "Event" do |t|
               scalar_names.each { |name| t.field name.downcase, name }
@@ -128,27 +65,17 @@ module ElasticGraph
             end
           end
 
-          expect(config.fetch("types_by_name")).to eq(
-            "Cursor" => {"scalar" => "Cursor"},
-            "Date" => {"scalar" => "Date"},
-            "Event" => {"fields_by_name" => {
-              "cursor" => {"type" => "Cursor"},
-              "date" => {"type" => "Date"},
-              "id" => {"type" => "ID"},
-              "jsonsafelong" => {"type" => "JsonSafeLong"},
-              "localtime" => {"type" => "LocalTime"},
-              "timezone" => {"type" => "TimeZone"},
-              "untyped" => {"type" => "Untyped"}
-            }},
-            "ID" => {"scalar" => "ID"},
-            "JsonSafeLong" => {"scalar" => "JsonSafeLong"},
-            "LocalTime" => {"scalar" => "LocalTime"},
-            "TimeZone" => {"scalar" => "TimeZone"},
-            "Untyped" => {"scalar" => "Untyped"}
+          types = config.fetch("types_by_name")
+          expect(types.except("Event").transform_values { |type| type.fetch("scalar") }).to eq(
+            "Boolean" => "Boolean", "Cursor" => "Cursor", "Date" => "Date", "DateTime" => "DateTime",
+            "Float" => "Float", "ID" => "ID", "Int" => "Int", "LocalTime" => "LocalTime",
+            "LongString" => "LongString", "SafeLong" => "JsonSafeLong", "String" => "String",
+            "TimeZone" => "TimeZone", "Untyped" => "Untyped"
           )
+          expect(types.fetch("Event").fetch("fields_by_name").fetch("safelong")).to eq("type" => "SafeLong", "name_in_index" => "safelong")
         end
 
-        it "loads typed metadata and the registered indexer extension after a YAML dump round trip" do
+        it "loads complete typed metadata after a YAML dump round trip" do
           results = define_proto_schema_results do |s|
             s.proto_schema_artifacts package_name: "custom.package"
             s.enum_type("Status") { |t| t.values "ACTIVE", "onHold" }
@@ -168,23 +95,15 @@ module ElasticGraph
             RuntimeMetadata::Field.new(name_in_index: "private_date", type: "Date")
           )
           expect(metadata.types_by_name.fetch("Date").scalar).to eq("Date")
-          expect(metadata.types_by_name.fetch("Status").non_standard_enum_values_by_name).to eq("STATUS_ON_HOLD" => "onHold")
+          expect(metadata.types_by_name.fetch("Status").enum_values_by_name).to eq("STATUS_ACTIVE" => "ACTIVE", "STATUS_ON_HOLD" => "onHold")
+          expect(metadata.types_by_name.fetch("Status").enum_zero_value).to eq("STATUS_UNSPECIFIED")
           expect(RuntimeMetadata::Schema.from_hash(metadata.to_dumpable_hash)).to eq(metadata)
           expect(extension.load_extension.extension_class).to be(IndexerExtension)
         end
 
-        it "omits empty metadata and restores defaults when loading it" do
-          config = ingestion_config do |s|
-            s.object_type "Event" do |t|
-              t.field "id", "String"
-              t.index "events"
-            end
-          end
-
-          expect(config).to eq("package_name" => "elasticgraph")
-          expect(RuntimeMetadata::Schema.from_hash(config).types_by_name).to eq({})
-          expect(RuntimeMetadata::Type.from_hash({})).to eq(RuntimeMetadata::Type.new(fields_by_name: {}, non_standard_enum_values_by_name: {}, scalar: nil))
-          expect(RuntimeMetadata::Field.from_hash({})).to eq(RuntimeMetadata::Field.new(name_in_index: nil, type: nil))
+        it "restores defaults for unused metadata attributes" do
+          expect(RuntimeMetadata::Schema.from_hash({"package_name" => "empty"}).types_by_name).to eq({})
+          expect(RuntimeMetadata::Type.from_hash({})).to eq(RuntimeMetadata::Type.new)
         end
 
         def ingestion_config(**options, &block)

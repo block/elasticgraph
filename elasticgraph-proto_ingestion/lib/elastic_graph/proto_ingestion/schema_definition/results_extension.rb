@@ -32,8 +32,8 @@ module ElasticGraph
 
         private
 
-        # Registers the protobuf indexer extension, configured with the ingestion facts that
-        # protobuf descriptors cannot express. The configuration depends on the complete schema,
+        # Registers the protobuf indexer extension, configured with the complete generated
+        # ingestion metadata. The configuration depends on the complete schema,
         # so it is added here rather than when {APIExtension} is extended onto the API.
         def build_runtime_metadata
           metadata = super

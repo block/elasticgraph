@@ -9,16 +9,16 @@
 module ElasticGraph
   module ProtoIngestion
     module RuntimeMetadata
-      # Ingestion facts for a protobuf field that its descriptor cannot express.
+      # The full ElasticGraph type signature and index name of a protobuf field.
       #
-      # `type` references a key in Schema#types_by_name, whose scalar is the canonical name.
+      # The unwrapped `type` references a key in Schema#types_by_name.
       #
       # @private
       Field = ::Data.define(:name_in_index, :type) do
         # @implements Field
 
         def self.from_hash(hash)
-          new(name_in_index: hash["name_in_index"], type: hash["type"])
+          new(name_in_index: hash.fetch("name_in_index"), type: hash.fetch("type"))
         end
 
         def to_dumpable_hash

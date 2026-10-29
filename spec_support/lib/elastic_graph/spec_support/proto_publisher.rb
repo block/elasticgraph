@@ -16,7 +16,7 @@ require "tmpdir"
 module ElasticGraph
   module SpecSupport
     # Publishes factory events through the generated schema and real protobuf binary encoding.
-    # This intentionally walks descriptors independently of the production record converter.
+    # This intentionally walks descriptors independently of the production record preparer.
     class ProtoPublisher
       def initialize(schema_artifacts)
         config = schema_artifacts.runtime_metadata.indexer_extension_modules.find do |extension|
@@ -102,17 +102,17 @@ module ElasticGraph
 
       def single_value(field, value, overrides)
         return value.to_s if %i[int64 sint64 uint64 fixed64 sfixed64].include?(field.type)
-        scalar = @metadata.types_by_name.fetch(overrides.type).scalar if overrides&.type
+        scalar = @metadata.types_by_name.fetch(overrides.type.delete("[]!")).scalar if overrides&.type
         return JSON.generate(value) if scalar == "Untyped"
         if field.type == :enum
           enum = field.subtype
-          names = @metadata.types_by_name[type_name(enum)]&.non_standard_enum_values_by_name || {}
+          names = @metadata.types_by_name[type_name(enum)]&.enum_values_by_name || {}
           prefix = enum.lookup_value(0).to_s.delete_suffix("_UNSPECIFIED")
           return names.key(value) || "#{prefix}_#{value}"
         end
-        if field.type == :message && !scalar && field.subtype.name.start_with?("#{@metadata.package_name}.")
+        if field.type == :message && field.subtype.name.start_with?("#{@metadata.package_name}.")
           return {"values" => field_value(field.subtype.lookup("values"), value, overrides)} if value.is_a?(Array)
-          return message_value(field.subtype, value)
+          return message_value(field.subtype, value) unless scalar
         end
         value
       end

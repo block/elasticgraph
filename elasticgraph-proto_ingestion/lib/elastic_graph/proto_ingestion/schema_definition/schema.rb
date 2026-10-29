@@ -116,15 +116,11 @@ module ElasticGraph
           @field_number_mappings.to_dumpable_hash
         end
 
-        # Returns the ingestion facts the indexer needs that protobuf descriptors cannot express.
-        # Types with no additional metadata are omitted.
+        # Returns the complete ingestion metadata alongside the generated protobuf schema.
         #
         # @return [RuntimeMetadata::Schema]
         def proto_ingestion_metadata
-          types_by_name = proto_types.filter_map do |type|
-            metadata = type.proto_ingestion_metadata
-            [type.name, metadata] unless metadata.empty?
-          end.to_h
+          types_by_name = proto_types.to_h { |type| [type.name, type.proto_ingestion_metadata] }
 
           RuntimeMetadata::Schema.new(package_name: @package_name, types_by_name: types_by_name)
         end

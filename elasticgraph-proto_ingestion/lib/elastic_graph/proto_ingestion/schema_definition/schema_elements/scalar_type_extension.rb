@@ -99,18 +99,11 @@ module ElasticGraph
             proto_name
           end
 
-          # Returns the scalar's original name when it differs from the default for its protobuf type.
+          # Records every scalar's canonical name, including renamed built-in scalars.
           #
           # @return [RuntimeMetadata::Type]
           def proto_ingestion_metadata
-            default_scalar = DEFAULT_SCALARS_BY_PROTO_TYPE[proto_name]
-            scalar_name = type_ref.with_reverted_override.name
-
-            RuntimeMetadata::Type.new(
-              fields_by_name: {},
-              non_standard_enum_values_by_name: {},
-              scalar: (scalar_name == default_scalar) ? nil : scalar_name
-            )
+            RuntimeMetadata::Type.new(scalar: type_ref.with_reverted_override.name)
           end
         end
       end

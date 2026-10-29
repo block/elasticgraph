@@ -3126,189 +3126,659 @@ indexer_extension_modules:
       types_by_name:
         Address:
           fields_by_name:
+            full_address:
+              name_in_index: full_address
+              type: String!
+            geo_location:
+              name_in_index: geo_location
+              type: GeoLocation
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
             manufacturer_id:
+              name_in_index: manufacturer_id
               type: ID
+            shapes:
+              name_in_index: shapes
+              type: "[GeoShape!]!"
+            timestamps:
+              name_in_index: timestamps
+              type: AddressTimestamps
+        AddressTimestamps:
+          fields_by_name:
+            created_at:
+              name_in_index: created_at
+              type: DateTime
+        Affiliations:
+          fields_by_name:
+            sponsorships_nested:
+              name_in_index: sponsorships_nested
+              type: "[Sponsorship!]!"
+            sponsorships_object:
+              name_in_index: sponsorships_object
+              type: "[Sponsorship!]!"
+        Boolean:
+          scalar: Boolean
         BrokerWholesaler:
           fields_by_name:
+            active:
+              name_in_index: active
+              type: Boolean
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
         Coach:
           fields_by_name:
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+            name:
+              name_in_index: name
+              type: String
+            salary:
+              name_in_index: salary
+              type: Int
         CoachProfile:
           fields_by_name:
+            annual_salary:
+              name_in_index: annual_salary
+              type: Int
             coach_id:
+              name_in_index: coach_id
               type: ID
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
             team_formed_on:
+              name_in_index: team_formed_on
               type: Date
             team_id:
+              name_in_index: team_id
               type: ID
+            team_league:
+              name_in_index: team_league
+              type: String
+        Color:
+          enum_values_by_name:
+            COLOR_RED: RED
+            COLOR_BLUE: BLUE
+            COLOR_GREEN: GREEN
+          enum_zero_value: COLOR_UNSPECIFIED
         Company:
           fields_by_name:
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+            name:
+              name_in_index: name
+              type: String
+            stock_ticker:
+              name_in_index: stock_ticker
+              type: String
         Component:
           fields_by_name:
+            created_at:
+              name_in_index: created_at
+              type: DateTime!
+            designer_name:
+              name_in_index: designer_name
+              type: String
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+            name:
+              name_in_index: name
+              type: String
             owner_id:
+              name_in_index: owner_id
               type: ID
             owner_ids:
-              type: ID
+              name_in_index: owner_ids
+              type: "[ID!]!"
             part_ids:
-              type: ID
+              name_in_index: part_ids
+              type: "[ID!]!"
+            position:
+              name_in_index: position
+              type: Position!
+            tags:
+              name_in_index: tags
+              type: "[String!]!"
+            widget_cost:
+              name_in_index: widget_cost
+              type: Money
+            widget_name:
+              name_in_index: widget_name
+              type: String
+            widget_size:
+              name_in_index: widget_size
+              type: Size
+            widget_tags:
+              name_in_index: widget_tags
+              type: "[String!]"
             widget_workspace_id:
               name_in_index: widget_workspace_id3
               type: ID
         ComponentDesign:
           fields_by_name:
             component_id:
+              name_in_index: component_id
               type: ID
+            designer_name:
+              name_in_index: designer_name
+              type: String
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
         Date:
           scalar: Date
+        DateTime:
+          scalar: DateTime
         DirectWholesaler:
           fields_by_name:
+            active:
+              name_in_index: active
+              type: Boolean
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+        DistributionChannel:
+          subtypes_by_field_name:
+            online_store: OnlineStore
+            physical_store: PhysicalStore
+            direct_wholesaler: DirectWholesaler
+            broker_wholesaler: BrokerWholesaler
         ElectricalPart:
           fields_by_name:
+            created_at:
+              name_in_index: created_at
+              type: DateTime!
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
             manufacturer_id:
+              name_in_index: manufacturer_id
               type: ID
+            name:
+              name_in_index: name
+              type: String
+            voltage:
+              name_in_index: voltage
+              type: Int!
+        Float:
+          scalar: Float
         GeneralManager:
           fields_by_name:
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+            name:
+              name_in_index: name
+              type: String
+            salary:
+              name_in_index: salary
+              type: Int
         GeneralManagerProfile:
           fields_by_name:
+            annual_salary:
+              name_in_index: annual_salary
+              type: Int
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
             team_formed_on:
+              name_in_index: team_formed_on
               type: Date
             team_id:
+              name_in_index: team_id
               type: ID
+            team_league:
+              name_in_index: team_league
+              type: String
         GeoLocation:
           fields_by_name:
             latitude:
               name_in_index: lat
+              type: Float!
             longitude:
               name_in_index: lon
+              type: Float!
+        GeoShape:
+          fields_by_name:
+            coordinates:
+              name_in_index: coordinates
+              type: "[Float!]!"
+            type:
+              name_in_index: type
+              type: String
         ID:
           scalar: ID
+        Int:
+          scalar: Int
+        Inventor:
+          subtypes_by_field_name:
+            person: Person
+            company: Company
         JsonSafeLong:
           scalar: JsonSafeLong
         LocalTime:
           scalar: LocalTime
+        LongString:
+          scalar: LongString
         Manufacturer:
           fields_by_name:
+            ceo:
+              name_in_index: ceo
+              type: Person
+            created_at:
+              name_in_index: created_at
+              type: DateTime!
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+            name:
+              name_in_index: name
+              type: String
+        Material:
+          enum_values_by_name:
+            MATERIAL_ALLOY: ALLOY
+            MATERIAL_CARBON_FIBER: CARBON_FIBER
+          enum_zero_value: MATERIAL_UNSPECIFIED
         MechanicalPart:
           fields_by_name:
+            created_at:
+              name_in_index: created_at
+              type: DateTime!
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
             manufacturer_id:
+              name_in_index: manufacturer_id
               type: ID
+            material:
+              name_in_index: material
+              type: Material
+            name:
+              name_in_index: name
+              type: String
+        Money:
+          fields_by_name:
+            amount_cents:
+              name_in_index: amount_cents
+              type: Int
+            currency:
+              name_in_index: currency
+              type: String!
+        NamedInventor:
+          subtypes_by_field_name:
+            person: Person
+            company: Company
         OnlineStore:
           fields_by_name:
+            active:
+              name_in_index: active
+              type: Boolean
             established_on:
+              name_in_index: established_on
               type: Date
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+            name:
+              name_in_index: name
+              type: String
         Person:
           fields_by_name:
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+            name:
+              name_in_index: name
+              type: String
+            nationality:
+              name_in_index: nationality
+              type: String
         PhysicalStore:
           fields_by_name:
+            active:
+              name_in_index: active
+              type: Boolean
             established_on:
+              name_in_index: established_on
               type: Date
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+        Player:
+          fields_by_name:
+            affiliations:
+              name_in_index: affiliations
+              type: Affiliations!
+            name:
+              name_in_index: name
+              type: String
+            nicknames:
+              name_in_index: nicknames
+              type: "[String!]!"
+            seasons_nested:
+              name_in_index: seasons_nested
+              type: "[PlayerSeason!]!"
+            seasons_object:
+              name_in_index: seasons_object
+              type: "[PlayerSeason!]!"
+        PlayerSeason:
+          fields_by_name:
+            awards:
+              name_in_index: awards
+              type: "[String!]!"
+            games_played:
+              name_in_index: games_played
+              type: Int
+            year:
+              name_in_index: year
+              type: Int
+        Position:
+          fields_by_name:
+            x:
+              name_in_index: x
+              type: Float!
+            "y":
+              name_in_index: "y"
+              type: Float!
+        Size:
+          enum_values_by_name:
+            SIZE_SMALL: SMALL
+            SIZE_MEDIUM: MEDIUM
+            SIZE_LARGE: LARGE
+          enum_zero_value: SIZE_UNSPECIFIED
         Sponsor:
           fields_by_name:
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+            name:
+              name_in_index: name
+              type: String
         Sponsorship:
           fields_by_name:
+            annual_total:
+              name_in_index: annual_total
+              type: Money!
             sponsor_id:
-              type: ID
+              name_in_index: sponsor_id
+              type: ID!
+        Staff:
+          fields_by_name:
+            coaches:
+              name_in_index: coaches
+              type: "[Coach!]!"
+            general_manager:
+              name_in_index: general_manager
+              type: GeneralManager
+        String:
+          scalar: String
         Team:
           fields_by_name:
             country_code:
-              type: ID
+              name_in_index: country_code
+              type: ID!
+            current_name:
+              name_in_index: current_name
+              type: String
+            current_players_nested:
+              name_in_index: current_players_nested
+              type: "[Player!]!"
+            current_players_object:
+              name_in_index: current_players_object
+              type: "[Player!]!"
+            details:
+              name_in_index: details
+              type: TeamDetails
+            forbes_valuation_moneys_nested:
+              name_in_index: forbes_valuation_moneys_nested
+              type: "[Money!]!"
+            forbes_valuation_moneys_object:
+              name_in_index: forbes_valuation_moneys_object
+              type: "[Money!]!"
             forbes_valuations:
-              type: JsonSafeLong
+              name_in_index: forbes_valuations
+              type: "[JsonSafeLong!]!"
             formed_on:
-              type: Date
+              name_in_index: formed_on
+              type: Date!
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+            league:
+              name_in_index: league
+              type: String!
             nested_fields:
               name_in_index: the_nested_fields
+              type: TeamNestedFields
+            nested_fields2:
+              name_in_index: nested_fields2
+              type: TeamNestedFields
+            past_names:
+              name_in_index: past_names
+              type: "[String!]!"
+            seasons_nested:
+              name_in_index: seasons_nested
+              type: "[TeamSeason!]!"
+            seasons_object:
+              name_in_index: seasons_object
+              type: "[TeamSeason!]!"
+            stadium_location:
+              name_in_index: stadium_location
+              type: GeoLocation
+            staff:
+              name_in_index: staff
+              type: Staff
+            won_championships_at:
+              name_in_index: won_championships_at
+              type: "[DateTime!]!"
+        TeamDetails:
+          fields_by_name:
+            count:
+              name_in_index: count
+              type: Int
+            uniform_colors:
+              name_in_index: uniform_colors
+              type: "[String!]!"
         TeamNestedFields:
           fields_by_name:
+            current_players:
+              name_in_index: current_players
+              type: "[Player!]!"
+            forbes_valuation_moneys:
+              name_in_index: forbes_valuation_moneys
+              type: "[Money!]!"
             seasons:
               name_in_index: the_seasons
+              type: "[TeamSeason!]!"
         TeamRecord:
           fields_by_name:
             first_win_on:
+              name_in_index: first_win_on
               type: Date
             last_win_on:
               name_in_index: last_win_date
               type: Date
             losses:
               name_in_index: loss_count
+              type: Int
             wins:
               name_in_index: win_count
+              type: Int
         TeamSeason:
           fields_by_name:
+            count:
+              name_in_index: count
+              type: Int
+            notes:
+              name_in_index: notes
+              type: "[String!]!"
+            players_nested:
+              name_in_index: players_nested
+              type: "[Player!]!"
+            players_object:
+              name_in_index: players_object
+              type: "[Player!]!"
             record:
               name_in_index: the_record
+              type: TeamRecord
+            started_at:
+              name_in_index: started_at
+              type: DateTime
+            was_shortened:
+              name_in_index: was_shortened
+              type: Boolean
+            won_games_at:
+              name_in_index: won_games_at
+              type: "[DateTime!]!"
+            year:
+              name_in_index: year
+              type: Int
         Untyped:
           scalar: Untyped
         Widget:
           fields_by_name:
+            amount_cents:
+              name_in_index: amount_cents
+              type: Int!
+            amounts:
+              name_in_index: amounts
+              type: "[Int!]!"
             component_ids:
-              type: ID
+              name_in_index: component_ids
+              type: "[ID!]!"
+            cost:
+              name_in_index: cost
+              type: Money
             cost_currency_introduced_on:
+              name_in_index: cost_currency_introduced_on
               type: Date
+            cost_currency_name:
+              name_in_index: cost_currency_name
+              type: String
+            cost_currency_primary_continent:
+              name_in_index: cost_currency_primary_continent
+              type: String
+            cost_currency_symbol:
+              name_in_index: cost_currency_symbol
+              type: String
+            cost_currency_unit:
+              name_in_index: cost_currency_unit
+              type: String
+            created_at:
+              name_in_index: created_at
+              type: DateTime!
             created_at_time_of_day:
+              name_in_index: created_at_time_of_day
               type: LocalTime
             created_on:
+              name_in_index: created_on
               type: Date
+            description:
+              name_in_index: description
+              type: String
+            fees:
+              name_in_index: fees
+              type: "[Money!]!"
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+            internal_details:
+              name_in_index: internal_details
+              type: WidgetInternalDetails
+            internal_highlightable_details:
+              name_in_index: internal_highlightable_details
+              type: WidgetInternalDetails
+            internal_highlightable_name:
+              name_in_index: internal_highlightable_name
+              type: String
+            internal_name:
+              name_in_index: internal_name
+              type: String
+            inventor:
+              name_in_index: inventor
+              type: Inventor
             metadata:
+              name_in_index: metadata
               type: Untyped
+            name:
+              name_in_index: name
+              type: String
+            name_text:
+              name_in_index: name_text
+              type: String
+            named_inventor:
+              name_in_index: named_inventor
+              type: NamedInventor
+            options:
+              name_in_index: options
+              type: WidgetOptions
             release_dates:
-              type: Date
+              name_in_index: release_dates
+              type: "[Date!]!"
+            release_timestamps:
+              name_in_index: release_timestamps
+              type: "[DateTime!]!"
+            tags:
+              name_in_index: tags
+              type: "[String!]!"
             the_options:
               name_in_index: the_opts
+              type: WidgetOptions
             weight_in_ng:
-              type: JsonSafeLong
+              name_in_index: weight_in_ng
+              type: JsonSafeLong!
+            weight_in_ng_str:
+              name_in_index: weight_in_ng_str
+              type: LongString!
             workspace_id:
               name_in_index: workspace_id2
-              type: ID
+              type: ID!
+            workspace_name:
+              name_in_index: workspace_name
+              type: String
+        WidgetInternalDetails:
+          fields_by_name:
+            name:
+              name_in_index: name
+              type: String
         WidgetOptions:
           fields_by_name:
+            color:
+              name_in_index: color
+              type: Color
+            is_draft:
+              name_in_index: is_draft
+              type: Boolean
+            size:
+              name_in_index: size
+              type: Size
             the_size:
               name_in_index: the_sighs
+              type: Size
         WidgetWorkspace:
           fields_by_name:
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
+            name:
+              name_in_index: name
+              type: String
+            widget:
+              name_in_index: widget
+              type: WorkspaceWidget
         WorkspaceWidget:
           fields_by_name:
+            created_at:
+              name_in_index: created_at
+              type: DateTime
             id:
-              type: ID
+              name_in_index: id
+              type: ID!
 object_types_by_name:
   Address:
     graphql_fields_by_name:
