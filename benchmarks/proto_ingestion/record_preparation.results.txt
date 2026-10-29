@@ -1,0 +1,5 @@
+Command: bundle exec ruby -Ispec_support/lib benchmarks/proto_ingestion/record_preparation.rb
+
+old conversion + shared preparation: 0.669s; 29887 records/s; 281.1 objects/record
+native preparation: 0.43s; 46538 records/s; 81.0 objects/record
+Ruby 4.0.0; google-protobuf 4.36.2; 20000 iterations; decode and initialization excluded

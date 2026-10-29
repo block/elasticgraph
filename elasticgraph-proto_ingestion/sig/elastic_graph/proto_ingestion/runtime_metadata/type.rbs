@@ -3,14 +3,15 @@ module ElasticGraph
     module RuntimeMetadata
       class Type < ::Data
         attr_reader fields_by_name: ::Hash[::String, Field]
-        attr_reader non_standard_enum_values_by_name: ::Hash[::String, ::String]
+        attr_reader enum_values_by_name: ::Hash[::String, ::String]
+        attr_reader enum_zero_value: ::String?
         attr_reader scalar: ::String?
+        attr_reader subtypes_by_field_name: ::Hash[::String, ::String]
 
-        def initialize: (fields_by_name: ::Hash[::String, Field], non_standard_enum_values_by_name: ::Hash[::String, ::String], scalar: ::String?) -> void
-        def self.new: (fields_by_name: ::Hash[::String, Field], non_standard_enum_values_by_name: ::Hash[::String, ::String], scalar: ::String?) -> Type
+        def initialize: (?fields_by_name: ::Hash[::String, Field], ?enum_values_by_name: ::Hash[::String, ::String], ?enum_zero_value: ::String?, ?scalar: ::String?, ?subtypes_by_field_name: ::Hash[::String, ::String]) -> void
+        def self.new: (?fields_by_name: ::Hash[::String, Field], ?enum_values_by_name: ::Hash[::String, ::String], ?enum_zero_value: ::String?, ?scalar: ::String?, ?subtypes_by_field_name: ::Hash[::String, ::String]) -> Type
         def self.from_hash: (::Hash[::String, untyped]) -> Type
         def to_dumpable_hash: () -> ::Hash[::String, untyped]
-        def empty?: () -> bool
       end
     end
   end

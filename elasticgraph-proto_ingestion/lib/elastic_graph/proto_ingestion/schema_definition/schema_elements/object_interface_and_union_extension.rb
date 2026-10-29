@@ -53,23 +53,23 @@ module ElasticGraph
             [list_depth, current]
           end
 
-          # Returns metadata for fields whose index name differs from their public name, or whose
-          # scalar has ingestion rules beyond its protobuf wire type. Abstract types have no fields.
+          # Returns field types, index names, and concrete alternatives directly from the schema.
           #
           # @return [RuntimeMetadata::Type]
           def proto_ingestion_metadata
-            return RuntimeMetadata::Type.new(fields_by_name: {}, non_standard_enum_values_by_name: {}, scalar: nil) if abstract?
+            if abstract?
+              abstract_type = _ = self
+              subtypes = abstract_type.recursively_resolve_subtypes.to_h do |subtype|
+                [Support::Casing.to_upper_snake(subtype.name).downcase, subtype.name]
+              end
+              return RuntimeMetadata::Type.new(subtypes_by_field_name: subtypes)
+            end
 
-            fields_by_name = proto_fields.filter_map do |schema_field, field|
-              base_type = _ = ObjectInterfaceAndUnionExtension.list_depth_and_base_type(field.type).last.resolved
-              scalar = base_type.proto_ingestion_metadata.scalar if base_type.is_a?(ScalarTypeExtension)
-              name_in_index = field.name_in_index unless field.name_in_index == schema_field.name
-              next unless name_in_index || scalar
+            fields_by_name = proto_fields.to_h do |schema_field, field|
+              [schema_field.name, RuntimeMetadata::Field.new(name_in_index: field.name_in_index, type: field.type.name)]
+            end
 
-              [schema_field.name, RuntimeMetadata::Field.new(name_in_index: name_in_index, type: scalar ? base_type.name : nil)]
-            end.to_h
-
-            RuntimeMetadata::Type.new(fields_by_name: fields_by_name, non_standard_enum_values_by_name: {}, scalar: nil)
+            RuntimeMetadata::Type.new(fields_by_name: fields_by_name)
           end
 
           # Returns this type's name in protobuf schemas.

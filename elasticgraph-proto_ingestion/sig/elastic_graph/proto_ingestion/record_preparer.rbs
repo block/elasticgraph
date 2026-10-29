@@ -1,0 +1,26 @@
+module ElasticGraph
+  module ProtoIngestion
+    class RecordPreparer
+      @types: Hash[String, RuntimeMetadata::Type]
+      @indexing_preparers: Hash[String, SchemaArtifacts::RuntimeMetadata::extensionClass?]
+      @fields_by_type: Hash[String, Array[Field]]
+      @enum_values_by_type: Hash[String, Hash[Symbol, String?]]
+
+      def initialize: (schemaArtifacts) -> void
+      def prepare_for_index: (String, untyped, Hash[String, untyped]?) -> untyped
+
+      class Field < ::Data
+        attr_reader name: String
+        attr_reader type: String
+        attr_reader name_in_index: String
+        attr_reader presence_method: Symbol?
+        def self.new: (String, String, String, Symbol?) -> Field
+      end
+
+      private
+
+      def prepare_value: (String, untyped, Hash[String, untyped]?) -> untyped
+      def prepare_object: (String, untyped, Hash[String, untyped]?) -> Hash[String, untyped]
+    end
+  end
+end

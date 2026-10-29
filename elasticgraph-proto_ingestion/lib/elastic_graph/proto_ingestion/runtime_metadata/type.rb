@@ -14,29 +14,33 @@ module ElasticGraph
       # Ingestion facts for a scalar, enum, or message type.
       #
       # @private
-      Type = ::Data.define(:fields_by_name, :non_standard_enum_values_by_name, :scalar) do
+      Type = ::Data.define(:fields_by_name, :enum_values_by_name, :enum_zero_value, :scalar, :subtypes_by_field_name) do
         # @implements Type
+
+        def initialize(fields_by_name: {}, enum_values_by_name: {}, enum_zero_value: nil, scalar: nil, subtypes_by_field_name: {})
+          super
+        end
 
         def self.from_hash(hash)
           fields = hash["fields_by_name"] || {} # : ::Hash[::String, untyped]
-          enum_values = hash["non_standard_enum_values_by_name"] || {} # : ::Hash[::String, ::String]
+          enum_values = hash["enum_values_by_name"] || {} # : ::Hash[::String, ::String]
           new(
             fields_by_name: fields.transform_values { |field| Field.from_hash(field) },
-            non_standard_enum_values_by_name: enum_values,
-            scalar: hash["scalar"]
+            enum_values_by_name: enum_values,
+            enum_zero_value: hash["enum_zero_value"],
+            scalar: hash["scalar"],
+            subtypes_by_field_name: hash["subtypes_by_field_name"] || {}
           )
         end
 
         def to_dumpable_hash
           {
             "fields_by_name" => fields_by_name.sort.to_h.transform_values(&:to_dumpable_hash),
-            "non_standard_enum_values_by_name" => non_standard_enum_values_by_name,
-            "scalar" => scalar
+            "enum_values_by_name" => enum_values_by_name,
+            "enum_zero_value" => enum_zero_value,
+            "scalar" => scalar,
+            "subtypes_by_field_name" => subtypes_by_field_name
           }
-        end
-
-        def empty?
-          fields_by_name.empty? && non_standard_enum_values_by_name.empty? && scalar.nil?
         end
       end
     end

@@ -31,11 +31,5 @@ module ElasticGraph
       "TimeZone" => {type: "string", field_comment: %(Must be an IANA time zone identifier, e.g. "America/Los_Angeles".)},
       "Untyped" => {type: "string"}
     }.freeze # : ::Hash[::String, {type: ::String, ?import: ::String, ?field_comment: ::String}]
-
-    # The default ElasticGraph scalar for each protobuf type. Several built-in scalars share
-    # a protobuf type, so select its default scalar before inverting the mapping.
-    DEFAULT_SCALARS_BY_PROTO_TYPE = BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME
-      .slice("Boolean", "Float", "DateTime", "Int", "LongString", "String")
-      .to_h { |name, options| [options.fetch(:type), name] }.freeze
   end
 end
