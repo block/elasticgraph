@@ -6,7 +6,6 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/proto_ingestion/proto_conversions"
 require "elastic_graph/proto_ingestion/runtime_metadata/schema"
 require "elastic_graph/spec_support/protoc"
 require "google/protobuf/descriptor_pb"
@@ -60,10 +59,13 @@ module ElasticGraph
         payload = publisher.encode(event)
         decoded = @batch_class.decode(payload).events.fetch(0)
         alternative = @envelope.lookup_oneof("record").find { |field| type_name(field.subtype) == event.type }
+        latency_timestamps = decoded.latency_timestamps.map do |name, value|
+          [name, JSON.parse(Google::Protobuf.encode_json(value))]
+        end.to_h
         event.with(
           op: decoded.op, id: decoded.id, version: decoded.version,
           record: alternative.get(decoded), schema_version: nil, ingestion_format: "proto",
-          latency_timestamps: decoded.latency_timestamps.map { |name, value| [name, JSON.parse(Google::Protobuf.encode_json(value))] }.to_h
+          latency_timestamps: latency_timestamps
         )
       end
 
@@ -100,7 +102,7 @@ module ElasticGraph
 
       def single_value(field, value, overrides)
         return value.to_s if %i[int64 sint64 uint64 fixed64 sfixed64].include?(field.type)
-        scalar = overrides&.type && @metadata.types_by_name.fetch(overrides.type).scalar
+        scalar = @metadata.types_by_name.fetch(overrides.type).scalar if overrides&.type
         return JSON.generate(value) if scalar == "Untyped"
         if field.type == :enum
           enum = field.subtype
