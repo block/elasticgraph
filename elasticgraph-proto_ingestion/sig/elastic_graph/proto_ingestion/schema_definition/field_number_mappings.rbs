@@ -7,12 +7,22 @@ module ElasticGraph
 
         type fieldNumbersByName = ::Hash[::String, ::Integer]
 
+        type fieldContractsByName = ::Hash[::String, FieldContract]
+
+        class FieldContract
+          attr_reader field_number: ::Integer
+          attr_reader proto_type: ::String
+          attr_reader list_depth: ::Integer
+
+          def self.new: (field_number: ::Integer, proto_type: ::String, list_depth: ::Integer) -> instance
+        end
+
         class MessageMapping
-          attr_reader field_numbers_by_name: fieldNumbersByName
+          attr_reader field_contracts_by_name: fieldContractsByName
           attr_reader next_number: ::Integer
 
-          def self.new: (field_numbers_by_name: fieldNumbersByName, next_number: ::Integer) -> instance
-          def with: (?field_numbers_by_name: fieldNumbersByName, ?next_number: ::Integer) -> instance
+          def self.new: (field_contracts_by_name: fieldContractsByName, next_number: ::Integer) -> instance
+          def with: (?field_contracts_by_name: fieldContractsByName, ?next_number: ::Integer) -> instance
         end
 
         class EnumMapping
@@ -45,7 +55,9 @@ module ElasticGraph
         def field_number_for: (
           message_name: ::String,
           public_field_name: ::String,
-          previous_field_names: ::Array[::String]
+          previous_field_names: ::Array[::String],
+          proto_type: ::String,
+          list_depth: ::Integer
         ) -> ::Integer
         def next_field_number_for: (::String) -> ::Integer
         def reserved_field_numbers_for: (::String, ::Array[::String]) -> fieldNumbersByName
@@ -59,7 +71,8 @@ module ElasticGraph
         def message_mapping_for: (::String) -> MessageMapping
         def enum_mapping_for: (::String) -> EnumMapping
         def reserved_numbers_by_name: (fieldNumbersByName, ::Array[::String]) -> fieldNumbersByName
-        def allocate_field_number: (::String, ::String, MessageMapping) -> MessageMapping
+        def verify_field_contract: (::String, ::String, FieldContract, ::String, ::Integer) -> void
+        def allocate_field_number: (::String, ::String, MessageMapping, ::String, ::Integer) -> MessageMapping
       end
     end
   end
