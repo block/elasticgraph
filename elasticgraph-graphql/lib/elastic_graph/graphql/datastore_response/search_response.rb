@@ -18,7 +18,7 @@ module ElasticGraph
       # Represents a search response from the datastore. Exposes both the raw metadata
       # provided by the datastore and the collection of documents. Can be treated as a
       # collection of documents when you don't care about the metadata.
-      class SearchResponse < ::Data.define(:raw_data, :metadata, :documents, :total_document_count, :aggregations_unavailable_reason, :decoded_cursor_factory)
+      class SearchResponse < ::Data.define(:raw_data, :metadata, :documents, :total_document_count, :aggregations_unavailable_reason, :decoded_cursor_factory, :field_retrieval_plan)
         include Enumerable
         extend Forwardable
 
@@ -28,9 +28,9 @@ module ElasticGraph
 
         EXCLUDED_METADATA_KEYS = %w[hits aggregations].freeze
 
-        def self.build(raw_data, decoded_cursor_factory: DecodedCursor::Factory::Null, aggregations_unavailable_reason: nil)
+        def self.build(raw_data, decoded_cursor_factory: DecodedCursor::Factory::Null, aggregations_unavailable_reason: nil, field_retrieval_plan: FieldRetrievalPlan::SOURCE)
           documents = raw_data.fetch("hits").fetch("hits").map do |doc|
-            Document.build(doc, decoded_cursor_factory: decoded_cursor_factory)
+            Document.build(doc, decoded_cursor_factory: decoded_cursor_factory, field_retrieval_plan: field_retrieval_plan)
           end
 
           metadata = raw_data.except(*EXCLUDED_METADATA_KEYS)
@@ -58,7 +58,8 @@ module ElasticGraph
             documents:,
             total_document_count:,
             aggregations_unavailable_reason:,
-            decoded_cursor_factory:
+            decoded_cursor_factory:,
+            field_retrieval_plan:
           )
         end
 
@@ -108,21 +109,19 @@ module ElasticGraph
         # filters on the set union of values. We can then use this method to "split" the single response into what
         # the separate responses would have been if we hadn't combined into a single query.
         def filter_results(field_path, values, size)
-          filter =
+          hits = documents.select do |document|
             if field_path == ["id"]
-              # `id` filtering is a very common case, and we want to avoid having to request
-              # `id` within `_source`, given it's available as `_id`.
-              ->(hit) { values.include?(hit.fetch("_id")) }
+              values.include?(document.id)
             else
-              ->(hit) { values.intersect?(Support::HashUtil.fetch_leaf_values_at_path(hit.fetch("_source"), field_path).to_set) }
+              values.intersect?(Support::HashUtil.fetch_leaf_values_at_path(document.payload, field_path).to_set)
             end
-
-          hits = raw_data.fetch("hits").fetch("hits").select(&filter).first(size)
+          end.first(size).map(&:raw_data)
           updated_raw_data = Support::HashUtil.deep_merge(raw_data, {"hits" => {"hits" => hits, "total" => nil}})
 
           SearchResponse.build(
             updated_raw_data,
             decoded_cursor_factory: decoded_cursor_factory,
+            field_retrieval_plan: field_retrieval_plan,
             aggregations_unavailable_reason: "aggregations cannot be provided accurately on a search response filtered in memory"
           )
         end
