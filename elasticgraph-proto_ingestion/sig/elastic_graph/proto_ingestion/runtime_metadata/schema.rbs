@@ -7,6 +7,7 @@ module ElasticGraph
 
         def initialize: (package_name: ::String, types_by_name: ::Hash[::String, Type]) -> void
         def self.new: (package_name: ::String, types_by_name: ::Hash[::String, Type]) -> Schema
+        def self.from_schema_artifacts: (schemaArtifacts) -> Schema
         def self.from_hash: (::Hash[::String, untyped]) -> Schema
         def to_dumpable_hash: () -> ::Hash[::String, untyped]
       end
