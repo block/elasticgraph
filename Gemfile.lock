@@ -364,7 +364,7 @@ GEM
       ffi (~> 1)
       ffi-compiler (~> 1)
       rake (~> 13.3)
-    graphql (2.6.11)
+    graphql (2.6.13)
       base64
       fiber-storage
       logger
@@ -824,7 +824,7 @@ CHECKSUMS
   google-protobuf (4.36.2) sha256=2f8daff50ae14aad36ab0ccdcf284065fa71d726c444efe114e6db82ffe62494
   google-protobuf (4.36.2-arm64-darwin) sha256=f70d810e6bbab9d8ad9c1d5fd685a21de4c10ad3ad32efb9455e17e5b1286917
   google-protobuf (4.36.2-java) sha256=bca01a7ea84973f5b7296862dcf16e347b53aeda75d4c13d19b2d186b589bf3a
-  graphql (2.6.11) sha256=9a9cde910e805c4c08fdf8d22bf129e935affc9ca8b4f9b2ec26b4b63666b15d
+  graphql (2.6.13) sha256=8d3eafbc61767203e66be2eececc28900a3700be1f16706810820c1c2d24a187
   graphql-c_parser (1.1.4) sha256=8d3bf769ae935373ada877fe003036892b45be98c2fbcc6731dd82af2c3e0656
   grpc-tools (1.84.0) sha256=f54767ec65e22553768d38a20d021ca2241c33ae2e96d51336152bbcc62578a8
   hana (1.3.7) sha256=5425db42d651fea08859811c29d20446f16af196308162894db208cac5ce9b0d
