@@ -8,7 +8,7 @@ module ElasticGraph
 
       private
 
-      @schema_artifacts: schemaArtifacts
+      @schema_artifacts: Artifacts::_Provider
       @preparers_by_json_schema_version: ::Hash[::Integer, ::ElasticGraph::Indexer::RecordPreparer]
 
       def build_type_metas_from: (::Hash[::String, untyped]) -> ::Array[::ElasticGraph::Indexer::RecordPreparer::TypeMetadata]
