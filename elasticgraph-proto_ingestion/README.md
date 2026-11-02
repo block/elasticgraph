@@ -1,7 +1,7 @@
 # ElasticGraph::ProtoIngestion
 
 An ElasticGraph extension that supports ingesting Protocol Buffer data into ElasticGraph.
-Currently it generates Protocol Buffers schema artifacts from ElasticGraph schemas: it emits
+It generates Protocol Buffers schema artifacts and provides a native-record adapter for the shared indexer. It emits
 `proto3` by default and can emit `proto2`, and supports arbitrary file-level header lines (such
 as `option` declarations).
 
@@ -83,6 +83,23 @@ end
 
 After running `bundle exec rake schema_artifacts:dump`, ElasticGraph will generate a `schema.proto`
 schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside your schema definition.
+
+## Indexing Adapter
+
+The schema extension registers a `proto` ingestion adapter with the shared indexer. The adapter
+validates native protobuf records against ElasticGraph scalar constraints and prepares the
+records for normal, derived, and multi-source indexing. It uses the typed protobuf runtime metadata
+from the schema dump for private index field names and scalar and enum rules.
+
+Transport integrations must validate the event envelope and decode records with descriptors from
+the same schema dump before passing `ElasticGraph::Indexer::Event` instances to the processor.
+The events use `ingestion_format: "proto"`, `schema_version: nil`, and a native protobuf message
+as `record`. Transport payload decoding and a public protobuf indexer wrapper will follow separately.
+
+Generated optional fields preserve explicit zero, false, and empty strings. Protobuf repeated fields
+represent an absent list as an empty list. The adapter does not enforce GraphQL non-null fields,
+because events contain no publisher schema version. Numeric range checks remain active when general
+record validation is sampled out. Rollover timestamps are required when an event targets a rollover index.
 
 ## Schema Definition API
 

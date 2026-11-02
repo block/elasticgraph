@@ -1,0 +1,22 @@
+module ElasticGraph
+  module ProtoIngestion
+    class IngestionAdapter
+      include ::ElasticGraph::Indexer::IngestionAdapter::_Adapter
+      ValidationResult: singleton(::ElasticGraph::Indexer::IngestionAdapter::ValidationResult)
+
+      @metadata: RuntimeMetadata::Schema
+      @record_preparer: RecordPreparer
+      @validator: RecordValidator
+      @update_targets: Hash[String, Array[SchemaArtifacts::RuntimeMetadata::UpdateTarget]]
+      @ingestible_types: Set[String]
+
+      def initialize: (schema_artifacts: schemaArtifacts) -> void
+
+      private
+
+      def rollover_error_for: (String, untyped) -> String?
+      def resolve_path: (untyped, String) -> [Array[String], untyped]
+      def invalid: (String, String) -> ::ElasticGraph::Indexer::IngestionAdapter::ValidationResult
+    end
+  end
+end
