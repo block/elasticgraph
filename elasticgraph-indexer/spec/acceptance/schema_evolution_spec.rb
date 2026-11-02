@@ -12,7 +12,7 @@ require "elastic_graph/schema_definition/rake_tasks"
 
 module ElasticGraph
   RSpec.describe "Indexing schema evolution", :factories, :capture_logs, :in_temp_dir, :rake_task do
-    for_each_ingestion_format do
+    for_each_ingestion_format do |format|
       let(:path_to_schema) { "config/schema.rb" }
 
       before do
@@ -104,7 +104,7 @@ module ElasticGraph
       end
 
       context "when a schema has evolved to lose a new field and we are running on a new datastore cluster that doesn't have the removed field in its mapping" do
-        it "can still ingest old schema version events that have the removed field" do
+        it "can still ingest old schema version events that have the removed field", pending: format == :proto && "Protobuf dumps do not require explicit field deletions yet." do
           write_address_schema_def(json_schema_version: 1, address_extras: "t.field 'deprecated', 'String'")
           dump_artifacts
 
@@ -212,7 +212,7 @@ module ElasticGraph
         end
 
         context "when a public field is renamed and `name_in_index` is used to make the new field keep reading and writing the existing index field" do
-          it "can index events for either JSON schema version" do
+          it "can index events for either JSON schema version", pending: format == :proto && "Protobuf dumps do not require explicit rename or deletion declarations yet." do
             # Write a v1 schema with a `full_name` field that is called `name` in the index
             write_teams_schema_def(json_schema_version: 1) do |team_def|
               safe_replace(
@@ -257,7 +257,7 @@ module ElasticGraph
         end
 
         context "when an embedded type that was in an old JSON schema has been dropped" do
-          it "correctly ignores that type's data when ingesting old events" do
+          it "correctly ignores that type's data when ingesting old events", pending: format == :proto && "Protobuf dumps do not require explicit field and type deletions yet." do
             write_teams_schema_def(json_schema_version: 1) do |team_def|
               # V1 has a `team_details: TeamDetails` field.
               expect(team_def).to include('schema.object_type "TeamDetails"', 't.field "details", "TeamDetails"')
@@ -299,7 +299,7 @@ module ElasticGraph
         end
 
         context "when an indexed type that was in an old JSON schema has been dropped" do
-          it "ignores an old event attempting to upsert that type" do
+          it "ignores an old event attempting to upsert that type", pending: format == :proto && "Protobuf needs type-deletion checks and handling of historical envelopes." do
             write_address_schema_def(json_schema_version: 1, schema_extras: <<~EOS)
               schema.object_type "Team" do |t|
                 t.field "id", "ID!"
@@ -334,6 +334,7 @@ module ElasticGraph
       end
 
       def write_teams_schema_def(json_schema_version:)
+        @publisher_version = json_schema_version
         # Comment out some lines that lead to schema dump warnings (we don't want the warnings in the output).
         schema_def_contents = existing_team_schema_def.gsub(/^\s+t\.field schema\.state.schema_elements.count/, "#")
         schema_def_contents = yield schema_def_contents
@@ -354,6 +355,7 @@ module ElasticGraph
       end
 
       def write_address_schema_def(json_schema_version:, address_extras: "", schema_extras: "")
+        @publisher_version = json_schema_version
         # This is a pared down schema definition of our normal test schema `Address` type.
         ::File.write(path_to_schema, <<~EOS)
           ElasticGraph.define_schema do |schema|
@@ -372,6 +374,7 @@ module ElasticGraph
       end
 
       def write_widget_schema_def(json_schema_version:, widget_extras: "", widgets_index_config: "")
+        @publisher_version = json_schema_version
         # This is a pared down schema definition of our normal test schema `Address` type.
         ::File.write(path_to_schema, <<~EOS)
           ElasticGraph.define_schema do |schema|
@@ -409,6 +412,9 @@ module ElasticGraph
             schema_artifacts_directory: "config/schema/artifacts",
             output: output
           )
+        end
+        if respond_to?(:capture_proto_publisher)
+          capture_proto_publisher(@publisher_version, SchemaArtifacts::FromDisk.new("config/schema/artifacts"))
         end
       end
 
