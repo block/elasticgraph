@@ -44,6 +44,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-indexer", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-lambda_support", ElasticGraph::VERSION
-  spec.add_dependency "aws-sdk-s3", "~> 1.232", ">= 1.232.1"
+  spec.add_dependency "aws-sdk-s3", "~> 1.235"
   spec.add_development_dependency "elasticgraph-proto_ingestion", ElasticGraph::VERSION
 end
