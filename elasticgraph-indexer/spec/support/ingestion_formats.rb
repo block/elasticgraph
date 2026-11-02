@@ -8,6 +8,7 @@
 
 require "elastic_graph/indexer/test_support/converters"
 require "elastic_graph/proto_ingestion/schema_definition/api_extension"
+require "elastic_graph/spec_support/proto_publisher"
 
 module ElasticGraph
   # Runs specs against each ingestion format, so that everything we verify for JSON ingestion is also
@@ -39,7 +40,7 @@ module ElasticGraph
     end
 
     def process_indexing_events(events, via: indexer)
-      via.processor.process(round_trip_indexing_events(events), refresh_indices: true)
+      via.processor.process(round_trip_indexing_events(events, schema_artifacts: via.schema_artifacts), refresh_indices: true)
     end
 
     # Overrides the `UsesDatastore` helper so that records are indexed via the ingestion format under test.
@@ -65,7 +66,7 @@ module ElasticGraph
       end
 
       # Publishes the given events in this ingestion format, returning the events the indexer receives.
-      def round_trip_indexing_events(events)
+      def round_trip_indexing_events(events, schema_artifacts: ingestion_schema_artifacts)
         events
       end
     end
@@ -74,10 +75,7 @@ module ElasticGraph
       include IngestionFormatSupport
 
       FORMAT = :proto
-      # Protobuf examples are pending until the indexer can ingest protobuf events. RSpec still runs pending
-      # examples and fails any that pass, so once protobuf ingestion works, this blanket `pending` gives way
-      # to `pending` metadata on the examples that still expose gaps.
-      METADATA = {ingests_proto_data: true, pending: "`elasticgraph-indexer` cannot ingest protobuf events yet."}
+      METADATA = {ingests_proto_data: true}
 
       # The stock schema artifacts are dumped with the protobuf extension. Using them avoids re-loading `config/schema.rb`:
       # Ruby resets a file's coverage each time it is loaded, so a re-load would discard coverage from earlier loads.
@@ -89,11 +87,19 @@ module ElasticGraph
         [ProtoIngestion::SchemaDefinition::APIExtension]
       end
 
-      # simplecov:disable -- the indexer has no protobuf ingestion adapter yet, so it fails before it calls this.
-      def round_trip_indexing_events(events)
-        raise ::NotImplementedError, "Protobuf indexing events cannot be decoded yet."
+      # Capture publishers before another dump overwrites their schema and metadata.
+      # These versions select test fixtures only; no version is placed on the protobuf wire.
+      def capture_proto_publisher(version, schema_artifacts)
+        (@proto_publishers_by_version ||= {})[version] = SpecSupport::ProtoPublisher.new(schema_artifacts)
       end
-      # simplecov:enable
+
+      def round_trip_indexing_events(events, schema_artifacts: ingestion_schema_artifacts)
+        publisher = (@proto_publishers ||= {}.compare_by_identity)[schema_artifacts] ||= SpecSupport::ProtoPublisher.new(schema_artifacts)
+        events.map do |event|
+          historical_publisher = @proto_publishers_by_version&.fetch(event.schema_version) || publisher
+          publisher.round_trip(event, publisher: historical_publisher)
+        end
+      end
     end
   end
 
