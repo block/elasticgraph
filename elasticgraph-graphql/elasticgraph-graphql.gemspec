@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "base64", "~> 0.3"
   spec.add_dependency "elasticgraph-datastore_core", ElasticGraph::VERSION
   spec.add_dependency "elasticgraph-schema_artifacts", ElasticGraph::VERSION
-  spec.add_dependency "graphql", "~> 2.6.11"
+  spec.add_dependency "graphql", "~> 2.6.13"
 
   spec.add_development_dependency "elasticgraph-admin", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
@@ -52,4 +52,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-indexer", ElasticGraph::VERSION
   spec.add_development_dependency "elasticgraph-schema_definition", ElasticGraph::VERSION
+  spec.add_development_dependency "elasticgraph-proto_ingestion", ElasticGraph::VERSION
 end

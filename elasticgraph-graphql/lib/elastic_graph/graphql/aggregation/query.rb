@@ -177,6 +177,12 @@ module ElasticGraph
             })
           end
 
+          if query.needs_doc_count_error && grouping.bounds_count_error_with_value_count?
+            wrapped_clauses = wrapped_clauses.merge({
+              Key.value_count_key(agg_key) => {"value_count" => {"field" => grouping.encoded_index_field_path}}
+            })
+          end
+
           AggregationDetail.new(wrapped_clauses, {"buckets_path" => [agg_key]})
         end
       end

@@ -486,6 +486,28 @@ module ElasticGraph
         expect(results).to eq(results).and match_array(expected_aggs)
       end
 
+      # The GraphQL layer rejects zoom levels outside `GEO_TILE_ZOOM_LEVELS` before querying the datastore. This bypasses
+      # that check to show that the range matches the precisions the datastore supports.
+      it "supports exactly the `GEO_TILE_ZOOM_LEVELS` zoom levels for geo tile groupings, matching the datastore" do
+        index_into(graphql, build(:address, geo_location: {latitude: 34.0739, longitude: -118.2400}))
+
+        expect(geo_tile_keys_at(GEO_TILE_ZOOM_LEVELS.min)).to eq ["0/0/0"]
+        expect(geo_tile_keys_at(GEO_TILE_ZOOM_LEVELS.max)).to eq ["29/92103187/214330019"]
+
+        [GEO_TILE_ZOOM_LEVELS.min - 1, GEO_TILE_ZOOM_LEVELS.max + 1].each do |zoom_level|
+          datastore_error = "Invalid geotile_grid precision of #{zoom_level}. Must be between #{GEO_TILE_ZOOM_LEVELS.min} and #{GEO_TILE_ZOOM_LEVELS.max}."
+
+          expect {
+            geo_tile_keys_at(zoom_level)
+          }.to raise_error(Errors::BadDatastoreRequest, a_string_including(datastore_error)).and log_warning(a_string_including(datastore_error))
+        end
+      end
+
+      def geo_tile_keys_at(zoom_level)
+        aggregations = aggregation_query_of(groupings: [geo_tile_grouping_of("geo_location", zoom_level: zoom_level)], needs_doc_count: true)
+        search_datastore_aggregations(aggregations, index_def_name: "addresses").map { |bucket| bucket.dig("key", "geo_location.as_geo_tile") }
+      end
+
       def with_updated_paginator(aggregation_query, **paginator_opts)
         aggregation_query.with(paginator: aggregation_query.paginator.with(**paginator_opts))
       end

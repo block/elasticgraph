@@ -10,21 +10,21 @@ source "https://rubygems.org", cooldown: 7
 
 # Gems needed by the test suite and other CI checks.
 group :development do
-  gem "aws_lambda_ric", "~> 3.2"
+  gem "aws_lambda_ric", "~> 3.2", ">= 3.2.1"
   # graphql-c_parser is no longer a hard dependency, but we include it here for faster CI tests
   gem "graphql-c_parser", "~> 1.1", ">= 1.1.4", platforms: :ruby
   # Vendors precompiled `protoc` binaries, so neither CI nor contributors need a system `protoc` install.
-  gem "grpc-tools", "~> 1.84"
+  gem "grpc-tools", "~> 1.84", ">= 1.84.1"
   gem "benchmark-ips", "~> 2.15", ">= 2.15.1"
   gem "coderay", "~> 1.1", ">= 1.1.3"
   gem "factory_bot", "~> 6.6"
   gem "faker", "~> 3.8"
   gem "flatware-rspec", "~> 2.4", platforms: :ruby
-  gem "httpx", "~> 1.8", ">= 1.8.4"
+  gem "httpx", "~> 1.9"
   gem "memory_profiler", "~> 1.1"
   gem "nokogiri", "~> 1.19", ">= 1.19.4"
   gem "method_source", "~> 1.1"
-  gem "rack-test", "~> 2.2"
+  gem "rack-test", "~> 2.3"
   gem "rspec", "~> 3.13", ">= 3.13.2"
   gem "rspec-retry", "~> 0.6", ">= 0.6.2"
   # We are waiting to upgrade to >= 2.27 until standardrb compatibility with rubocop plugins is fixed:
@@ -36,9 +36,9 @@ group :development do
   # We are waiting to upgrade to >= 3.5 until standardrb compatibility with rubocop plugins is fixed:
   # https://github.com/standardrb/standard/issues/701
   gem "rubocop-rspec", "~> 3.10.2"
-  gem "simplecov", "~> 1.3", ">= 1.3.1"
+  gem "simplecov", "~> 1.3", ">= 1.3.2"
   gem "simplecov-console", "~> 0.9", ">= 0.9.5"
-  gem "standard", "~> 1.56.0"
+  gem "standard", "~> 1.57.0"
   gem "steep", "~> 2.1.0", platforms: :ruby
   gem "super_diff", "~> 0.19"
   gem "vcr", "~> 6.4"
@@ -53,12 +53,12 @@ group :site do
   # as of rdoc 8.0 depends on `rbs`. `rbs` has a C native extension that fails to compile on JRuby,
   # so allowing these onto JRuby breaks `bundle install` there.
   platforms :ruby do
-    gem "html-proofer", "~> 5.2", ">= 5.2.2"
+    gem "html-proofer", "~> 5.2", ">= 5.2.3"
     gem "jekyll", "~> 4.4", ">= 4.4.1"
     gem "redcarpet", "~> 3.6", ">= 3.6.1"
     gem "yard", "~> 0.9", ">= 0.9.45"
     gem "yard-doctest", "~> 0.1", ">= 0.1.17"
-    gem "yard-markdown", "~> 0.9", ">= 0.9.1"
+    gem "yard-markdown", "~> 0.10"
     gem "irb", "~> 1.18" # Needed for yard on Ruby 4.0
   end
 

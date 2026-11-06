@@ -111,6 +111,145 @@ module ElasticGraph
             expect(response.dig(0, "sub_aggregations", "seasons_nested", "nodes", 2, "count_detail")).to be_exactly_equal_to(5)
           end
 
+          context "with geo tile grouping" do
+            let(:graphql) do
+              build_graphql(schema_definition: lambda do |schema|
+                schema.object_type "Venue" do |t|
+                  t.field "id", "ID"
+                  t.field "visits", "[Visit!]!" do |f|
+                    f.mapping type: "nested"
+                  end
+                  t.index "venues"
+                end
+
+                schema.object_type "Visit" do |t|
+                  t.field "location", "GeoLocation"
+                  t.field "tag", "String"
+                end
+              end)
+            end
+
+            let(:tile_key) { "visits.location.as_geo_tile" }
+            let(:tag_key) { "visits.tag" }
+
+            it "reports tile counts as exact when the returned tiles account for every location value" do
+              aggs = {
+                "target:visits" => {
+                  "meta" => outer_meta({"buckets_path" => [tile_key]}),
+                  "doc_count" => 6,
+                  tile_key => {
+                    "meta" => inner_terms_meta(tile_key),
+                    "buckets" => [{"key" => "8/40/99", "doc_count" => 3}, {"key" => "8/41/99", "doc_count" => 2}]
+                  }
+                }.with_missing_value_bucket(1).merge(Key.value_count_key(tile_key) => {"value" => 5})
+              }
+
+              expect(resolve_count_details_by_grouping(aggs, "location { as_geo_tile(zoom_level: 8) { x y } }")).to match({
+                {"location" => {"as_geo_tile" => {"x" => 40, "y" => 99}}} => be_exactly_equal_to(3),
+                {"location" => {"as_geo_tile" => {"x" => 41, "y" => 99}}} => be_exactly_equal_to(2),
+                {"location" => {"as_geo_tile" => nil}} => be_exactly_equal_to(1)
+              })
+            end
+
+            it "bounds each tile count by the location values that the returned tiles do not account for, since those values could be in any tile" do
+              aggs = {
+                "target:visits" => {
+                  "meta" => outer_meta({"buckets_path" => [tile_key]}),
+                  "doc_count" => 10,
+                  tile_key => {
+                    "meta" => inner_terms_meta(tile_key),
+                    "buckets" => [{"key" => "8/40/99", "doc_count" => 3}, {"key" => "8/41/99", "doc_count" => 2}]
+                  }
+                }.with_missing_value_bucket(1).merge(Key.value_count_key(tile_key) => {"value" => 9})
+              }
+
+              expect(resolve_count_details_by_grouping(aggs, "location { as_geo_tile(zoom_level: 8) { x y } }")).to match({
+                {"location" => {"as_geo_tile" => {"x" => 40, "y" => 99}}} => be_approximately_equal_to(3, with_upper_bound: 7),
+                {"location" => {"as_geo_tile" => {"x" => 41, "y" => 99}}} => be_approximately_equal_to(2, with_upper_bound: 6),
+                {"location" => {"as_geo_tile" => nil}} => be_exactly_equal_to(1)
+              })
+            end
+
+            it "adds the count error of a parent `terms` bucket to the count errors of the tiles under it" do
+              aggs = {
+                "target:visits" => {
+                  "meta" => outer_meta({"buckets_path" => [tag_key]}),
+                  "doc_count" => 10,
+                  tag_key => {
+                    "meta" => inner_terms_meta(tag_key, {"buckets_path" => [tile_key]}),
+                    "buckets" => [
+                      {
+                        "key" => "a",
+                        "doc_count" => 5,
+                        "doc_count_error_upper_bound" => 2,
+                        tile_key => {
+                          "meta" => inner_terms_meta(tile_key),
+                          "buckets" => [{"key" => "8/40/99", "doc_count" => 4}]
+                        }
+                      }.with_missing_value_bucket(1).merge(Key.value_count_key(tile_key) => {"value" => 4})
+                    ]
+                  }
+                }
+              }
+
+              expect(resolve_count_details_by_grouping(aggs, "tag, location { as_geo_tile(zoom_level: 8) { x y } }")).to match({
+                {"tag" => "a", "location" => {"as_geo_tile" => {"x" => 40, "y" => 99}}} => be_approximately_equal_to(4, with_upper_bound: 6),
+                {"tag" => "a", "location" => {"as_geo_tile" => nil}} => be_approximately_equal_to(1, with_upper_bound: 3)
+              })
+            end
+
+            it "adds the count error of a parent tile bucket to the count errors of the `terms` buckets under it, but not to those under the missing location bucket" do
+              aggs = {
+                "target:visits" => {
+                  "meta" => outer_meta({"buckets_path" => [tile_key]}),
+                  "doc_count" => 10,
+                  tile_key => {
+                    "meta" => inner_terms_meta(tile_key, {"buckets_path" => [tag_key]}),
+                    "buckets" => [
+                      {
+                        "key" => "8/40/99",
+                        "doc_count" => 5,
+                        tag_key => {
+                          "meta" => inner_terms_meta(tag_key),
+                          "buckets" => [{"key" => "a", "doc_count" => 5, "doc_count_error_upper_bound" => 1}]
+                        }
+                      }
+                    ]
+                  }
+                }.with_missing_value_bucket(1, {
+                  tag_key => {
+                    "meta" => inner_terms_meta(tag_key),
+                    "buckets" => [{"key" => "b", "doc_count" => 1, "doc_count_error_upper_bound" => 0}]
+                  }
+                }).merge(Key.value_count_key(tile_key) => {"value" => 7})
+              }
+
+              expect(resolve_count_details_by_grouping(aggs, "location { as_geo_tile(zoom_level: 8) { x y } }, tag")).to match({
+                {"location" => {"as_geo_tile" => {"x" => 40, "y" => 99}}, "tag" => "a"} => be_approximately_equal_to(5, with_upper_bound: 8),
+                {"location" => {"as_geo_tile" => nil}, "tag" => "b"} => be_exactly_equal_to(1)
+              })
+            end
+
+            def resolve_count_details_by_grouping(aggs, grouped_by_selection)
+              nodes = resolve_target_nodes(<<~QUERY, aggs: aggs, path: ["data", "target", "nodes", 0, "sub_aggregations", "visits", "nodes"])
+                target: venue_aggregations {
+                  nodes {
+                    sub_aggregations {
+                      visits {
+                        nodes {
+                          grouped_by { #{grouped_by_selection} }
+                          count_detail { approximate_value exact_value upper_bound }
+                        }
+                      }
+                    }
+                  }
+                }
+              QUERY
+
+              nodes.to_h { |node| [node.fetch("grouped_by"), node.fetch("count_detail")] }
+            end
+          end
+
           def be_exactly_equal_to(count)
             eq({"approximate_value" => count, "exact_value" => count, "upper_bound" => count})
           end

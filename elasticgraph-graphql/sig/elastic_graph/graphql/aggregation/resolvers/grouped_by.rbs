@@ -32,6 +32,8 @@ module ElasticGraph
 
           private
 
+          def field_path_for: (Schema::Field, ::GraphQL::Execution::Lookahead) -> ::Array[PathSegment]
+
           def work_around_terms_aggregation_boolean_value: (untyped) -> untyped
         end
       end

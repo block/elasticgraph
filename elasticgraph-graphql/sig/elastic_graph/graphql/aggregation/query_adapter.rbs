@@ -114,6 +114,11 @@ module ElasticGraph
           node: ::GraphQL::Execution::Lookahead,
         ) -> ::Array[DateHistogramGrouping | ScriptTermGrouping]
 
+        def geo_tile_groupings_from: (
+          field_path: ::Array[PathSegment],
+          node: ::GraphQL::Execution::Lookahead,
+        ) -> ::Array[GeoTileGrouping]
+
         def interval_from: (
           ::GraphQL::Execution::Lookahead,
           ::Hash[::String, untyped]

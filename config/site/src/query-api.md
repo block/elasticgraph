@@ -27,9 +27,27 @@ Learn how to effectively use ElasticGraph's powerful Query API to filter, aggreg
 
 {% assign subpages = site.pages | where_exp: "page", "page.url contains section.url" | where_exp: "page", "page.url != section.url" | sort: "menu_order" %}
 {% if subpages.size > 0 %}
-{% for subpage in subpages %}
-- [{{ subpage.nav_title | default: subpage.title }}]({{ subpage.url | relative_url }})
-{% endfor %}
+<ul>
+  {% for subpage in subpages %}
+    {% assign subpage_parts = subpage.url | split: '/' %}
+    {% if subpage_parts.size == 4 %}
+      <li>
+        <a href="{{ subpage.url | relative_url }}">{{ subpage.nav_title | default: subpage.title }}</a>
+        {% assign children = subpages | where_exp: "child", "child.url contains subpage.url" | where_exp: "child", "child.url != subpage.url" %}
+        {% if children.size > 0 %}
+          <ul>
+            {% for child in children %}
+              {% assign child_parts = child.url | split: '/' %}
+              {% if child_parts.size == 5 %}
+                <li><a href="{{ child.url | relative_url }}">{{ child.nav_title | default: child.title }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
 {% endif %}
 
 {% endfor %}

@@ -1,0 +1,15 @@
+module ElasticGraph
+  module ProtoIngestion
+    module RuntimeMetadata
+      class Schema < ::Data
+        attr_reader package_name: ::String
+        attr_reader types_by_name: ::Hash[::String, Type]
+
+        def initialize: (package_name: ::String, types_by_name: ::Hash[::String, Type]) -> void
+        def self.new: (package_name: ::String, types_by_name: ::Hash[::String, Type]) -> Schema
+        def self.from_hash: (::Hash[::String, untyped]) -> Schema
+        def to_dumpable_hash: () -> ::Hash[::String, untyped]
+      end
+    end
+  end
+end

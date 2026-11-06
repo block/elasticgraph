@@ -144,6 +144,7 @@ ElasticGraph.define_schema do |schema|
     t.field "started_at", "DateTime"
     t.field "won_games_at", "[DateTime!]!", singular: "won_game_at"
     t.field "was_shortened", "Boolean"
+    t.field "stadium_location", "GeoLocation"
 
     t.field "players_nested", "[Player!]!" do |f|
       f.mapping type: "nested"

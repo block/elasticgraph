@@ -55,7 +55,11 @@ module ElasticGraph
           FloatAggregatedValues
           FloatListFilterInput
           GeoLocation
+          GeoLocationGroupedBy
           GeoLocationListFilterInput
+          GeoTile
+          GeoTileBounds
+          GeoTileCorners
           IDListFilterInput
           IntAggregatedValues
           IntListFilterInput

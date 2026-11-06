@@ -3,7 +3,6 @@ module ElasticGraph
     module SchemaDefinition
       module SchemaElements
         module ScalarTypeExtension: ::ElasticGraph::SchemaDefinition::SchemaElements::ScalarType
-          BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME: ::Hash[::String, {type: ::String, ?import: ::String, ?field_comment: ::String}]
           VALID_PROTOBUF_IMPORT_PATH: ::Regexp
 
           attr_reader protobuf_type: ::String?
@@ -14,6 +13,7 @@ module ElasticGraph
           def initialize_proto_extension: () { () -> void } -> void
           def proto_name: () -> ::String
           def proto_type_reference: (::String package_name) -> ::String
+          def proto_ingestion_metadata: () -> RuntimeMetadata::Type
           def to_proto: (Schema schema, ::String package_name) -> nil
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]
         end

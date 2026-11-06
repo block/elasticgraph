@@ -283,7 +283,8 @@ messages:
       was_shortened: 7
       players_nested: 8
       players_object: 9
-    next_number: 10
+      stadium_location: 10
+    next_number: 11
   Widget:
     fields:
       id: 1

@@ -62,7 +62,10 @@ module ElasticGraph
           # - Converts bucket keys into hashes that can be used to resolve `grouped_by` fields.
           # - Recursively flattens multiple levels of aggregations (which happens when we need to mix multiple kinds of
           #   bucket aggregations to group in the way the client requested) into a single flat list.
-          def format_buckets(sub_agg, buckets_path, parent_key_fields: {}, parent_key_values: [])
+          #
+          # A bucket's count can be too low by its own count error plus the count errors of its parent buckets, so we add them up.
+          # The count error is `nil` when the query did not request it.
+          def format_buckets(sub_agg, buckets_path, parent_key_fields: {}, parent_key_values: [], parent_count_error: 0)
             agg_with_buckets = sub_agg.dig(*buckets_path)
 
             meta = agg_with_buckets.fetch("meta")
@@ -74,6 +77,12 @@ module ElasticGraph
             merge_into_bucket = meta.fetch("merge_into_bucket")
 
             raw_buckets = agg_with_buckets.fetch("buckets") # : ::Array[::Hash[::String, untyped]]
+
+            # Each value is in exactly one bucket, so any value that the returned buckets don't account for could be in any bucket.
+            if (value_count = sub_agg.dig(*value_count_path_from(buckets_path), "value"))
+              unaccounted_value_count = value_count - raw_buckets.sum { |raw_bucket| raw_bucket.fetch("doc_count") }
+              raw_buckets = raw_buckets.map { |raw_bucket| raw_bucket.merge({"doc_count_error_upper_bound" => unaccounted_value_count}) }
+            end
 
             # If the missing bucket is non-empty, include it. This matches the behavior of composite aggregations
             # when the `missing_bucket` option is used.
@@ -103,12 +112,15 @@ module ElasticGraph
               key_fields = parent_key_fields.merge(key_fields_hash)
               key_values = parent_key_values + key_values
 
+              bucket_count_error = merge_into_bucket.merge(raw_bucket)["doc_count_error_upper_bound"] # : ::Integer?
+              count_error = parent_count_error + bucket_count_error if parent_count_error && bucket_count_error
+
               # If there's another level of aggregations, `buckets_path` will provide us with the path to that next level.
               # We can use it to recurse as we build a flat list of buckets.
               if sub_buckets_path
-                format_buckets(raw_bucket, sub_buckets_path, parent_key_fields: key_fields, parent_key_values: key_values)
+                format_buckets(raw_bucket, sub_buckets_path, parent_key_fields: key_fields, parent_key_values: key_values, parent_count_error: count_error)
               else
-                [raw_bucket.merge(merge_into_bucket).merge({"key" => key_fields, "key_values" => key_values})]
+                [raw_bucket.merge(merge_into_bucket).merge({"key" => key_fields, "key_values" => key_values, "doc_count_error_upper_bound" => count_error}.compact)]
               end
             end
           end
@@ -139,6 +151,11 @@ module ElasticGraph
           def missing_bucket_path_from(buckets_path)
             *all_but_last, last = buckets_path
             all_but_last + [Key.missing_value_bucket_key(last.to_s)]
+          end
+
+          def value_count_path_from(buckets_path)
+            *all_but_last, last = buckets_path
+            all_but_last + [Key.value_count_key(last.to_s)]
           end
         end
       end

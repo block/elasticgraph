@@ -881,6 +881,31 @@ module ElasticGraph
           expect(term_options_for_true).to include("show_term_doc_count_error" => true)
           expect(term_options_for_false).to include("show_term_doc_count_error" => false)
         end
+
+        it "adds a `value_count` aggregation next to a geo tile grouping only when the doc count error is needed, so that the error can be bounded" do
+          tile_key = "seasons_nested.location.as_geo_tile"
+          aggs_for_true, aggs_for_false = [true, false].map do |needs_doc_count_error|
+            query = new_query(aggregations: [aggregation_query_of(name: "teams", sub_aggregations: [
+              nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(
+                name: "seasons_nested",
+                needs_doc_count_error: needs_doc_count_error,
+                groupings: [geo_tile_grouping_of("seasons_nested", "location", zoom_level: 8)]
+              ))
+            ])])
+
+            datastore_body_of(query).dig(:aggs, "teams:seasons_nested", "aggs")
+          end
+
+          expect(aggs_for_true).to eq({
+            tile_key => {
+              "meta" => inner_terms_meta(tile_key),
+              "geotile_grid" => {"field" => "seasons_nested.location", "precision" => 8, "size" => 51}
+            },
+            Aggregation::Key.missing_value_bucket_key(tile_key) => {"missing" => {"field" => "seasons_nested.location"}},
+            Aggregation::Key.value_count_key(tile_key) => {"value_count" => {"field" => "seasons_nested.location"}}
+          })
+          expect(aggs_for_false.keys).to contain_exactly(tile_key, Aggregation::Key.missing_value_bucket_key(tile_key))
+        end
       end
 
       context "with groupings (using the `CompositeGroupingAdapter`)" do

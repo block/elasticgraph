@@ -1841,6 +1841,11 @@ graphql_resolvers_by_name:
     resolver_ref:
       name: ElasticGraph::Apollo::GraphQL::ServiceFieldResolver
       require_path: elastic_graph/apollo/graphql/service_field_resolver
+  as_geo_tile:
+    needs_lookahead: true
+    resolver_ref:
+      name: ElasticGraph::GraphQL::Aggregation::Resolvers::AsGeoTile
+      require_path: elastic_graph/graphql/aggregation/resolvers/as_geo_tile
   get_record_field_value:
     needs_lookahead: false
     resolver_ref:
@@ -2151,6 +2156,12 @@ index_definitions_by_name:
       __counts.seasons_object|players_object|seasons_object|games_played:
         source: __self
       __counts.seasons_object|players_object|seasons_object|year:
+        source: __self
+      __counts.seasons_object|stadium_location:
+        source: __self
+      __counts.seasons_object|stadium_location|lat:
+        source: __self
+      __counts.seasons_object|stadium_location|lon:
         source: __self
       __counts.seasons_object|started_at:
         source: __self
@@ -2470,6 +2481,10 @@ index_definitions_by_name:
         source: __self
       nested_fields2.the_seasons.players_object.seasons_object.year:
         source: __self
+      nested_fields2.the_seasons.stadium_location.lat:
+        source: __self
+      nested_fields2.the_seasons.stadium_location.lon:
+        source: __self
       nested_fields2.the_seasons.started_at:
         source: __self
       nested_fields2.the_seasons.the_record.first_win_on:
@@ -2612,6 +2627,10 @@ index_definitions_by_name:
         source: __self
       seasons_nested.players_object.seasons_object.year:
         source: __self
+      seasons_nested.stadium_location.lat:
+        source: __self
+      seasons_nested.stadium_location.lon:
+        source: __self
       seasons_nested.started_at:
         source: __self
       seasons_nested.the_record.first_win_on:
@@ -2715,6 +2734,10 @@ index_definitions_by_name:
       seasons_object.players_object.seasons_object.games_played:
         source: __self
       seasons_object.players_object.seasons_object.year:
+        source: __self
+      seasons_object.stadium_location.lat:
+        source: __self
+      seasons_object.stadium_location.lon:
         source: __self
       seasons_object.started_at:
         source: __self
@@ -2929,6 +2952,10 @@ index_definitions_by_name:
       the_nested_fields.the_seasons.players_object.seasons_object.games_played:
         source: __self
       the_nested_fields.the_seasons.players_object.seasons_object.year:
+        source: __self
+      the_nested_fields.the_seasons.stadium_location.lat:
+        source: __self
+      the_nested_fields.the_seasons.stadium_location.lon:
         source: __self
       the_nested_fields.the_seasons.started_at:
         source: __self
@@ -3147,6 +3174,197 @@ indexer_extension_modules:
 - extension_ref:
     name: ElasticGraph::JSONIngestion::IndexerExtension
     require_path: elastic_graph/json_ingestion/indexer_extension
+- extension_ref:
+    name: ElasticGraph::ProtoIngestion::IndexerExtension
+    require_path: elastic_graph/proto_ingestion/indexer_extension
+    config:
+      package_name: elasticgraph
+      types_by_name:
+        Address:
+          fields_by_name:
+            id:
+              type: ID
+            manufacturer_id:
+              type: ID
+        BrokerWholesaler:
+          fields_by_name:
+            id:
+              type: ID
+        Coach:
+          fields_by_name:
+            id:
+              type: ID
+        CoachProfile:
+          fields_by_name:
+            coach_id:
+              type: ID
+            id:
+              type: ID
+            team_formed_on:
+              type: Date
+            team_id:
+              type: ID
+        Company:
+          fields_by_name:
+            id:
+              type: ID
+        Component:
+          fields_by_name:
+            id:
+              type: ID
+            owner_id:
+              type: ID
+            owner_ids:
+              type: ID
+            part_ids:
+              type: ID
+            widget_workspace_id:
+              name_in_index: widget_workspace_id3
+              type: ID
+        ComponentDesign:
+          fields_by_name:
+            component_id:
+              type: ID
+            id:
+              type: ID
+        Date:
+          scalar: Date
+        DirectWholesaler:
+          fields_by_name:
+            id:
+              type: ID
+        ElectricalPart:
+          fields_by_name:
+            id:
+              type: ID
+            manufacturer_id:
+              type: ID
+        GeneralManager:
+          fields_by_name:
+            id:
+              type: ID
+        GeneralManagerProfile:
+          fields_by_name:
+            id:
+              type: ID
+            team_formed_on:
+              type: Date
+            team_id:
+              type: ID
+        GeoLocation:
+          fields_by_name:
+            latitude:
+              name_in_index: lat
+            longitude:
+              name_in_index: lon
+        ID:
+          scalar: ID
+        JsonSafeLong:
+          scalar: JsonSafeLong
+        LocalTime:
+          scalar: LocalTime
+        Manufacturer:
+          fields_by_name:
+            id:
+              type: ID
+        MechanicalPart:
+          fields_by_name:
+            id:
+              type: ID
+            manufacturer_id:
+              type: ID
+        OnlineStore:
+          fields_by_name:
+            established_on:
+              type: Date
+            id:
+              type: ID
+        Person:
+          fields_by_name:
+            id:
+              type: ID
+        PhysicalStore:
+          fields_by_name:
+            established_on:
+              type: Date
+            id:
+              type: ID
+        Sponsor:
+          fields_by_name:
+            id:
+              type: ID
+        Sponsorship:
+          fields_by_name:
+            sponsor_id:
+              type: ID
+        Team:
+          fields_by_name:
+            country_code:
+              type: ID
+            forbes_valuations:
+              type: JsonSafeLong
+            formed_on:
+              type: Date
+            id:
+              type: ID
+            nested_fields:
+              name_in_index: the_nested_fields
+        TeamNestedFields:
+          fields_by_name:
+            seasons:
+              name_in_index: the_seasons
+        TeamRecord:
+          fields_by_name:
+            first_win_on:
+              type: Date
+            last_win_on:
+              name_in_index: last_win_date
+              type: Date
+            losses:
+              name_in_index: loss_count
+            wins:
+              name_in_index: win_count
+        TeamSeason:
+          fields_by_name:
+            record:
+              name_in_index: the_record
+        Untyped:
+          scalar: Untyped
+        Widget:
+          fields_by_name:
+            component_ids:
+              type: ID
+            cost_currency_introduced_on:
+              type: Date
+            created_at_time_of_day:
+              type: LocalTime
+            created_on:
+              type: Date
+            id:
+              type: ID
+            metadata:
+              type: Untyped
+            release_dates:
+              type: Date
+            the_options:
+              name_in_index: the_opts
+            weight_in_ng:
+              type: JsonSafeLong
+            workspace_id:
+              name_in_index: workspace_id2
+              type: ID
+        WidgetOptions:
+          fields_by_name:
+            the_size:
+              name_in_index: the_sighs
+        WidgetWorkspace:
+          fields_by_name:
+            id:
+              type: ID
+        WorkspaceWidget:
+          fields_by_name:
+            id:
+              type: ID
 object_types_by_name:
   Address:
     graphql_fields_by_name:
@@ -3279,6 +3497,9 @@ object_types_by_name:
   AddressGroupedBy:
     graphql_fields_by_name:
       full_address:
+        resolver:
+          name: object_with_lookahead
+      geo_location:
         resolver:
           name: object_with_lookahead
       timestamps:
@@ -4436,6 +4657,17 @@ object_types_by_name:
         name_in_index: lon
         resolver:
           name: get_record_field_value
+  GeoLocationGroupedBy:
+    elasticgraph_category: geo_location_grouped_by_object
+    graphql_fields_by_name:
+      as_geo_tile:
+        resolver:
+          name: as_geo_tile
+    graphql_only_return_type: true
+  GeoLocationListFilterInput:
+    graphql_fields_by_name:
+      count:
+        name_in_index: __counts
   GeoShape:
     graphql_fields_by_name:
       coordinates:
@@ -4444,6 +4676,57 @@ object_types_by_name:
       type:
         resolver:
           name: get_record_field_value
+  GeoTile:
+    graphql_fields_by_name:
+      bounds:
+        resolver:
+          name: object_without_lookahead
+      corners:
+        resolver:
+          name: object_without_lookahead
+      map_center_point:
+        resolver:
+          name: object_without_lookahead
+      x:
+        resolver:
+          name: object_without_lookahead
+      "y":
+        resolver:
+          name: object_without_lookahead
+      zoom_level:
+        resolver:
+          name: object_without_lookahead
+    graphql_only_return_type: true
+  GeoTileBounds:
+    graphql_fields_by_name:
+      east:
+        resolver:
+          name: object_without_lookahead
+      north:
+        resolver:
+          name: object_without_lookahead
+      south:
+        resolver:
+          name: object_without_lookahead
+      west:
+        resolver:
+          name: object_without_lookahead
+    graphql_only_return_type: true
+  GeoTileCorners:
+    graphql_fields_by_name:
+      northeast:
+        resolver:
+          name: object_without_lookahead
+      northwest:
+        resolver:
+          name: object_without_lookahead
+      southeast:
+        resolver:
+          name: object_without_lookahead
+      southwest:
+        resolver:
+          name: object_without_lookahead
+    graphql_only_return_type: true
   IDListFilterInput:
     graphql_fields_by_name:
       count:
@@ -7416,6 +7699,9 @@ object_types_by_name:
       seasons_object:
         resolver:
           name: object_with_lookahead
+      stadium_location:
+        resolver:
+          name: object_with_lookahead
       staff:
         resolver:
           name: object_with_lookahead
@@ -7698,6 +7984,9 @@ object_types_by_name:
         name_in_index: the_record
         resolver:
           name: get_record_field_value
+      stadium_location:
+        resolver:
+          name: get_record_field_value
       started_at:
         resolver:
           name: get_record_field_value
@@ -7723,6 +8012,9 @@ object_types_by_name:
           name: object_with_lookahead
       record:
         name_in_index: the_record
+        resolver:
+          name: object_with_lookahead
+      stadium_location:
         resolver:
           name: object_with_lookahead
       started_at:
@@ -7759,6 +8051,9 @@ object_types_by_name:
           name: object_with_lookahead
       record:
         name_in_index: the_record
+        resolver:
+          name: object_with_lookahead
+      stadium_location:
         resolver:
           name: object_with_lookahead
       started_at:
@@ -9428,6 +9723,9 @@ object_types_by_name:
         resolver:
           name: object_with_lookahead
       full_address:
+        resolver:
+          name: object_with_lookahead
+      geo_location:
         resolver:
           name: object_with_lookahead
       internal_details:

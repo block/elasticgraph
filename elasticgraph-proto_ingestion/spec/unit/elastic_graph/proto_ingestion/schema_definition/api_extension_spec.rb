@@ -43,7 +43,7 @@ module ElasticGraph
         end
 
         it "maps every built-in scalar to a proto field type, documenting the format of those that need it" do
-          built_in_scalar_options = SchemaElements::ScalarTypeExtension::BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME
+          built_in_scalar_options = BUILT_IN_SCALAR_PROTO_OPTIONS_BY_NAME
           field_types = []
           proto = define_proto_schema do |s|
             s.object_type "Widget" do |t|

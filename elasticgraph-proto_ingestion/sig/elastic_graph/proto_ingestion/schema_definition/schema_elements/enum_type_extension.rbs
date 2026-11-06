@@ -13,6 +13,7 @@ module ElasticGraph
           def proto_type_reference: (::String package_name) -> ::String
           def protobuf_import: () -> nil
           def protobuf_field_comment: () -> nil
+          def proto_ingestion_metadata: () -> RuntimeMetadata::Type
           def proto_enum_value_prefix: () -> ::String
           def to_proto: (Schema schema, ::String package_name) -> ::String
           def referenced_proto_types: () -> ::Array[::ElasticGraph::SchemaDefinition::SchemaElements::graphQLType]

@@ -100,6 +100,7 @@ module ElasticGraph
 
         private
 
+        def type_disallows_grouping?: () -> bool
         def text?: () -> bool
         def args_sdl: (joiner: ::String, ?after_opening_paren: ::String) ?{ (argument) -> boolish } -> ::String
         def list_field_grouped_by_doc_note: (::String) -> ::String

@@ -175,6 +175,7 @@ FactoryBot.define do
     year { Faker::Number.between(from: 1950, to: 2023) }
     record { build :team_record }
     was_shortened { false }
+    stadium_location { build :geo_location }
 
     notes do
       Array.new(Faker::Number.between(from: 1, to: 3)) { Faker::TvShows::MichaelScott.quote }

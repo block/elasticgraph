@@ -27,7 +27,7 @@ module ElasticGraph
         def boolean?: () -> bool
         def resolved: () -> graphQLType?
         def unwrapped_name: () -> ::String
-        def scalar_type_needing_grouped_by_object?: () -> bool
+        def grouped_by_type_defined?: () -> bool
         def with_reverted_override: () -> TypeReference
 
         def to_final_form: (?as_input: bool) -> TypeReference

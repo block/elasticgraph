@@ -2,6 +2,7 @@ module ElasticGraph
   DATASTORE_DATE_FORMAT: ::String
   DATASTORE_DATE_TIME_FORMAT: ::String
   DATE_TIME_PRECISION: ::Integer
+  GEO_TILE_ZOOM_LEVELS: ::Range[::Integer]
   TIMEOUT_MS_HEADER: ::String
   OPAQUE_ID_HEADER: ::String
   INT_MIN: ::Integer
