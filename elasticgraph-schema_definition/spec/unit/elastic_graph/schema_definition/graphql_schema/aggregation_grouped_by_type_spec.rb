@@ -394,6 +394,27 @@ module ElasticGraph
           EOS
         end
 
+        {"parent" => [false, true], "leaf" => [true, false]}.each do |disabled_part, (parent_groupable, leaf_groupable)|
+          it "rejects a backing indexing path with a non-groupable #{disabled_part} when grouping is required" do
+            define_schema do |schema|
+              schema.object_type "Options" do |type|
+                type.field "size", "String", name_in_index: "indexed_size", groupable: leaf_groupable
+                type.field "color", "String"
+              end
+
+              schema.object_type "Widget" do |type|
+                type.field "id", "ID!"
+                type.field "options", "Options", name_in_index: "indexed_options", groupable: parent_groupable
+                type.field "size", "String", name_in_index: "indexed_options.indexed_size", graphql_only: true do |field|
+                  expect(field.backing_indexing_field(require_groupable: true)).to be_nil
+                  expect(field.backing_indexing_field.name).to eq("size")
+                end
+                type.index "widgets"
+              end
+            end
+          end
+        end
+
         it "supports geographic grouping without enabling arbitrary custom mappings" do
           results = define_schema do |schema|
             schema.object_type "Widget" do |t|

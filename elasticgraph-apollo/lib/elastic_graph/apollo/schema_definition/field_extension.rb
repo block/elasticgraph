@@ -71,10 +71,12 @@ module ElasticGraph
           return super unless resolver&.name == :apollo_entity_ref
           return unless groupable?
 
+          entity_ref_resolver = resolver # : SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver
+
           parent_type.field name, type.unwrap_non_null.name,
             name_in_index: name_in_index, graphql_only: true,
             groupable: false, filterable: false, sortable: false, aggregatable: false, highlightable: false do |field|
-              field.resolve_with :apollo_entity_ref, **resolver.config, scalar_grouping: true
+              field.resolve_with :apollo_entity_ref, **entity_ref_resolver.config, scalar_grouping: true
               add_grouped_by_field_documentation(field)
               grouped_by_customizations.each { |customize| customize.call(field) }
             end

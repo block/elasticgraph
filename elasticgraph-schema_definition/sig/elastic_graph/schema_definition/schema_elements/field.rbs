@@ -20,6 +20,8 @@ module ElasticGraph
         attr_reader accuracy_confidence: accuracyConfidence
         attr_accessor computation_function: ::Symbol?
         attr_reader filter_customizations: ::Array[^(Field) -> void]
+        attr_reader grouped_by_customizations: ::Array[^(Field) -> void]
+        attr_accessor groupable: bool?
         attr_reader sort_order_enum_value_customizations: ::Array[^(SortOrderEnumValue) -> void]
         attr_reader source: FieldSource?
         attr_accessor relationship: Relationship?
@@ -67,6 +69,7 @@ module ElasticGraph
         def sub_aggregatable?: () -> bool
         def define_aggregated_values_field: (ObjectType) -> void
         def define_grouped_by_field: (ObjectType) -> void
+        def add_grouped_by_field_documentation: (Field) -> void
         def define_highlights_field: (ObjectType) -> void
         def define_sub_aggregations_field: (parent_type: ObjectType, type: ::String) ?{ (Field) -> void } -> void
         def define_old_aggregation_fields: (ObjectType) -> void
