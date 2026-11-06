@@ -704,6 +704,8 @@ module ElasticGraph
             expect(type_def_from(schema_string, "WidgetGroupedBy")).to eq(<<~EOS.strip)
               type WidgetGroupedBy {
                 component_id: ID
+                component1: Component
+                component2: Component
               }
             EOS
             expect(type_def_from(schema_string, "WidgetAggregatedValues")).to eq(<<~EOS.strip)

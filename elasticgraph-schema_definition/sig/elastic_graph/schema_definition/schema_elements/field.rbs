@@ -96,7 +96,7 @@ module ElasticGraph
         def computes: (::Symbol) -> void
         def runtime_metadata_graphql_field: () -> SchemaArtifacts::RuntimeMetadata::GraphQLField
 
-        def backing_indexing_field: () -> Field?
+        def backing_indexing_field: (?require_groupable: bool) -> Field?
 
         private
 

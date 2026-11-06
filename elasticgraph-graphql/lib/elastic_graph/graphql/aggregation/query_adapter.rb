@@ -220,9 +220,10 @@ module ElasticGraph
             # New date/time grouping API (DateGroupedBy, DateTimeGroupedBy)
             if field.type.elasticgraph_category == :date_grouped_by_object
               date_time_groupings_from(field_path: field_path, node: node)
-            elsif !field.type.object?
-              # Non-date/time grouping
-              missing_value_placeholder = field.type.unwrap_fully.grouping_missing_value_placeholder
+            elsif !field.type.object? || field.resolver&.config&.fetch(:scalar_grouping, false)
+              # A resolver can expose a scalar grouping key as an object (e.g. an Apollo entity
+              # reference). In that case, group by the backing field, not its selected children.
+              missing_value_placeholder = field.type.object? ? nil : field.type.unwrap_fully.grouping_missing_value_placeholder
               [FieldTermGrouping.new(field_path: field_path, missing_value_placeholder: missing_value_placeholder)]
             end
           end

@@ -13,6 +13,7 @@ module ElasticGraph
         include ApolloDirectives::Shareable
         include ApolloDirectives::Tag
         def tag_with: (::String) -> void
+        def define_grouped_by_field: (ElasticGraph::SchemaDefinition::SchemaElements::ObjectType) -> void
         def self.tagged_with?: (ElasticGraph::SchemaDefinition::Mixins::HasDirectives, ::String) -> bool
       end
     end

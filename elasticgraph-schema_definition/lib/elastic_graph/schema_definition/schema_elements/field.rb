@@ -1120,9 +1120,10 @@ module ElasticGraph
 
         # The alternate field that is backing this field in the datastore index. Will only be non-`nil` for `graphql_only` fields.
         # @return [Field, nil] the field backing this field in the index
+        # @param require_groupable [Boolean] only return a field if every part of its path supports grouping
         #
         # @private
-        def backing_indexing_field
+        def backing_indexing_field(require_groupable: false)
           return nil unless graphql_only
 
           type = parent_type
@@ -1130,6 +1131,7 @@ module ElasticGraph
 
           name_in_index.split(".").each do |path_part|
             if (field = type&.indexing_fields_by_name_in_index&.fetch(path_part, nil))
+              return nil if require_groupable && !field.groupable?
               type = field.type.fully_unwrapped.as_object_type
             else
               return nil

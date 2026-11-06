@@ -1822,7 +1822,7 @@ graphql_resolvers_by_name:
       name: ElasticGraph::Apollo::GraphQL::EntitiesFieldResolver
       require_path: elastic_graph/apollo/graphql/entities_field_resolver
   apollo_entity_ref:
-    needs_lookahead: false
+    needs_lookahead: true
     resolver_ref:
       name: ElasticGraph::Apollo::GraphQL::ApolloEntityRefResolver::ForSingleId
       require_path: elastic_graph/apollo/graphql/apollo_entity_ref_resolver
@@ -3791,6 +3791,14 @@ object_types_by_name:
       name:
         resolver:
           name: object_with_lookahead
+      owner:
+        name_in_index: owner_id
+        resolver:
+          config:
+            source_id_field: owner_id
+            exposed_id_field: token
+            scalar_grouping: true
+          name: apollo_entity_ref
       position:
         resolver:
           name: object_with_lookahead
@@ -5589,6 +5597,14 @@ object_types_by_name:
       options:
         resolver:
           name: object_with_lookahead
+      owner:
+        name_in_index: owner_id
+        resolver:
+          config:
+            source_id_field: owner_id
+            exposed_id_field: token
+            scalar_grouping: true
+          name: apollo_entity_ref
       position:
         resolver:
           name: object_with_lookahead
