@@ -761,6 +761,60 @@ module ElasticGraph
               )])
             end
 
+            {"a scalar grouping resolver" => true, "an ordinary object resolver" => false}.each do |description, scalar_grouping|
+              context "with #{description} on an object grouping field" do
+                before(:context) do
+                  self.schema_artifacts = generate_schema_artifacts do |schema|
+                    schema.object_type "Money" do |type|
+                      type.field "currency", "String"
+                      type.field "amount_cents", "Int"
+                    end
+                    schema.object_type "Widget" do |type|
+                      type.field "id", "ID!"
+                      type.field "amount_cents", "Int"
+                      type.field "cost", "Money" do |field|
+                        field.customize_grouped_by_field do |grouped_field|
+                          grouped_field.name_in_index = "amount_cents" if scalar_grouping
+                          grouped_field.resolve_with :object_with_lookahead, scalar_grouping: scalar_grouping
+                        end
+                      end
+                      type.index "widgets"
+                    end
+                  end
+                end
+
+                it "uses the resolver configuration to determine whether to group on the object or its children" do
+                  aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
+                    query {
+                      widget_aggregations {
+                        #{before_nodes}
+                          grouped_by {
+                            price: cost { currency amount_cents }
+                          }
+                        #{after_nodes}
+                      }
+                    }
+                  QUERY
+
+                  expected_groupings =
+                    if scalar_grouping
+                      [field_term_grouping_of("amount_cents", field_names_in_graphql_query: ["price"], missing_value_placeholder: nil)]
+                    else
+                      [
+                        field_term_grouping_of("cost", "currency", field_names_in_graphql_query: ["price", "currency"]),
+                        field_term_grouping_of("cost", "amount_cents", field_names_in_graphql_query: ["price", "amount_cents"], missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER)
+                      ]
+                    end
+
+                  expect(aggregations).to eq([aggregation_query_of(
+                    name: "widget_aggregations",
+                    computations: [],
+                    groupings: expected_groupings
+                  )])
+                end
+              end
+            end
+
             it "groups on geo tiles without treating selected tile properties as grouping dimensions" do
               aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
                 query {
