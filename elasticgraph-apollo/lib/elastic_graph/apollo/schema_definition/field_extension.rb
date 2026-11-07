@@ -11,7 +11,7 @@ require "elastic_graph/apollo/schema_definition/apollo_directives"
 module ElasticGraph
   module Apollo
     module SchemaDefinition
-      # Extends {ElasticGraph::SchemaDefinition::SchemaElements::Field} with Apollo directives.
+      # Extends {ElasticGraph::SchemaDefinition::SchemaElements::Field} to offer Apollo field directives.
       module FieldExtension
         include ApolloDirectives::Authenticated
         include ApolloDirectives::External
