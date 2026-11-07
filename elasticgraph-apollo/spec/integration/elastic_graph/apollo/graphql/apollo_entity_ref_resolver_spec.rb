@@ -39,6 +39,33 @@ module ElasticGraph
           )
         end
 
+        it "groups by an entity ref field backed by a non-list id field, using the backing id as the grouping key" do
+          index_records(
+            build(:component, owner_id: "oid_1"),
+            build(:component, owner_id: "oid_1"),
+            build(:component, owner_id: "oid_2"),
+            build(:component, owner_id: nil)
+          )
+
+          # The alias matters: the datastore returns each bucket keyed by the field's alias.
+          data = execute_expecting_no_errors(<<~QUERY).dig("component_aggregations", "nodes")
+            query {
+              component_aggregations {
+                nodes {
+                  grouped_by { the_owner: owner { token } }
+                  count
+                }
+              }
+            }
+          QUERY
+
+          expect(data).to contain_exactly(
+            {"grouped_by" => {"the_owner" => {"token" => "oid_1"}}, "count" => 2},
+            {"grouped_by" => {"the_owner" => {"token" => "oid_2"}}, "count" => 1},
+            {"grouped_by" => {"the_owner" => nil}, "count" => 1}
+          )
+        end
+
         it "resolves an entity ref field backed by a list of ids field" do
           index_records(
             build(:component, id: "c1", owner_ids: ["oid_1", "oid_2"]),

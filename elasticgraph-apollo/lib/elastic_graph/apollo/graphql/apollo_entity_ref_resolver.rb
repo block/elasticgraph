@@ -33,6 +33,21 @@ module ElasticGraph
           end
         end
 
+        # GraphQL resolver for the `GroupedBy` counterpart of a singleton `apollo_entity_ref_field`. Needs the lookahead
+        # because the grouping key of the bucket includes the client's alias for the field.
+        #
+        # @private
+        class ForGroupedBy
+          def initialize(elasticgraph_graphql:, config:)
+            @exposed_id_field = config.fetch(:exposed_id_field)
+          end
+
+          def resolve(field:, object:, args:, context:, lookahead:)
+            id = object.key_value_for(field: field, lookahead: lookahead)
+            {@exposed_id_field => id} unless id.nil?
+          end
+        end
+
         # GraphQL resolver for fields defined with `apollo_entity_ref_field` that are backed by a list of ids.
         #
         # @private

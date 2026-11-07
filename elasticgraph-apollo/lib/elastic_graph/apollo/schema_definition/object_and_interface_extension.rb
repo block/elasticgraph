@@ -38,8 +38,11 @@ module ElasticGraph
         # @param id_field_name_in_index [String] Name of the backing ID field in the datastore index
         # @return [void]
         # @note This can be used for either a singleton or list reference, based on if `type` is a list.
-        # @note The resulting field will only be available for clients to request as a return field. It will not support filtering,
-        #   sorting, grouping, aggregated values, or highlights.
+        # @note Singleton references are automatically exposed on the generated `GroupedBy` type when their backing scalar ID
+        #   is groupable. The existing scalar grouping remains available, and the grouped reference is always nullable.
+        #   Filtering, sorting, aggregated values, and highlights are not enabled for entity references.
+        # @note To opt out of automatic grouping for an individual reference, set `f.groupable = false` in the customization block.
+        #   List and paginated references are not automatically propagated to `GroupedBy`.
         # @see #apollo_entity_ref_paginated_collection_field
         #
         # @example Expose `Review.product` and `Review.comments` entity reference fields
@@ -64,6 +67,7 @@ module ElasticGraph
         #
         #       # New field we're adding to expose the existing `productId` field as a `Product` entity reference.
         #       t.apollo_entity_ref_field "product", "Product", id_field_name_in_index: "productId"
+        #       # ReviewGroupedBy automatically exposes both productId and product.
         #
         #       # New field we're adding to expose the existing `commentIds` field as a list of `Comment` entity references.
         #       t.apollo_entity_ref_field "comments", "[Comment!]!", id_field_name_in_index: "commentIds"
@@ -76,13 +80,19 @@ module ElasticGraph
             name,
             type,
             name_in_index: id_field_name_in_index,
-            **LIMITED_GRAPHQL_ONLY_FIELD_OPTIONS
+            **LIMITED_GRAPHQL_ONLY_FIELD_OPTIONS.except(:groupable)
           ) do |f|
             validate_entity_ref_options(__method__.to_s, f, id_field_name_in_index, type) do |exposed_id_field|
               if f.type.list?
+                f.groupable = false
                 f.resolve_with :apollo_entity_ref_list, source_ids_field: id_field_name_in_index, exposed_id_field: exposed_id_field
               else
+                f.groupable = f.groupable != false && groupable_by_single_id?(f, id_field_name_in_index)
                 f.resolve_with :apollo_entity_ref, source_id_field: id_field_name_in_index, exposed_id_field: exposed_id_field
+                f.grouped_by_field_type = f.type.fully_unwrapped.name
+                f.customize_grouped_by_field do |grouped_by_field|
+                  grouped_by_field.resolve_with :apollo_entity_group_by_ref, exposed_id_field: exposed_id_field
+                end
               end
             end
 
@@ -178,6 +188,21 @@ module ElasticGraph
         # {ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields#paginated_collection_field}.
         # It does not support the `sortable` option.
         LIMITED_GRAPHQL_ONLY_PAGINATED_FIELD_OPTIONS = LIMITED_GRAPHQL_ONLY_FIELD_OPTIONS.except(:sortable)
+
+        # Indicates if every field on the path to the backing id can be grouped on, and the id is a single value.
+        def groupable_by_single_id?(field, id_field_name_in_index)
+          root_path_part, *nested_path_parts = id_field_name_in_index.split(".")
+          backing_field = field.parent_type.indexing_fields_by_name_in_index.fetch(root_path_part.to_s)
+          return false unless backing_field.groupable?
+
+          nested_path_parts.each do |path_part|
+            parent_type = backing_field.type.fully_unwrapped.as_object_type # : ::ElasticGraph::SchemaDefinition::SchemaElements::anyObjectType
+            backing_field = parent_type.indexing_fields_by_name_in_index.fetch(path_part)
+            return false unless backing_field.groupable?
+          end
+
+          !backing_field.type.list?
+        end
 
         def validate_entity_ref_options(method_name, field, id_field_name_in_index, entity_ref_type_name)
           # Defer validation since it depends on the definition of the entity ref type, which may be as yet undefined.

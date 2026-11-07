@@ -1596,6 +1596,11 @@ type ComponentGroupedBy {
   name: String
 
   """
+  The `owner` field value for this group.
+  """
+  owner: ComponentOwner
+
+  """
   The `position` field value for this group.
   """
   position: PositionGroupedBy
@@ -7677,6 +7682,11 @@ type NamedEntityGroupedBy {
   The `options` field value for this group.
   """
   options: WidgetOptionsGroupedBy
+
+  """
+  The `owner` field value for this group.
+  """
+  owner: ComponentOwner
 
   """
   The `position` field value for this group.

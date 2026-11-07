@@ -19,6 +19,8 @@ module ElasticGraph
         LIMITED_GRAPHQL_ONLY_FIELD_OPTIONS: ::Hash[::Symbol, untyped]
         LIMITED_GRAPHQL_ONLY_PAGINATED_FIELD_OPTIONS: ::Hash[::Symbol, untyped]
 
+        def groupable_by_single_id?: (::ElasticGraph::SchemaDefinition::SchemaElements::Field, ::String) -> bool
+
         def validate_entity_ref_options: (
           ::String,
           ::ElasticGraph::SchemaDefinition::SchemaElements::Field,
