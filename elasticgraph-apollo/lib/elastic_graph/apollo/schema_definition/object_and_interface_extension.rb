@@ -192,14 +192,16 @@ module ElasticGraph
         # Indicates if every field on the path to the backing id can be grouped on, and the id is a single value.
         def groupable_by_single_id?(field, id_field_name_in_index)
           root_path_part, *nested_path_parts = id_field_name_in_index.split(".")
-          root_field = field.parent_type.indexing_fields_by_name_in_index.fetch(root_path_part.to_s)
+          backing_field = field.parent_type.indexing_fields_by_name_in_index.fetch(root_path_part.to_s)
+          return false unless backing_field.groupable?
 
-          path_fields = nested_path_parts.reduce([root_field]) do |fields, path_part|
-            parent_type = fields.last.type.fully_unwrapped.as_object_type # : ::ElasticGraph::SchemaDefinition::SchemaElements::anyObjectType
-            fields + [parent_type.indexing_fields_by_name_in_index.fetch(path_part)]
+          nested_path_parts.each do |path_part|
+            parent_type = backing_field.type.fully_unwrapped.as_object_type # : ::ElasticGraph::SchemaDefinition::SchemaElements::anyObjectType
+            backing_field = parent_type.indexing_fields_by_name_in_index.fetch(path_part)
+            return false unless backing_field.groupable?
           end
 
-          path_fields.all?(&:groupable?) && !path_fields.last.type.list?
+          !backing_field.type.list?
         end
 
         def validate_entity_ref_options(method_name, field, id_field_name_in_index, entity_ref_type_name)

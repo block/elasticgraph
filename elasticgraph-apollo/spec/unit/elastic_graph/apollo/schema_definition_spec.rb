@@ -767,6 +767,7 @@ module ElasticGraph
 
               schema.object_type "Identity" do |t|
                 t.field "component_id", "ID"
+                t.field "ungroupable_component_id", "ID", groupable: false
               end
 
               schema.object_type "Widget" do |t|
@@ -788,6 +789,7 @@ module ElasticGraph
                 t.apollo_entity_ref_field "ungroupable_component", "Component", id_field_name_in_index: "ungroupable_component_id"
                 t.apollo_entity_ref_field "list_backed_component", "Component", id_field_name_in_index: "component_ids"
                 t.apollo_entity_ref_field "identity_component", "Component", id_field_name_in_index: "identity.component_id"
+                t.apollo_entity_ref_field "ungroupable_identity_component", "Component", id_field_name_in_index: "identity.ungroupable_component_id"
                 t.apollo_entity_ref_field "nested_identity_component", "Component", id_field_name_in_index: "nested_identities.component_id"
 
                 t.index "widgets"
