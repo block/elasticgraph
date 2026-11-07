@@ -80,17 +80,19 @@ module ElasticGraph
             name,
             type,
             name_in_index: id_field_name_in_index,
-            **LIMITED_GRAPHQL_ONLY_FIELD_OPTIONS,
-            groupable: nil
+            **LIMITED_GRAPHQL_ONLY_FIELD_OPTIONS.except(:groupable)
           ) do |f|
             validate_entity_ref_options(__method__.to_s, f, id_field_name_in_index, type) do |exposed_id_field|
               if f.type.list?
                 f.groupable = false
                 f.resolve_with :apollo_entity_ref_list, source_ids_field: id_field_name_in_index, exposed_id_field: exposed_id_field
               else
-                backing_field = f.backing_indexing_field(require_groupable: true)
-                f.groupable = f.groupable != false && !backing_field.nil? && !backing_field.type.list?
+                f.groupable = f.groupable != false && groupable_by_single_id?(f, id_field_name_in_index)
                 f.resolve_with :apollo_entity_ref, source_id_field: id_field_name_in_index, exposed_id_field: exposed_id_field
+                f.grouped_by_field_type = f.type.fully_unwrapped.name
+                f.customize_grouped_by_field do |grouped_by_field|
+                  grouped_by_field.resolve_with :apollo_entity_group_by_ref, exposed_id_field: exposed_id_field
+                end
               end
             end
 
@@ -186,6 +188,19 @@ module ElasticGraph
         # {ElasticGraph::SchemaDefinition::SchemaElements::TypeWithSubfields#paginated_collection_field}.
         # It does not support the `sortable` option.
         LIMITED_GRAPHQL_ONLY_PAGINATED_FIELD_OPTIONS = LIMITED_GRAPHQL_ONLY_FIELD_OPTIONS.except(:sortable)
+
+        # Indicates if every field on the path to the backing id can be grouped on, and the id is a single value.
+        def groupable_by_single_id?(field, id_field_name_in_index)
+          root_path_part, *nested_path_parts = id_field_name_in_index.split(".")
+          root_field = field.parent_type.indexing_fields_by_name_in_index.fetch(root_path_part.to_s)
+
+          path_fields = nested_path_parts.reduce([root_field]) do |fields, path_part|
+            parent_type = fields.last.type.fully_unwrapped.as_object_type # : ::ElasticGraph::SchemaDefinition::SchemaElements::anyObjectType
+            fields + [parent_type.indexing_fields_by_name_in_index.fetch(path_part)]
+          end
+
+          path_fields.all?(&:groupable?) && !path_fields.last.type.list?
+        end
 
         def validate_entity_ref_options(method_name, field, id_field_name_in_index, entity_ref_type_name)
           # Defer validation since it depends on the definition of the entity ref type, which may be as yet undefined.

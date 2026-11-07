@@ -761,8 +761,8 @@ module ElasticGraph
               )])
             end
 
-            {"a scalar grouping resolver" => true, "an ordinary object resolver" => false}.each do |description, scalar_grouping|
-              context "with #{description} on an object grouping field" do
+            {"a leaf field" => true, "an object field" => false}.each do |description, backed_by_leaf_field|
+              context "with an object grouping field backed by #{description} in the index" do
                 before(:context) do
                   self.schema_artifacts = generate_schema_artifacts do |schema|
                     schema.object_type "Money" do |type|
@@ -774,8 +774,8 @@ module ElasticGraph
                       type.field "amount_cents", "Int"
                       type.field "cost", "Money" do |field|
                         field.customize_grouped_by_field do |grouped_field|
-                          grouped_field.name_in_index = "amount_cents" if scalar_grouping
-                          grouped_field.resolve_with :object_with_lookahead, scalar_grouping: scalar_grouping
+                          # A custom resolver can expose a single indexed value as an object.
+                          grouped_field.name_in_index = "amount_cents" if backed_by_leaf_field
                         end
                       end
                       type.index "widgets"
@@ -783,7 +783,7 @@ module ElasticGraph
                   end
                 end
 
-                it "uses the resolver configuration to determine whether to group on the object or its children" do
+                it "groups on the field itself when its index path is a leaf field, and on its subfields otherwise" do
                   aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
                     query {
                       widget_aggregations {
@@ -797,7 +797,7 @@ module ElasticGraph
                   QUERY
 
                   expected_groupings =
-                    if scalar_grouping
+                    if backed_by_leaf_field
                       [field_term_grouping_of("amount_cents", field_names_in_graphql_query: ["price"], missing_value_placeholder: nil)]
                     else
                       [

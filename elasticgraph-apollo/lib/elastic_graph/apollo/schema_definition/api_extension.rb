@@ -397,6 +397,7 @@ module ElasticGraph
           register_graphql_resolver :apollo_service, GraphQL::ServiceFieldResolver, defined_at: require_path, built_in: true
 
           require(require_path = "elastic_graph/apollo/graphql/apollo_entity_ref_resolver")
+          register_graphql_resolver :apollo_entity_group_by_ref, GraphQL::ApolloEntityRefResolver::ForGroupedBy, defined_at: require_path, built_in: true
           register_graphql_resolver :apollo_entity_ref, GraphQL::ApolloEntityRefResolver::ForSingleId, defined_at: require_path, built_in: true
           register_graphql_resolver :apollo_entity_ref_list, GraphQL::ApolloEntityRefResolver::ForIdList, defined_at: require_path, built_in: true
           register_graphql_resolver :apollo_entity_ref_paginated, GraphQL::ApolloEntityRefResolver::ForPaginatedList, defined_at: require_path, built_in: true

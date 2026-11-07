@@ -394,27 +394,6 @@ module ElasticGraph
           EOS
         end
 
-        {"parent" => [false, true], "leaf" => [true, false]}.each do |disabled_part, (parent_groupable, leaf_groupable)|
-          it "rejects a backing indexing path with a non-groupable #{disabled_part} when grouping is required" do
-            define_schema do |schema|
-              schema.object_type "Options" do |type|
-                type.field "size", "String", name_in_index: "indexed_size", groupable: leaf_groupable
-                type.field "color", "String"
-              end
-
-              schema.object_type "Widget" do |type|
-                type.field "id", "ID!"
-                type.field "options", "Options", name_in_index: "indexed_options", groupable: parent_groupable
-                type.field "size", "String", name_in_index: "indexed_options.indexed_size", graphql_only: true do |field|
-                  expect(field.backing_indexing_field(require_groupable: true)).to be_nil
-                  expect(field.backing_indexing_field.name).to eq("size")
-                end
-                type.index "widgets"
-              end
-            end
-          end
-        end
-
         it "supports geographic grouping without enabling arbitrary custom mappings" do
           results = define_schema do |schema|
             schema.object_type "Widget" do |t|
@@ -661,6 +640,30 @@ module ElasticGraph
               name: String @deprecated @external
               options: WidgetOptionsGroupedBy @deprecated
               size: Int @external
+            }
+          EOS
+        end
+
+        it "uses `grouped_by_field_type` as the type of the derived field when set" do
+          result = define_schema do |api|
+            api.object_type "Owner" do |t|
+              t.field "id", "ID!"
+              t.graphql_only true
+            end
+
+            api.object_type "Widget" do |t|
+              t.field "owner_id", "ID"
+              t.field "owner", "Owner!", name_in_index: "owner_id", graphql_only: true, groupable: true,
+                filterable: false, aggregatable: false, sortable: false, highlightable: false do |f|
+                f.grouped_by_field_type = "Owner"
+              end
+            end
+          end
+
+          expect(grouped_by_type_from(result, "Widget")).to eq(<<~EOS.strip)
+            type WidgetGroupedBy {
+              owner_id: ID
+              owner: Owner
             }
           EOS
         end

@@ -7,7 +7,6 @@
 # frozen_string_literal: true
 
 require "elastic_graph/graphql/resolvers/relay_connection/array_adapter"
-require "elastic_graph/graphql/aggregation/resolvers/grouped_by"
 
 module ElasticGraph
   module Apollo
@@ -25,13 +24,26 @@ module ElasticGraph
             @exposed_id_field = config.fetch(:exposed_id_field)
           end
 
-          def resolve(field:, object:, args:, context:, lookahead:)
-            id = if object.is_a?(ElasticGraph::GraphQL::Aggregation::Resolvers::GroupedBy)
-              object.key_value_for(field: field, lookahead: lookahead)
-            else
-              # Documents indexed before the backing ID was added resolve like an explicit null.
-              object[@source_id_field]
+          def resolve(field:, object:, args:, context:)
+            # `[]` rather than `fetch`, here and in `ForIdList`: a document indexed before the backing id field
+            # was added to the schema has no key for it, and must resolve the same as an explicit `null`.
+            if (id = object[@source_id_field])
+              {@exposed_id_field => id}
             end
+          end
+        end
+
+        # GraphQL resolver for the `GroupedBy` counterpart of a singleton `apollo_entity_ref_field`. Needs the lookahead
+        # because the grouping key of the bucket includes the client's alias for the field.
+        #
+        # @private
+        class ForGroupedBy
+          def initialize(elasticgraph_graphql:, config:)
+            @exposed_id_field = config.fetch(:exposed_id_field)
+          end
+
+          def resolve(field:, object:, args:, context:, lookahead:)
+            id = object.key_value_for(field: field, lookahead: lookahead)
             {@exposed_id_field => id} unless id.nil?
           end
         end

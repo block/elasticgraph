@@ -10,6 +10,7 @@ require "elastic_graph/constants"
 require "elastic_graph/graphql/aggregation/composite_grouping_adapter"
 require "elastic_graph/graphql/aggregation/computation"
 require "elastic_graph/graphql/aggregation/date_histogram_grouping"
+require "elastic_graph/graphql/aggregation/field_path_encoder"
 require "elastic_graph/graphql/aggregation/field_term_grouping"
 require "elastic_graph/graphql/aggregation/geo_tile_grouping"
 require "elastic_graph/graphql/aggregation/nested_sub_aggregation"
@@ -66,6 +67,7 @@ module ElasticGraph
             aggregations_node,
             field: field,
             context: context,
+            index_definitions: query.initial_search_index_definitions,
             grouping_adapter: CompositeGroupingAdapter,
             # Filters on root aggregations applied to the search query body itself instead of
             # using a filter aggregation, like sub-aggregations do, so we don't want a filter
@@ -98,7 +100,7 @@ module ElasticGraph
           )
         end
 
-        def build_aggregation_query_for(aggregations_node, field:, context:, grouping_adapter:, nested_path: [], unfiltered: false)
+        def build_aggregation_query_for(aggregations_node, field:, context:, index_definitions:, grouping_adapter:, nested_path: [], unfiltered: false)
           aggregation_name = name_of(_ = aggregations_node.ast_nodes.first)
 
           # Get the AST node for the `nodes` subfield (e.g. from `fooAggregations { nodes { ... } }`)
@@ -132,9 +134,9 @@ module ElasticGraph
 
           Query.new(
             name: aggregation_name,
-            groupings: build_groupings_from(node_node, aggregation_name, from_field_path: nested_path),
+            groupings: build_groupings_from(node_node, aggregation_name, index_definitions: index_definitions, from_field_path: nested_path),
             computations: build_computations_from(node_node, context: context, from_field_path: nested_path),
-            sub_aggregations: build_sub_aggregations_from(node_node, context: context, parent_nested_path: nested_path),
+            sub_aggregations: build_sub_aggregations_from(node_node, context: context, index_definitions: index_definitions, parent_nested_path: nested_path),
             needs_doc_count: count_detail_node.selected? || node_node.selects?(element_names.count),
             needs_doc_count_error: needs_doc_count_error,
             paginator: build_paginator_for(aggregations_node),
@@ -213,27 +215,32 @@ module ElasticGraph
           )
         end
 
-        def build_groupings_from(node_node, aggregation_name, from_field_path: [])
+        def build_groupings_from(node_node, aggregation_name, index_definitions:, from_field_path: [])
           grouped_by_node = selection_above_grouping_fields(node_node, element_names.grouped_by, aggregation_name)
 
           build_clauses_from(grouped_by_node) do |node, field, field_path|
             field_path = from_field_path + field_path
-
-            # Grouping fields always have a resolver, including the default object resolver.
-            resolver = field.resolver # : SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver
 
             # New date/time grouping API (DateGroupedBy, DateTimeGroupedBy)
             if field.type.elasticgraph_category == :date_grouped_by_object
               date_time_groupings_from(field_path: field_path, node: node)
             elsif field.type.elasticgraph_category == :geo_location_grouped_by_object
               geo_tile_groupings_from(field_path: field_path, node: node)
-            elsif !field.type.object? || resolver.config.fetch(:scalar_grouping, false)
-              # A resolver can expose a scalar grouping key as an object (e.g. an Apollo entity
-              # reference). In that case, group by the backing field, not its selected children.
-              missing_value_placeholder = field.type.object? ? nil : field.type.unwrap_fully.grouping_missing_value_placeholder
+            elsif !field.type.object?
+              # Non-date/time grouping
+              missing_value_placeholder = field.type.unwrap_fully.grouping_missing_value_placeholder
               [FieldTermGrouping.new(field_path: field_path, missing_value_placeholder: missing_value_placeholder)]
+            elsif indexed_as_leaf_field?(field_path, index_definitions)
+              # A custom resolver can expose a single indexed value as an object. We group on that value
+              # rather than on the selected subfields, which have no values of their own in the index.
+              [FieldTermGrouping.new(field_path: field_path, missing_value_placeholder: nil)]
             end
           end
+        end
+
+        def indexed_as_leaf_field?(field_path, index_definitions)
+          path = FieldPathEncoder.join(field_path.filter_map(&:name_in_index))
+          index_definitions.any? { |index_def| index_def.fields_by_path.key?(path) }
         end
 
         # Builds a grouping for each selected `as_geo_tile` operation, validating its zoom level
@@ -335,7 +342,7 @@ module ElasticGraph
           ast_node.alias || ast_node.name
         end
 
-        def build_sub_aggregations_from(node_node, context:, parent_nested_path: [])
+        def build_sub_aggregations_from(node_node, context:, index_definitions:, parent_nested_path: [])
           key_sub_agg_pairs =
             build_clauses_from(node_node.selection(element_names.sub_aggregations)) do |node, field, field_path|
               if field.type.elasticgraph_category == :nested_sub_aggregation_connection
@@ -346,6 +353,7 @@ module ElasticGraph
                     node,
                     field: field,
                     context: context,
+                    index_definitions: index_definitions,
                     grouping_adapter: sub_aggregation_grouping_adapter,
                     nested_path: nested_path
                   )

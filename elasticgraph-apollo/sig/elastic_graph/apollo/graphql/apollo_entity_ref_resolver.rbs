@@ -3,8 +3,13 @@ module ElasticGraph
     module GraphQL
       module ApolloEntityRefResolver
         class ForSingleId
-          include ::ElasticGraph::_GraphQLResolverWithLookahead
+          include ::ElasticGraph::_GraphQLResolverWithoutLookahead
           @source_id_field: ::String
+          @exposed_id_field: ::String
+        end
+
+        class ForGroupedBy
+          include ::ElasticGraph::_GraphQLResolverWithLookahead
           @exposed_id_field: ::String
         end
 
