@@ -24,8 +24,9 @@ module ElasticGraph
               "name" => "", "active" => false, "quantity" => 0,
               "large" => 2**63 - 1, "visits" => 2**53 - 1
             })
-            expect(native).not_to receive(:to_h)
-            expect(Google::Protobuf).not_to receive(:encode_json)
+            forbid_hash_conversion(native)
+            native.freeze
+            expect(::Google::Protobuf).not_to receive(:encode_json)
 
             expect(preparer.prepare_for_index("Product", native, nil)).to include(
               "private_name" => "", "active" => false, "quantity" => 0,
@@ -42,7 +43,9 @@ module ElasticGraph
               "shape" => {"__typename" => "Box", "width" => 0},
               "attachments" => [{"label" => "sample"}], "grid" => [[[0, 2], []], []]
             })
-            expect(native.shape.box).not_to receive(:to_h)
+            forbid_hash_conversion(native.shape.box)
+            native.freeze
+
             expect(preparer.prepare_for_index("Product", native, nil)).to include(
               "shape" => {"private_width" => 0},
               "attachments" => [{"label" => "sample"}], "grid" => [[[0, 2], []], []]
@@ -75,8 +78,8 @@ module ElasticGraph
             )
             native = native_record({})
             native.state = 0
-            native.states.push(0, 1729)
-            expect(preparer.prepare_for_index("Product", native, nil)).to include("state" => nil, "states" => [nil, 1729])
+            native.states.push(0, 1, 1729)
+            expect(preparer.prepare_for_index("Product", native, nil)).to include("state" => nil, "states" => [nil, "ACTIVE", 1729])
             native.state = 1729
             expect(preparer.prepare_for_index("Product", native, nil)).to include("state" => 1729)
           end
@@ -97,7 +100,7 @@ module ElasticGraph
             )
             native = native_record({})
             native.payload = "invalid json"
-            expect { preparer.prepare_for_index("Product", native, nil) }.to raise_error(JSON::ParserError)
+            expect { preparer.prepare_for_index("Product", native, nil) }.to raise_error(::JSON::ParserError)
           end
 
           it "prepares every root type and caches compiled message plans across records" do
@@ -109,12 +112,13 @@ module ElasticGraph
             expect(preparer.prepare_for_index("Product", again, nil)).to include("private_name" => "again")
           end
 
-          it "uses canonical scalar metadata after a built-in type is renamed" do
-            artifacts = define_preparation_schema(type_name_overrides: {"Untyped" => "Payload"})
+          it "uses canonical scalar metadata after built-in types are renamed" do
+            artifacts = define_preparation_schema(type_name_overrides: {"Untyped" => "Payload", "DateTime" => "Moment"})
             renamed_publisher = SpecSupport::ProtoPublisher.new(artifacts)
-            native = native_record({"payload" => {"answer" => 42}}, via: renamed_publisher)
+            native = native_record({"payload" => {"answer" => 42}, "at" => "2024-02-29T12:34:56.123456789Z"}, via: renamed_publisher)
+
             expect(described_class.new(artifacts).prepare_for_index("Product", native, nil)).to include(
-              "payload" => '{"answer":42}'
+              "payload" => '{"answer":42}', "at" => "2024-02-29T12:34:56.123Z"
             )
           end
 
@@ -138,29 +142,46 @@ module ElasticGraph
             preparer.prepare_for_index(type, native_record(record, type: type), mapping)
           end
 
+          def forbid_hash_conversion(message)
+            # Mocking a native message gives it a singleton class, which breaks descriptor lookup on JRuby.
+            message.class.prepend(::Module.new do
+              def to_h
+                # simplecov:disable -- only fails when preparation expands a native record into a public hash.
+                raise "Native records must not be expanded into public hashes."
+                # simplecov:enable
+              end
+            end)
+          end
+
           define_method :define_preparation_schema do |**options|
             define_proto_schema_results(**options) do |schema|
               schema.proto_schema_artifacts package_name: "preparation", syntax: syntax
               schema.enum_type("State") { |type| type.values "ACTIVE", "onHold" }
               schema.enum_type("Kind") { |type| type.values "STANDARD", "SPECIAL" }
+
               schema.object_type("Box") do |type|
                 type.field "id", "ID!"
                 type.field "width", "Int", name_in_index: "private_width"
               end
+
               schema.object_type("RoundSphere") do |type|
                 type.field "id", "ID!"
                 type.field "radius", "Float"
               end
+
               schema.union_type("Shape") do |type|
                 type.subtypes "Box", "RoundSphere"
                 type.index "shapes"
               end
+
               schema.object_type("Attachment") { |type| type.field "label", "String" }
+
               schema.object_type("Other") do |type|
                 type.field "id", "ID!"
                 type.field "label", "String", name_in_index: "private_label"
                 type.index "others"
               end
+
               schema.object_type "Product" do |type|
                 type.field "id", "ID!"
                 type.field "name", "String", name_in_index: "private_name"
