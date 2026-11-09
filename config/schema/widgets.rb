@@ -303,7 +303,7 @@ ElasticGraph.define_schema do |schema|
     if schema.respond_to?(:target_apollo_federation_version)
       # simplecov:disable -- this file is only exercised in a test running without `elasticgraph-apollo`.
       t.apollo_entity_ref_field "owner", "ComponentOwner", id_field_name_in_index: "owner_id"
-      t.apollo_entity_ref_field "owners", "[ComponentOwner!]!", id_field_name_in_index: "owner_ids"
+      t.apollo_entity_ref_field "owners", "[ComponentOwner!]!", id_field_name_in_index: "owner_ids", singular: "listed_owner"
       t.apollo_entity_ref_paginated_collection_field "owners_paginated", "ComponentOwner", id_field_name_in_index: "owner_ids"
 
       schema.object_type "ComponentOwner" do |t|

@@ -644,6 +644,28 @@ module ElasticGraph
           EOS
         end
 
+        it "makes a field groupable with the specified `grouped_by_field_type` when set" do
+          result = define_schema do |api|
+            api.object_type "Owner" do |t|
+              t.field "id", "ID!", groupable: false
+            end
+
+            api.object_type "Widget" do |t|
+              t.field "owner_id", "ID"
+              t.field "owner", "Owner!", name_in_index: "owner_id", graphql_only: true do |f|
+                f.grouped_by_field_type = "Owner"
+              end
+            end
+          end
+
+          expect(grouped_by_type_from(result, "Widget")).to eq(<<~EOS.strip)
+            type WidgetGroupedBy {
+              owner_id: ID
+              owner: Owner
+            }
+          EOS
+        end
+
         it "does not automatically copy directives to the derived field" do
           result = define_schema do |api|
             api.object_type "Widget" do |t|

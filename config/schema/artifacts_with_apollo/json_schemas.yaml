@@ -824,9 +824,11 @@ json_schema_version: 1
     type: object
     properties:
       sponsor_id:
-        allOf:
-        - "$ref": "#/$defs/ID"
-        - maxLength: 8191
+        anyOf:
+        - allOf:
+          - "$ref": "#/$defs/ID"
+          - maxLength: 8191
+        - type: 'null'
       annual_total:
         "$ref": "#/$defs/Money"
       __typename:

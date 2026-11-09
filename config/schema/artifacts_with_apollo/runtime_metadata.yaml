@@ -1821,6 +1821,11 @@ graphql_resolvers_by_name:
     resolver_ref:
       name: ElasticGraph::Apollo::GraphQL::EntitiesFieldResolver
       require_path: elastic_graph/apollo/graphql/entities_field_resolver
+  apollo_entity_grouped_by_ref:
+    needs_lookahead: true
+    resolver_ref:
+      name: ElasticGraph::Apollo::GraphQL::ApolloEntityRefResolver::ForGroupedBy
+      require_path: elastic_graph/apollo/graphql/apollo_entity_ref_resolver
   apollo_entity_ref:
     needs_lookahead: false
     resolver_ref:
@@ -4009,9 +4014,21 @@ object_types_by_name:
       designer_name:
         resolver:
           name: object_with_lookahead
+      listed_owner:
+        name_in_index: owner_ids
+        resolver:
+          config:
+            exposed_id_field: token
+          name: apollo_entity_grouped_by_ref
       name:
         resolver:
           name: object_with_lookahead
+      owner:
+        name_in_index: owner_id
+        resolver:
+          config:
+            exposed_id_field: token
+          name: apollo_entity_grouped_by_ref
       position:
         resolver:
           name: object_with_lookahead
@@ -5857,6 +5874,12 @@ object_types_by_name:
       inventor:
         resolver:
           name: object_with_lookahead
+      listed_owner:
+        name_in_index: owner_ids
+        resolver:
+          config:
+            exposed_id_field: token
+          name: apollo_entity_grouped_by_ref
       material:
         resolver:
           name: object_with_lookahead
@@ -5872,6 +5895,12 @@ object_types_by_name:
       options:
         resolver:
           name: object_with_lookahead
+      owner:
+        name_in_index: owner_id
+        resolver:
+          config:
+            exposed_id_field: token
+          name: apollo_entity_grouped_by_ref
       position:
         resolver:
           name: object_with_lookahead
@@ -7083,6 +7112,13 @@ object_types_by_name:
       annual_total:
         resolver:
           name: get_record_field_value
+      sponsor:
+        name_in_index: sponsor_id
+        resolver:
+          config:
+            source_id_field: sponsor_id
+            exposed_id_field: id
+          name: apollo_entity_ref
       sponsor_id:
         resolver:
           name: get_record_field_value
@@ -7103,6 +7139,12 @@ object_types_by_name:
       annual_total:
         resolver:
           name: object_with_lookahead
+      sponsor:
+        name_in_index: sponsor_id
+        resolver:
+          config:
+            exposed_id_field: id
+          name: apollo_entity_grouped_by_ref
       sponsor_id:
         resolver:
           name: object_with_lookahead
@@ -7118,6 +7160,11 @@ object_types_by_name:
     graphql_fields_by_name:
       count:
         name_in_index: __counts
+  SponsorshipSponsor:
+    graphql_fields_by_name:
+      id:
+        resolver:
+          name: get_record_field_value
   Staff:
     graphql_fields_by_name:
       coaches:

@@ -690,8 +690,8 @@ module ElasticGraph
               }
             EOS
 
-            # The entity ref field should be available as a return field but not available for
-            # filtering, grouping, aggregating, sorting, or highlighting.
+            # The entity ref field should be available as a return field and for grouping (always nullable, like other
+            # grouped values), but not for filtering, aggregating, sorting, or highlighting.
             expect(type_def_from(schema_string, "WidgetFilterInput")).to eq(<<~EOS.strip)
               input WidgetFilterInput {
                 #{schema_elements.any_of}: [WidgetFilterInput!]
@@ -704,6 +704,8 @@ module ElasticGraph
             expect(type_def_from(schema_string, "WidgetGroupedBy")).to eq(<<~EOS.strip)
               type WidgetGroupedBy {
                 component_id: ID
+                component1: Component
+                component2: Component
               }
             EOS
             expect(type_def_from(schema_string, "WidgetAggregatedValues")).to eq(<<~EOS.strip)
@@ -747,6 +749,63 @@ module ElasticGraph
               name_in_index: "component_id",
               resolver: configured_graphql_resolver(:apollo_entity_ref, source_id_field: "component_id", exposed_id_field: "the_id_field")
             ))
+
+            # The `GroupedBy` field reads the id from the aggregation bucket key, which the datastore groups as a single term.
+            expect(
+              results.runtime_metadata.object_types_by_name.fetch("WidgetGroupedBy").graphql_fields_by_name.fetch("component1")
+            ).to eq(graphql_field_with(
+              name_in_index: "component_id",
+              resolver: configured_graphql_resolver(:apollo_entity_grouped_by_ref, exposed_id_field: "the_id_field")
+            ))
+          end
+
+          it "offers a singleton entity reference field for grouping only when its backing id field can be grouped as a single value" do
+            results = define_schema do |schema|
+              schema.object_type "Component" do |t|
+                t.field "the_id_field", "ID"
+              end
+
+              schema.object_type "Identity" do |t|
+                t.field "component_id", "ID"
+                t.field "ungroupable_component_id", "ID", groupable: false
+              end
+
+              schema.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.field "component_id", "ID"
+                t.field "hidden_component_id", "ID", indexing_only: true
+                t.field "ungroupable_component_id", "ID", groupable: false
+                t.field "component_ids", "[ID!]!", singular: "listed_component_id"
+                t.field "identity", "Identity"
+                t.field "nested_identities", "[Identity!]!" do |f|
+                  f.mapping type: "nested"
+                end
+
+                t.apollo_entity_ref_field "component", "Component", id_field_name_in_index: "component_id"
+                t.apollo_entity_ref_field "opted_out_component", "Component", id_field_name_in_index: "component_id" do |f|
+                  f.groupable = false
+                end
+                t.apollo_entity_ref_field "hidden_component", "Component", id_field_name_in_index: "hidden_component_id"
+                t.apollo_entity_ref_field "ungroupable_component", "Component", id_field_name_in_index: "ungroupable_component_id"
+                t.apollo_entity_ref_field "list_backed_component", "Component", id_field_name_in_index: "component_ids"
+                t.apollo_entity_ref_field "identity_component", "Component", id_field_name_in_index: "identity.component_id"
+                t.apollo_entity_ref_field "ungroupable_identity_component", "Component", id_field_name_in_index: "identity.ungroupable_component_id"
+                t.apollo_entity_ref_field "nested_identity_component", "Component", id_field_name_in_index: "nested_identities.component_id"
+
+                t.index "widgets"
+              end
+            end
+
+            expect(type_def_from(results.graphql_schema_string, "WidgetGroupedBy")).to eq(<<~EOS.strip)
+              type WidgetGroupedBy {
+                component_id: ID
+                listed_component_id: ID
+                identity: IdentityGroupedBy
+                component: Component
+                hidden_component: Component
+                identity_component: Component
+              }
+            EOS
           end
 
           it "supports an entity reference field for a list of ids" do
@@ -835,6 +894,43 @@ module ElasticGraph
             expect(runtime_graphql_fields_by_name.fetch("components2")).to eq(graphql_field_with(
               name_in_index: "component_ids",
               resolver: configured_graphql_resolver(:apollo_entity_ref_list, source_ids_field: "component_ids", exposed_id_field: "the_id_field")
+            ))
+          end
+
+          it "groups list entity references by individual ids when a singular name is supplied" do
+            results = define_schema do |schema|
+              schema.object_type "Component" do |t|
+                t.field "the_id_field", "ID"
+              end
+
+              schema.object_type "Widget" do |t|
+                t.field "id", "ID"
+                t.field "component_ids", "[ID!]!"
+                t.field "hidden_component_ids", "[ID!]!", indexing_only: true
+                t.field "disabled_component_ids", "[ID!]!", groupable: false
+                t.apollo_entity_ref_field "components", "[Component!]!", id_field_name_in_index: "component_ids", singular: "component"
+                t.apollo_entity_ref_field "hidden_components", "[Component!]!", id_field_name_in_index: "hidden_component_ids", singular: "hidden_component"
+                t.apollo_entity_ref_field "disabled_components", "[Component!]!", id_field_name_in_index: "disabled_component_ids", singular: "disabled_component"
+                t.apollo_entity_ref_field "opted_out_components", "[Component!]!", id_field_name_in_index: "component_ids", singular: "opted_out_component" do |f|
+                  f.groupable = false
+                end
+                t.apollo_entity_ref_field "ungrouped_components", "[Component!]!", id_field_name_in_index: "component_ids"
+                t.index "widgets"
+              end
+            end
+
+            expect(type_def_from(results.graphql_schema_string, "WidgetGroupedBy")).to eq(<<~EOS.strip)
+              type WidgetGroupedBy {
+                component: Component
+                hidden_component: Component
+              }
+            EOS
+
+            expect(
+              results.runtime_metadata.object_types_by_name.fetch("WidgetGroupedBy").graphql_fields_by_name.fetch("component")
+            ).to eq(graphql_field_with(
+              name_in_index: "component_ids",
+              resolver: configured_graphql_resolver(:apollo_entity_grouped_by_ref, exposed_id_field: "the_id_field")
             ))
           end
 

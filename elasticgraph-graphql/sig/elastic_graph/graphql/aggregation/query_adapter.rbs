@@ -55,6 +55,7 @@ module ElasticGraph
           ::GraphQL::Execution::Lookahead,
           field: Schema::Field,
           context: QueryContext,
+          index_definitions: ::Array[DatastoreCore::_IndexDefinition],
           grouping_adapter: groupingAdapter,
           ?nested_path: ::Array[PathSegment],
           ?unfiltered: bool
@@ -102,8 +103,11 @@ module ElasticGraph
         def build_groupings_from: (
           ::GraphQL::Execution::Lookahead,
           ::String,
+          index_definitions: ::Array[DatastoreCore::_IndexDefinition],
           ?from_field_path: ::Array[PathSegment]
         ) -> ::Set[grouping]
+
+        def indexed_as_leaf_field?: (::Array[PathSegment], ::Array[DatastoreCore::_IndexDefinition]) -> bool
 
         def field_from_node: (
           ::GraphQL::Execution::Lookahead
@@ -144,6 +148,7 @@ module ElasticGraph
         def build_sub_aggregations_from: (
           ::GraphQL::Execution::Lookahead,
           context: QueryContext,
+          index_definitions: ::Array[DatastoreCore::_IndexDefinition],
           ?parent_nested_path: ::Array[PathSegment]
         ) -> ::Hash[::String, NestedSubAggregation]
 

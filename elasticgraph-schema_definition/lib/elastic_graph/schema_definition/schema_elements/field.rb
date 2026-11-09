@@ -54,6 +54,8 @@ module ElasticGraph
       #   @private
       # @!attribute [rw] grouped_by_customizations
       #   @private
+      # @!attribute [rw] grouped_by_field_type
+      #   @private
       # @!attribute [rw] highlights_customizations
       #   @private
       # @!attribute [rw] sub_aggregations_customizations
@@ -90,7 +92,7 @@ module ElasticGraph
       #   @private
       class Field < Struct.new(
         :name, :original_type, :parent_type, :original_type_for_derived_types, :schema_def_state, :accuracy_confidence,
-        :filter_customizations, :grouped_by_customizations, :highlights_customizations, :sub_aggregations_customizations,
+        :filter_customizations, :grouped_by_customizations, :grouped_by_field_type, :highlights_customizations, :sub_aggregations_customizations,
         :aggregated_values_customizations, :sort_order_enum_value_customizations, :args,
         :sortable, :filterable, :aggregatable, :groupable, :highlightable, :returnable,
         :graphql_only, :source, :runtime_field_script, :relationship, :singular_name,
@@ -120,6 +122,7 @@ module ElasticGraph
             accuracy_confidence: accuracy_confidence,
             filter_customizations: [],
             grouped_by_customizations: [],
+            grouped_by_field_type: nil,
             highlights_customizations: [],
             sub_aggregations_customizations: [],
             aggregated_values_customizations: [],
@@ -676,6 +679,7 @@ module ElasticGraph
         def groupable?
           # If the groupability of the field was specified explicitly when the field was defined, use the specified value.
           return groupable unless groupable.nil?
+          return true if grouped_by_field_type
 
           # We don't want the `id` field of a root document type to be available to group by, because it's the unique primary key
           # and the groupings would each contain one document. It's simpler and more efficient to just query the raw documents
@@ -862,6 +866,8 @@ module ElasticGraph
         # use it, derived from the original type name before any type-name overrides are applied.
         # @private
         def grouped_by_field_type_name
+          return grouped_by_field_type if grouped_by_field_type
+
           unwrapped_type = type_for_derived_types.fully_unwrapped
           original_unwrapped_type = original_type_for_derived_types.fully_unwrapped
           if original_unwrapped_type.grouped_by_type_defined?
