@@ -26,7 +26,7 @@ module ElasticGraph
         end
         @types = {}
         @enums = {}
-        @mutex = Mutex.new
+        @mutex = ::Mutex.new
       end
 
       # Implements the indexer's record-preparer interface without an intermediate public record hash.
@@ -49,12 +49,14 @@ module ElasticGraph
         unless fields
           alternative = message.value
           return nil unless alternative
+
           return prepare_message(message.public_send(alternative), mapping_properties)
         end
 
         prepared = {} # : Hash[String, untyped]
         fields.each do |field|
           next if field.presence_method && !message.public_send(field.presence_method)
+
           nested_mapping = mapping_properties&.dig(field.name_in_index, "properties")
           prepared[field.name_in_index] = prepare_value(field, message[field.name], field.list_depth, nested_mapping)
         end
@@ -63,6 +65,7 @@ module ElasticGraph
         if typename_type && typename_type != "constant_keyword"
           prepared["__typename"] = type.name
         end
+
         prepared
       end
 
@@ -72,7 +75,9 @@ module ElasticGraph
             prepare_value(field, (depth > 1) ? item.values : item, depth - 1, nested_mapping)
           end
         end
+
         return prepare_message(value, nested_mapping) if field.nested_message
+
         (_ = field.leaf_preparer).call(value)
       end
 
@@ -85,6 +90,7 @@ module ElasticGraph
           field = entry # : ::Google::Protobuf::FieldDescriptor
           build_field(descriptor, field, overrides[field.name])
         end
+
         Type.new(name, fields)
       end
 
@@ -98,8 +104,10 @@ module ElasticGraph
         while leaf.label == :repeated
           list_depth += 1
           break unless leaf.type == :message
+
           wrapper = leaf.subtype # : ::Google::Protobuf::Descriptor
           break unless wrapper.name.start_with?("#{descriptor.name}.")
+
           leaf = wrapper.lookup("values") # : ::Google::Protobuf::FieldDescriptor
         end
 
@@ -120,10 +128,16 @@ module ElasticGraph
           overrides = @metadata.types_by_name[name]&.non_standard_enum_values_by_name || {}
           entries = descriptor.to_h
           prefix = entries.key(0).to_s.delete_suffix("_UNSPECIFIED")
-          entries.to_h do |symbol, number|
+          values = {} # : Hash[Symbol | Integer, String?]
+
+          entries.each do |symbol, number|
             key = symbol.to_s
-            [symbol, (number == 0) ? nil : (overrides[key] || ProtoConversions.enum_value_to_eg_name(key, prefix))]
+            value = (number == 0) ? nil : (overrides[key] || ProtoConversions.enum_value_to_eg_name(key, prefix))
+            # JRuby can expose repeated enum values as numbers rather than symbols.
+            values[symbol] = values[number] = value
           end
+
+          values
         end
       end
 
@@ -131,15 +145,16 @@ module ElasticGraph
         if (type_name = field_meta&.type)
           scalar = @metadata.types_by_name.fetch(type_name).scalar
         end
+
         proto_type = leaf_field.subtype&.name || leaf_field.type.to_s
         scalar ||= DEFAULT_SCALARS_BY_PROTO_TYPE.fetch(proto_type)
         type_name ||= scalar
         preparer = @indexing_preparers[type_name]
 
         if scalar == "Untyped"
-          ->(value) { prepare_scalar(preparer, JSON.parse(value)) }
+          ->(value) { prepare_scalar(preparer, ::JSON.parse(value)) }
         elsif leaf_field.type == :message
-          ->(value) { prepare_scalar(preparer, JSON.parse(Google::Protobuf.encode_json(value))) }
+          ->(value) { prepare_scalar(preparer, ::JSON.parse(::Google::Protobuf.encode_json(value))) }
         else
           ->(value) { prepare_scalar(preparer, value) }
         end

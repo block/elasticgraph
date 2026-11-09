@@ -99,7 +99,7 @@ module ElasticGraph
             proto_name
           end
 
-          # Returns the scalar's original name when it differs from the default for its protobuf type.
+          # Returns the canonical scalar name when its wire type or customized name needs metadata.
           #
           # @return [RuntimeMetadata::Type]
           def proto_ingestion_metadata
@@ -109,7 +109,7 @@ module ElasticGraph
             RuntimeMetadata::Type.new(
               fields_by_name: {},
               non_standard_enum_values_by_name: {},
-              scalar: (scalar_name == default_scalar) ? nil : scalar_name
+              scalar: (scalar_name == default_scalar && name == scalar_name) ? nil : scalar_name
             )
           end
         end

@@ -4,7 +4,7 @@ module ElasticGraph
       @metadata: RuntimeMetadata::Schema
       @indexing_preparers: Hash[String, SchemaArtifacts::RuntimeMetadata::extensionClass?]
       @types: Hash[untyped, Type]
-      @enums: Hash[Google::Protobuf::EnumDescriptor, Hash[Symbol, String?]]
+      @enums: Hash[Google::Protobuf::EnumDescriptor, Hash[Symbol | Integer, String?]]
       @mutex: Mutex
 
       def initialize: (schemaArtifacts) -> void
@@ -32,7 +32,7 @@ module ElasticGraph
       def prepare_value: (Field, untyped, Integer, Hash[String, untyped]?) -> untyped
       def build_type: (Google::Protobuf::Descriptor) -> Type
       def build_field: (Google::Protobuf::Descriptor, Google::Protobuf::FieldDescriptor, RuntimeMetadata::Field?) -> Field
-      def build_enum: (Google::Protobuf::EnumDescriptor) -> Hash[Symbol, String?]
+      def build_enum: (Google::Protobuf::EnumDescriptor) -> Hash[Symbol | Integer, String?]
       def build_scalar_preparer: (Google::Protobuf::FieldDescriptor, RuntimeMetadata::Field?) -> ^(untyped) -> untyped
       def prepare_scalar: (SchemaArtifacts::RuntimeMetadata::extensionClass?, untyped) -> untyped
       def type_name_for: (Google::Protobuf::Descriptor | Google::Protobuf::EnumDescriptor) -> String
