@@ -14,9 +14,16 @@ graph LR;
     classDef externalGemStyle fill:#E0EFFF,stroke:#70A1D7,color:#2980B9;
     elasticgraph-proto_ingestion["elasticgraph-proto_ingestion"];
     class elasticgraph-proto_ingestion targetGemStyle;
+    elasticgraph-indexer["elasticgraph-indexer"];
+    elasticgraph-proto_ingestion --> elasticgraph-indexer;
+    class elasticgraph-indexer otherEgGemStyle;
     elasticgraph-support["elasticgraph-support"];
     elasticgraph-proto_ingestion --> elasticgraph-support;
     class elasticgraph-support otherEgGemStyle;
+    google-protobuf["google-protobuf"];
+    elasticgraph-proto_ingestion --> google-protobuf;
+    class google-protobuf externalGemStyle;
+    click google-protobuf href "https://rubygems.org/gems/google-protobuf" "Open on RubyGems.org" _blank;
 ```
 
 ## Usage
