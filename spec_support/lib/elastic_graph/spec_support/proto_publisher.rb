@@ -119,7 +119,7 @@ module ElasticGraph
         return value.to_s if %i[int64 sint64 uint64 fixed64 sfixed64].include?(field.type)
 
         if field.type == :message && field.subtype.name.start_with?("#{@metadata.package_name}.")
-          return {"values" => field_value(field.subtype.lookup("values"), value, overrides)} if value.is_a?(Array)
+          return {"values" => field_value(field.subtype.lookup("values"), value, overrides)} if value.is_a?(::Array)
           return message_value(field.subtype, value)
         end
 

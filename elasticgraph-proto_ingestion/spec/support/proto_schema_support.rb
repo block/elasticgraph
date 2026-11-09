@@ -56,7 +56,7 @@ module ElasticGraph
       PROTOC_BINARY = SpecSupport::Protoc::PROTOC_BINARY
 
       def run_protoc(proto_schema, operation, input)
-        Tempfile.create(["schema", ".proto"]) do |schema_file|
+        ::Tempfile.create(["schema", ".proto"]) do |schema_file|
           schema_file.write(proto_schema)
           schema_file.flush
           directory = ::File.dirname(schema_file.path)

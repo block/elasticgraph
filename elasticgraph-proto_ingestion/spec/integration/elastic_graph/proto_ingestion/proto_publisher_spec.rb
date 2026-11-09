@@ -36,7 +36,7 @@ module ElasticGraph
             schema_version: nil, ingestion_format: "proto", message_id: original.message_id,
             latency_timestamps: original.latency_timestamps
           )
-          expect(result.record).not_to be_a(Hash)
+          expect(result.record).not_to be_a(::Hash)
           expect(result.record.class.descriptor.name).to eq("publisher.Product")
           expect(result.record.name).to eq("published")
           expect(result.record.large).to eq(2**63 - 1)
@@ -108,7 +108,7 @@ module ElasticGraph
 
         it "reports compiler errors" do
           allow(schema_artifacts).to receive(:proto_schema).and_return("invalid protobuf schema")
-          expect { publisher }.to raise_error(RuntimeError, /schema.proto.*Expected/m)
+          expect { publisher }.to raise_error(::RuntimeError, /schema.proto.*Expected/m)
         end
 
         define_method :define_publisher_schema do |prior_results = nil, &extra_fields|

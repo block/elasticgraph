@@ -16,23 +16,23 @@ module ElasticGraph
       # simplecov:disable -- only one platform's branches can execute in any given run.
       PROTOC_BINARY = begin
         arch =
-          if RbConfig::CONFIG["host_os"].match?(/darwin/)
+          if ::RbConfig::CONFIG["host_os"].match?(/darwin/)
             "x86_64" # Apple Silicon uses the x86_64 binary under Rosetta; the gem ships no arm64 build.
-          elsif RbConfig::CONFIG["host_cpu"].match?(/x86_64|amd64/)
+          elsif ::RbConfig::CONFIG["host_cpu"].match?(/x86_64|amd64/)
             "x86_64"
           else
             "x86"
           end
 
         os =
-          case RbConfig::CONFIG["host_os"]
+          case ::RbConfig::CONFIG["host_os"]
           when /darwin/ then "macos"
           when /mswin|mingw|cygwin/ then "windows"
           else "linux"
           end
 
-        bin_dir = ::File.expand_path("bin/#{arch}-#{os}", Gem.loaded_specs.fetch("grpc-tools").full_gem_path)
-        ::File.join(bin_dir, "protoc#{RbConfig::CONFIG["EXEEXT"]}").tap do |binary|
+        bin_dir = ::File.expand_path("bin/#{arch}-#{os}", ::Gem.loaded_specs.fetch("grpc-tools").full_gem_path)
+        ::File.join(bin_dir, "protoc#{::RbConfig::CONFIG["EXEEXT"]}").tap do |binary|
           raise "`grpc-tools` ships no `protoc` for #{arch}-#{os}; expected it at #{binary}." unless ::File.exist?(binary)
         end
       end
