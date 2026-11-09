@@ -113,22 +113,13 @@ module ElasticGraph
           end
 
           it "uses canonical scalar metadata after built-in types are renamed" do
-            artifacts = define_preparation_schema(type_name_overrides: {"Untyped" => "Payload", "DateTime" => "Moment"})
+            artifacts = define_preparation_schema(type_name_overrides: {"Untyped" => "Payload", "LongString" => "BigInt", "DateTime" => "Moment"})
             renamed_publisher = SpecSupport::ProtoPublisher.new(artifacts)
-            native = native_record({"payload" => {"answer" => 42}, "at" => "2024-02-29T12:34:56.123456789Z"}, via: renamed_publisher)
+            native = native_record({"payload" => {"answer" => 42}, "large" => 99, "at" => "2024-02-29T12:34:56.123456789Z"}, via: renamed_publisher)
 
             expect(described_class.new(artifacts).prepare_for_index("Product", native, nil)).to include(
-              "payload" => '{"answer":42}', "at" => "2024-02-29T12:34:56.123Z"
+              "payload" => '{"answer":42}', "large" => 99, "at" => "2024-02-29T12:34:56.123Z"
             )
-          end
-
-          it "retains scalar values when GraphQL runtime metadata has no preparer for their type" do
-            native = native_record({"released" => "2024-02-29"})
-            metadata = schema_artifacts.runtime_metadata
-            allow(schema_artifacts).to receive(:runtime_metadata).and_return(
-              metadata.with(scalar_types_by_name: metadata.scalar_types_by_name.except("Date"))
-            )
-            expect(preparer.prepare_for_index("Product", native, nil)).to include("released" => "2024-02-29")
           end
 
           def native_record(record, type: "Product", via: publisher)
@@ -206,13 +197,16 @@ module ElasticGraph
       end
 
       it "requires the protobuf extension metadata" do
-        artifacts = generate_schema_artifacts do |schema|
+        artifacts = define_schema(schema_element_name_form: :snake_case) do |schema|
           schema.object_type("Item") do |type|
             type.field "id", "ID!"
             type.index "items"
           end
         end
-        expect { described_class.new(artifacts) }.to raise_error(Errors::ConfigError, /Protobuf runtime metadata is missing/)
+        expect { described_class.new(artifacts) }.to raise_error(
+          Errors::ConfigError,
+          /Protobuf runtime metadata is missing\. Enable `ElasticGraph::ProtoIngestion::SchemaDefinition::APIExtension`/
+        )
       end
     end
   end

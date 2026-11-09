@@ -26,7 +26,7 @@ module ElasticGraph
             candidate.extension_ref.fetch("name") == "ElasticGraph::ProtoIngestion::IndexerExtension"
           end
           unless extension
-            raise Errors::ConfigError, "Protobuf runtime metadata is missing. Enable ProtoIngestion::SchemaDefinition::APIExtension and dump schema artifacts."
+            raise Errors::ConfigError, "Protobuf runtime metadata is missing. Enable `ElasticGraph::ProtoIngestion::SchemaDefinition::APIExtension` and dump schema artifacts."
           end
           from_hash(extension.extension_ref.fetch("config"))
         end
