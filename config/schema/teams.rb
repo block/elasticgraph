@@ -162,8 +162,21 @@ ElasticGraph.define_schema do |schema|
   end
 
   schema.object_type "Sponsorship" do |t|
-    t.field "sponsor_id", "ID!"
+    t.field "sponsor_id", "ID"
     t.field "annual_total", "Money!"
+
+    # Define some Apollo-specific schema elements when we are defining the schema for Apollo.
+    # simplecov:disable -- this file is only exercised in a test running without `elasticgraph-apollo`.
+    if schema.respond_to?(:target_apollo_federation_version)
+      # Exercises an entity reference on a `nested` type, which is grouped on in sub-aggregations.
+      t.apollo_entity_ref_field "sponsor", "SponsorshipSponsor", id_field_name_in_index: "sponsor_id"
+
+      schema.object_type "SponsorshipSponsor" do |t|
+        t.field "id", "ID"
+        t.apollo_key fields: "id", resolvable: false
+      end
+    end
+    # simplecov:enable
   end
 
   schema.object_type "Affiliations" do |t|

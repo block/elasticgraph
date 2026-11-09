@@ -33,7 +33,7 @@ module ElasticGraph
           end
         end
 
-        # GraphQL resolver for the `GroupedBy` counterpart of a singleton `apollo_entity_ref_field`. Needs the lookahead
+        # GraphQL resolver for the `GroupedBy` counterpart of an `apollo_entity_ref_field`. Needs the lookahead
         # because the grouping key of the bucket includes the client's alias for the field.
         #
         # @private

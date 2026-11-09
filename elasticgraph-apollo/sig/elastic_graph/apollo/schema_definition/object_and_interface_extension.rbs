@@ -5,7 +5,8 @@ module ElasticGraph
         def apollo_entity_ref_field: (
           ::String,
           ::String,
-          id_field_name_in_index: ::String
+          id_field_name_in_index: ::String,
+          ?singular: ::String?
         ) ?{ (::ElasticGraph::SchemaDefinition::SchemaElements::Field) -> void } -> void
 
         def apollo_entity_ref_paginated_collection_field: (
@@ -19,7 +20,7 @@ module ElasticGraph
         LIMITED_GRAPHQL_ONLY_FIELD_OPTIONS: ::Hash[::Symbol, untyped]
         LIMITED_GRAPHQL_ONLY_PAGINATED_FIELD_OPTIONS: ::Hash[::Symbol, untyped]
 
-        def groupable_by_single_id?: (::ElasticGraph::SchemaDefinition::SchemaElements::Field, ::String) -> bool
+        def groupable_by_id?: (::ElasticGraph::SchemaDefinition::SchemaElements::Field, ::String) -> bool
 
         def validate_entity_ref_options: (
           ::String,

@@ -761,59 +761,107 @@ module ElasticGraph
               )])
             end
 
-            {"a leaf field" => true, "an object field" => false}.each do |description, backed_by_leaf_field|
-              context "with an object grouping field backed by #{description} in the index" do
-                before(:context) do
-                  self.schema_artifacts = generate_schema_artifacts do |schema|
-                    schema.object_type "Money" do |type|
-                      type.field "currency", "String"
-                      type.field "amount_cents", "Int"
-                    end
-                    schema.object_type "Widget" do |type|
-                      type.field "id", "ID!"
-                      type.field "amount_cents", "Int"
-                      type.field "cost", "Money" do |field|
-                        field.customize_grouped_by_field do |grouped_field|
-                          # A custom resolver can expose a single indexed value as an object.
-                          grouped_field.name_in_index = "amount_cents" if backed_by_leaf_field
-                        end
-                      end
-                      type.index "widgets"
-                    end
-                  end
-                end
+            context "with an object grouping field backed by a leaf field in the index" do
+              before(:context) do
+                # A custom resolver can expose a single indexed value as an object.
+                self.schema_artifacts = generate_schema_artifacts_with_cost_fields(
+                  customize_widget_cost: ->(field) { field.customize_grouped_by_field { |gf| gf.name_in_index = "amount_cents" } },
+                  customize_part_cost: ->(field) { field.customize_grouped_by_field { |gf| gf.name_in_index = "part_amount_cents" } }
+                )
+              end
 
-                it "groups on the field itself when its index path is a leaf field, and on its subfields otherwise" do
-                  aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
-                    query {
-                      widget_aggregations {
-                        #{before_nodes}
-                          grouped_by {
-                            price: cost { currency amount_cents }
-                          }
-                        #{after_nodes}
-                      }
+              it "groups on the field itself" do
+                expect(aggregations_grouped_by_cost).to eq([aggregation_query_of(
+                  name: "widget_aggregations",
+                  computations: [],
+                  groupings: [
+                    field_term_grouping_of("amount_cents", field_names_in_graphql_query: ["price"], missing_value_placeholder: nil)
+                  ]
+                )])
+              end
+
+              it "groups on the field itself when it is under an embedded object field" do
+                aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
+                  query {
+                    widget_aggregations {
+                      #{before_nodes}
+                        grouped_by {
+                          part { price: cost { currency amount_cents } }
+                        }
+                      #{after_nodes}
                     }
-                  QUERY
+                  }
+                QUERY
 
-                  expected_groupings =
-                    if backed_by_leaf_field
-                      [field_term_grouping_of("amount_cents", field_names_in_graphql_query: ["price"], missing_value_placeholder: nil)]
-                    else
-                      [
-                        field_term_grouping_of("cost", "currency", field_names_in_graphql_query: ["price", "currency"]),
-                        field_term_grouping_of("cost", "amount_cents", field_names_in_graphql_query: ["price", "amount_cents"], missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER)
-                      ]
-                    end
+                expect(aggregations).to eq([aggregation_query_of(
+                  name: "widget_aggregations",
+                  computations: [],
+                  groupings: [
+                    field_term_grouping_of("part", "part_amount_cents", field_names_in_graphql_query: ["part", "price"], missing_value_placeholder: nil)
+                  ]
+                )])
+              end
 
-                  expect(aggregations).to eq([aggregation_query_of(
-                    name: "widget_aggregations",
-                    computations: [],
-                    groupings: expected_groupings
-                  )])
-                end
+              it "groups on the field itself when it is in a sub-aggregation" do
+                aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
+                  query {
+                    widget_aggregations {
+                      #{before_nodes}
+                        sub_aggregations {
+                          parts_nested {
+                            nodes {
+                              grouped_by { price: cost { currency amount_cents } }
+                            }
+                          }
+                        }
+                      #{after_nodes}
+                    }
+                  }
+                QUERY
+
+                expect(aggregations).to eq([aggregation_query_of(name: "widget_aggregations", sub_aggregations: [
+                  nested_sub_aggregation_of(path_in_index: ["parts_nested"], query: sub_aggregation_query_of(
+                    name: "parts_nested",
+                    groupings: [
+                      field_term_grouping_of("parts_nested", "part_amount_cents", field_names_in_graphql_query: ["parts_nested", "price"], missing_value_placeholder: nil)
+                    ]
+                  ))
+                ])])
               end
             end
+
+            context "with an object grouping field backed by an object field in the index" do
+              before(:context) do
+                self.schema_artifacts = generate_schema_artifacts_with_cost_fields
+              end
+
+              it "groups on its subfields" do
+                expect(aggregations_grouped_by_cost).to eq([aggregation_query_of(
+                  name: "widget_aggregations",
+                  computations: [],
+                  groupings: [
+                    field_term_grouping_of("cost", "currency", field_names_in_graphql_query: ["price", "currency"]),
+                    field_term_grouping_of("cost", "amount_cents", field_names_in_graphql_query: ["price", "amount_cents"], missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER)
+                  ]
+                )])
+              end
+            end
+
+            # `define_method` lets the body reference the shared example's `before_nodes`/`after_nodes` args.
+            define_method :aggregations_grouped_by_cost do
+              aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
+                query {
+                  widget_aggregations {
+                    #{before_nodes}
+                      grouped_by {
+                        price: cost { currency amount_cents }
+                      }
+                    #{after_nodes}
+                  }
+                }
+              QUERY
+            end
+            private :aggregations_grouped_by_cost
 
             it "groups on geo tiles without treating selected tile properties as grouping dimensions" do
               aggregations = aggregations_from_datastore_query("Query", :widget_aggregations, <<~QUERY)
@@ -2020,6 +2068,31 @@ module ElasticGraph
               ],
               needs_doc_count: true
             )])
+          end
+        end
+
+        def generate_schema_artifacts_with_cost_fields(customize_widget_cost: nil, customize_part_cost: nil)
+          generate_schema_artifacts do |schema|
+            schema.object_type "Money" do |type|
+              type.field "currency", "String"
+              type.field "amount_cents", "Int"
+            end
+
+            schema.object_type "Part" do |type|
+              type.field "part_amount_cents", "Int"
+              type.field "cost", "Money", &customize_part_cost
+            end
+
+            schema.object_type "Widget" do |type|
+              type.field "id", "ID!"
+              type.field "amount_cents", "Int"
+              type.field "cost", "Money", &customize_widget_cost
+              type.field "part", "Part"
+              type.field "parts_nested", "[Part!]!" do |field|
+                field.mapping type: "nested"
+              end
+              type.index "widgets"
+            end
           end
         end
 

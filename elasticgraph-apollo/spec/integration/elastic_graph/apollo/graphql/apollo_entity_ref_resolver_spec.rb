@@ -66,6 +66,71 @@ module ElasticGraph
           )
         end
 
+        it "groups by an entity ref field in a sub-aggregation, including a group for the missing id" do
+          sponsorship = ->(sponsor_id) { build(:sponsorship, sponsor_id: sponsor_id) }
+          players = ->(*sponsor_ids) { [build(:player, affiliations: build(:affiliations, sponsorships: sponsor_ids.map(&sponsorship)))] }
+          index_records(
+            build(:team, current_players: players.call("s1", "s1", nil)),
+            build(:team, current_players: players.call("s2"))
+          )
+
+          data = execute_expecting_no_errors(<<~QUERY).dig("team_aggregations", "nodes", 0, "sub_aggregations", "current_players_nested", "nodes", 0, "sub_aggregations", "affiliations", "sponsorships_nested", "nodes")
+            query {
+              team_aggregations {
+                nodes {
+                  sub_aggregations {
+                    current_players_nested {
+                      nodes {
+                        sub_aggregations {
+                          affiliations {
+                            sponsorships_nested {
+                              nodes {
+                                grouped_by { the_sponsor: sponsor { id } }
+                                count_detail { approximate_value }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          QUERY
+
+          expect(data).to contain_exactly(
+            {"grouped_by" => {"the_sponsor" => {"id" => "s1"}}, "count_detail" => {"approximate_value" => 2}},
+            {"grouped_by" => {"the_sponsor" => {"id" => "s2"}}, "count_detail" => {"approximate_value" => 1}},
+            {"grouped_by" => {"the_sponsor" => nil}, "count_detail" => {"approximate_value" => 1}}
+          )
+        end
+
+        it "groups list entity references on individual ids without counting duplicate ids twice per document" do
+          index_records(
+            build(:component, owner_ids: ["oid_1", "oid_1", "oid_2"]),
+            build(:component, owner_ids: ["oid_1"]),
+            build(:component, owner_ids: [])
+          )
+
+          data = execute_expecting_no_errors(<<~QUERY).dig("component_aggregations", "nodes")
+            query {
+              component_aggregations {
+                nodes {
+                  grouped_by { the_owner: listed_owner { token } }
+                  count
+                }
+              }
+            }
+          QUERY
+
+          expect(data).to contain_exactly(
+            {"grouped_by" => {"the_owner" => {"token" => "oid_1"}}, "count" => 2},
+            {"grouped_by" => {"the_owner" => {"token" => "oid_2"}}, "count" => 1},
+            {"grouped_by" => {"the_owner" => nil}, "count" => 1}
+          )
+        end
+
         it "resolves an entity ref field backed by a list of ids field" do
           index_records(
             build(:component, id: "c1", owner_ids: ["oid_1", "oid_2"]),

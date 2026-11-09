@@ -1591,6 +1591,17 @@ type ComponentGroupedBy {
   designer_name: String
 
   """
+  The individual value from `owners` for this group.
+
+  Note: `owners` is a collection field, but selecting this field will group on individual values of `owners`.
+  That means that a document may be grouped into multiple aggregation groupings (i.e. when its `owners`
+  field has multiple values) leading to some data duplication in the response. However, if a value shows
+  up in `owners` multiple times for a single document, that document will only be included in the group
+  once.
+  """
+  listed_owner: ComponentOwner
+
+  """
   The `name` field value for this group.
   """
   name: String
@@ -7659,6 +7670,17 @@ type NamedEntityGroupedBy {
   inventor: InventorGroupedBy
 
   """
+  The individual value from `owners` for this group.
+
+  Note: `owners` is a collection field, but selecting this field will group on individual values of `owners`.
+  That means that a document may be grouped into multiple aggregation groupings (i.e. when its `owners`
+  field has multiple values) leading to some data duplication in the response. However, if a value shows
+  up in `owners` multiple times for a single document, that document will only be included in the group
+  once.
+  """
+  listed_owner: ComponentOwner
+
+  """
   The `material` field value for this group.
   """
   material: Material
@@ -13173,7 +13195,8 @@ enum SponsorSortOrderInput {
 
 type Sponsorship {
   annual_total: Money!
-  sponsor_id: ID!
+  sponsor: SponsorshipSponsor
+  sponsor_id: ID
 }
 
 """
@@ -13310,6 +13333,11 @@ type SponsorshipGroupedBy {
   annual_total: MoneyGroupedBy
 
   """
+  The `sponsor` field value for this group.
+  """
+  sponsor: SponsorshipSponsor
+
+  """
   The `sponsor_id` field value for this group.
   """
   sponsor_id: ID
@@ -13378,6 +13406,10 @@ input SponsorshipListFilterInput {
   When `null` or an empty object is passed, matches no documents.
   """
   not: SponsorshipListFilterInput
+}
+
+type SponsorshipSponsor @key(fields: "id", resolvable: false) {
+  id: ID
 }
 
 type Staff {

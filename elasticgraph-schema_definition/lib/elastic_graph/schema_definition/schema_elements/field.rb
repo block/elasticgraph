@@ -679,6 +679,7 @@ module ElasticGraph
         def groupable?
           # If the groupability of the field was specified explicitly when the field was defined, use the specified value.
           return groupable unless groupable.nil?
+          return true if grouped_by_field_type
 
           # We don't want the `id` field of a root document type to be available to group by, because it's the unique primary key
           # and the groupings would each contain one document. It's simpler and more efficient to just query the raw documents

@@ -12840,7 +12840,7 @@ enum SponsorSortOrderInput {
 
 type Sponsorship {
   annual_total: Money!
-  sponsor_id: ID!
+  sponsor_id: ID
 }
 
 """
