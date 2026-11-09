@@ -6,11 +6,12 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/constants"
 require "elastic_graph/proto_ingestion"
 require "elastic_graph/proto_ingestion/proto_conversions"
 require "elastic_graph/proto_ingestion/runtime_metadata/schema"
-require "google/protobuf"
 require "json"
+require "time"
 
 module ElasticGraph
   module ProtoIngestion
@@ -21,9 +22,7 @@ module ElasticGraph
     class RecordPreparer
       def initialize(schema_artifacts)
         @metadata = RuntimeMetadata::Schema.from_schema_artifacts(schema_artifacts)
-        @indexing_preparers = schema_artifacts.runtime_metadata.scalar_types_by_name.transform_values do |scalar|
-          scalar.load_indexing_preparer.extension_class
-        end
+        @scalar_types_by_name = schema_artifacts.runtime_metadata.scalar_types_by_name
         @types = {}
         @enums = {}
         @mutex = ::Mutex.new
@@ -39,7 +38,8 @@ module ElasticGraph
 
       # Resolved once per protobuf message class so subsequent records do not inspect descriptors.
       Type = ::Data.define(:name, :fields)
-      Field = ::Data.define(:name, :name_in_index, :presence_method, :list_depth, :nested_message, :leaf_preparer)
+      Field = ::Data.define(:name, :name_in_index, :presence_method, :list_depth, :leaf_preparer)
+      private_constant :Type, :Field
 
       def prepare_message(message, mapping_properties)
         return nil if message.nil?
@@ -76,9 +76,11 @@ module ElasticGraph
           end
         end
 
-        return prepare_message(value, nested_mapping) if field.nested_message
-
-        (_ = field.leaf_preparer).call(value)
+        if (leaf_preparer = field.leaf_preparer)
+          leaf_preparer.call(value)
+        else
+          prepare_message(value, nested_mapping)
+        end
       end
 
       def build_type(descriptor)
@@ -111,15 +113,21 @@ module ElasticGraph
           leaf = wrapper.lookup("values") # : ::Google::Protobuf::FieldDescriptor
         end
 
-        if leaf.type == :enum
+        case leaf.type
+        when :enum
           enum_descriptor = leaf.subtype # : ::Google::Protobuf::EnumDescriptor
           enum_values = build_enum(enum_descriptor)
-          Field.new(name, name_in_index, presence_method, list_depth, false, ->(value) { enum_values.fetch(value, value) })
-        elsif leaf.type == :message && (_ = leaf.subtype).name.start_with?("#{@metadata.package_name}.")
-          Field.new(name, name_in_index, presence_method, list_depth, true, nil)
+          leaf_preparer = ->(value) { enum_values.fetch(value, value) }
+        when :message
+          message_descriptor = leaf.subtype # : ::Google::Protobuf::Descriptor
+          unless message_descriptor.name.start_with?("#{@metadata.package_name}.")
+            leaf_preparer = ->(value) { ::Time.at(value.seconds, value.nanos, :nanosecond, in: "UTC").iso8601(DATE_TIME_PRECISION) }
+          end
         else
-          Field.new(name, name_in_index, presence_method, list_depth, false, build_scalar_preparer(leaf, field_meta))
+          leaf_preparer = build_scalar_preparer(leaf, field_meta)
         end
+
+        Field.new(name, name_in_index, presence_method, list_depth, leaf_preparer)
       end
 
       def build_enum(descriptor)
@@ -146,22 +154,14 @@ module ElasticGraph
           scalar = @metadata.types_by_name.fetch(type_name).scalar
         end
 
-        proto_type = leaf_field.subtype&.name || leaf_field.type.to_s
-        scalar ||= DEFAULT_SCALARS_BY_PROTO_TYPE.fetch(proto_type)
-        type_name ||= scalar
-        preparer = @indexing_preparers[type_name]
+        type_name ||= DEFAULT_SCALARS_BY_PROTO_TYPE.fetch(leaf_field.type.to_s)
+        preparer = @scalar_types_by_name.fetch(type_name).load_indexing_preparer.extension_class # : singleton(SchemaArtifacts::RuntimeMetadata::ScalarIndexingPreparerInterface)
 
         if scalar == "Untyped"
-          ->(value) { prepare_scalar(preparer, ::JSON.parse(value)) }
-        elsif leaf_field.type == :message
-          ->(value) { prepare_scalar(preparer, ::JSON.parse(::Google::Protobuf.encode_json(value))) }
+          ->(value) { preparer.prepare_for_indexing(::JSON.parse(value)) }
         else
-          ->(value) { prepare_scalar(preparer, value) }
+          ->(value) { preparer.prepare_for_indexing(value) }
         end
-      end
-
-      def prepare_scalar(preparer, value)
-        preparer ? (_ = preparer).prepare_for_indexing(value) : value
       end
 
       def type_name_for(descriptor)
