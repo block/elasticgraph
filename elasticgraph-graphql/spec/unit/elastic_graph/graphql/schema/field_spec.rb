@@ -244,7 +244,7 @@ module ElasticGraph
           def field_of_type(type_name)
             define_schema do |schema|
               schema.object_type "Photo" do |t|
-                t.field "some_field", type_name, filterable: false, aggregatable: false, groupable: false
+                t.field "some_field", type_name, filterable: false, aggregatable: false, groupable: false, graphql_only: true
               end
             end.field_named("Photo", "some_field")
           end

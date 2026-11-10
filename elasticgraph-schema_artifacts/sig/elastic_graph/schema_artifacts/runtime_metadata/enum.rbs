@@ -6,12 +6,14 @@ module ElasticGraph
       module Enum
         class TypeSupertype
           attr_reader values_by_name: ::Hash[::String, Value]
-          def initialize: (values_by_name: ::Hash[::String, Value]) -> void
-          def with: (?values_by_name: ::Hash[::String, Value]) -> Type
+          attr_reader grouping_missing_value_placeholder: ::String?
+          def initialize: (values_by_name: ::Hash[::String, Value], grouping_missing_value_placeholder: ::String?) -> void
+          def with: (?values_by_name: ::Hash[::String, Value], ?grouping_missing_value_placeholder: ::String?) -> Type
         end
 
         class Type < TypeSupertype
           VALUES_BY_NAME: "values_by_name"
+          GROUPING_MISSING_VALUE_PLACEHOLDER: "grouping_missing_value_placeholder"
           def self.from_hash: (::Hash[::String, untyped]) -> Type
           def to_dumpable_hash: () -> ::Hash[::String, untyped]
         end

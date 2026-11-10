@@ -466,7 +466,7 @@ module ElasticGraph
 
           with_apollo_runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(with_apollo_results.runtime_metadata.to_dumpable_hash)
           without_apollo_runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(without_apollo_results.runtime_metadata.to_dumpable_hash)
-          expect(with_apollo_runtime_metadata.enum_types_by_name).to eq(without_apollo_runtime_metadata.enum_types_by_name)
+          expect(with_apollo_runtime_metadata.enum_types_by_name.except("link__Purpose", "link__PurposeInput")).to eq(without_apollo_runtime_metadata.enum_types_by_name)
           expect(with_apollo_runtime_metadata.object_types_by_name.except("_Entity", "_Service", "Query")).to eq(without_apollo_runtime_metadata.object_types_by_name.except("Query"))
         end
 

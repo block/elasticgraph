@@ -16,9 +16,15 @@ module ElasticGraph
         include RuntimeMetadataSupport
 
         it "builds from a minimal hash" do
-          field = IndexField.from_hash({})
+          field = IndexField.from_hash({"type_name" => "Int"})
 
-          expect(field).to eq IndexField.new(source: SELF_RELATIONSHIP_NAME)
+          expect(field).to eq IndexField.new(source: SELF_RELATIONSHIP_NAME, type_name: "Int")
+        end
+
+        it "round-trips the `type_name` through its dumpable hash" do
+          field = IndexField.new(source: "other", type_name: "Int")
+
+          expect(IndexField.from_hash(field.to_dumpable_hash)).to eq(field)
         end
       end
     end

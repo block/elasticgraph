@@ -206,8 +206,15 @@ module ElasticGraph
         runtime_meta = schema_definition_results.runtime_metadata
 
         schema_type_names = schema.types.keys
-        pruned_enum_types = runtime_meta.enum_types_by_name.slice(*schema_type_names)
-        pruned_scalar_types = runtime_meta.scalar_types_by_name.slice(*schema_type_names)
+
+        # A scalar or enum type that only `indexing_only` fields use is pruned from the GraphQL schema, but the GraphQL
+        # layer still needs its runtime metadata (grouping missing value placeholder) to group on index fields of that type.
+        index_field_type_names = runtime_meta.index_definitions_by_name.values.flat_map do |index_def|
+          index_def.fields_by_path.values.map(&:type_name)
+        end
+
+        pruned_enum_types = runtime_meta.enum_types_by_name.slice(*schema_type_names, *index_field_type_names)
+        pruned_scalar_types = runtime_meta.scalar_types_by_name.slice(*schema_type_names, *index_field_type_names)
 
         # A non-indexed `sourced_from` source type is pruned from the GraphQL schema (nothing references it),
         # but the indexer still needs its runtime metadata (update targets) to process its events.

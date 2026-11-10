@@ -17,20 +17,22 @@ module ElasticGraph
         # Runtime metadata related to an ElasticGraph enum type.
         #
         # @private
-        class Type < ::Data.define(:values_by_name)
+        class Type < ::Data.define(:values_by_name, :grouping_missing_value_placeholder)
           VALUES_BY_NAME = "values_by_name"
+          GROUPING_MISSING_VALUE_PLACEHOLDER = "grouping_missing_value_placeholder"
 
           def self.from_hash(hash)
             values_by_name = hash[VALUES_BY_NAME]&.transform_values do |value_hash|
               Value.from_hash(value_hash)
             end || {}
 
-            new(values_by_name: values_by_name)
+            new(values_by_name: values_by_name, grouping_missing_value_placeholder: hash[GROUPING_MISSING_VALUE_PLACEHOLDER])
           end
 
           def to_dumpable_hash
             {
               # Keys here are ordered alphabetically; please keep them that way.
+              GROUPING_MISSING_VALUE_PLACEHOLDER => grouping_missing_value_placeholder,
               VALUES_BY_NAME => HashDumper.dump_hash(values_by_name, &:to_dumpable_hash)
             }
           end

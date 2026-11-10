@@ -423,10 +423,36 @@ module ElasticGraph
             end
           end
 
-          expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "widget_name" => index_field_with(source: "widget"),
-            "widget_type" => index_field_with(source: "widget")
+          expect(fields_by_path.transform_values(&:source)).to eq({
+            "id" => SELF_RELATIONSHIP_NAME,
+            "widget_name" => "widget",
+            "widget_type" => "widget"
+          })
+        end
+
+        it "records the type name of each leaf field" do
+          fields_by_path = fields_by_path_for "widgets" do |s|
+            s.enum_type "Color" do |t|
+              t.value "RED"
+            end
+
+            s.object_type "Widget" do |t|
+              t.field "id", "ID!"
+              t.field "amount_cents", "Int"
+              t.field "color", "Color"
+              t.field "is_draft", "Boolean"
+              t.field "tags", "[String!]!"
+              t.index "widgets"
+            end
+          end
+
+          expect(fields_by_path.transform_values(&:type_name)).to eq({
+            "id" => "ID",
+            "amount_cents" => "Int",
+            "color" => "Color",
+            "is_draft" => "Boolean",
+            "tags" => "String",
+            "#{LIST_COUNTS_FIELD}.tags" => "Int"
           })
         end
 
@@ -460,11 +486,11 @@ module ElasticGraph
             end
           end
 
-          expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "widget_fields.id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "widget_fields.name" => index_field_with(source: "widget"),
-            "widget_fields.type" => index_field_with(source: "widget")
+          expect(fields_by_path.transform_values(&:source)).to eq({
+            "id" => SELF_RELATIONSHIP_NAME,
+            "widget_fields.id" => SELF_RELATIONSHIP_NAME,
+            "widget_fields.name" => "widget",
+            "widget_fields.type" => "widget"
           })
         end
 
@@ -478,9 +504,9 @@ module ElasticGraph
             end
           end
 
-          expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "type" => index_field_with(source: SELF_RELATIONSHIP_NAME)
+          expect(fields_by_path.transform_values(&:source)).to eq({
+            "id" => SELF_RELATIONSHIP_NAME,
+            "type" => SELF_RELATIONSHIP_NAME
           })
         end
 
@@ -514,11 +540,11 @@ module ElasticGraph
             end
           end
 
-          expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "nested.id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "nested.name2" => index_field_with(source: "widget"),
-            "nested.type" => index_field_with(source: "widget")
+          expect(fields_by_path.transform_values(&:source)).to eq({
+            "id" => SELF_RELATIONSHIP_NAME,
+            "nested.id" => SELF_RELATIONSHIP_NAME,
+            "nested.name2" => "widget",
+            "nested.type" => "widget"
           })
         end
 
@@ -549,12 +575,12 @@ module ElasticGraph
             end
           end
 
-          expect(fields_by_path).to eq({
-            "component_id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "name" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "type" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "widget_name" => index_field_with(source: "widget")
+          expect(fields_by_path.transform_values(&:source)).to eq({
+            "component_id" => SELF_RELATIONSHIP_NAME,
+            "id" => SELF_RELATIONSHIP_NAME,
+            "name" => SELF_RELATIONSHIP_NAME,
+            "type" => SELF_RELATIONSHIP_NAME,
+            "widget_name" => "widget"
           })
         end
 
@@ -587,12 +613,12 @@ module ElasticGraph
             end
           end
 
-          expect(fields_by_path).to eq({
-            "component_id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "name" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "type" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "widget_name" => index_field_with(source: "widget")
+          expect(fields_by_path.transform_values(&:source)).to eq({
+            "component_id" => SELF_RELATIONSHIP_NAME,
+            "id" => SELF_RELATIONSHIP_NAME,
+            "name" => SELF_RELATIONSHIP_NAME,
+            "type" => SELF_RELATIONSHIP_NAME,
+            "widget_name" => "widget"
           })
         end
 
@@ -624,10 +650,10 @@ module ElasticGraph
             end
           end
 
-          expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "widget_name_and_type.name" => index_field_with(source: "widget"),
-            "widget_name_and_type.type" => index_field_with(source: "widget")
+          expect(fields_by_path.transform_values(&:source)).to eq({
+            "id" => SELF_RELATIONSHIP_NAME,
+            "widget_name_and_type.name" => "widget",
+            "widget_name_and_type.type" => "widget"
           })
         end
 
@@ -661,8 +687,8 @@ module ElasticGraph
           end
 
           expect(fields_by_path.select { |k, v| k.start_with?(LIST_COUNTS_FIELD) }).to eq({
-            "#{LIST_COUNTS_FIELD}.tags" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "#{LIST_COUNTS_FIELD}.widget_tags" => index_field_with(source: "widget")
+            "#{LIST_COUNTS_FIELD}.tags" => index_field_with(source: SELF_RELATIONSHIP_NAME, type_name: "Int"),
+            "#{LIST_COUNTS_FIELD}.widget_tags" => index_field_with(source: "widget", type_name: "Int")
           })
         end
 
@@ -700,8 +726,8 @@ module ElasticGraph
           end
 
           expect(fields_by_path.select { |k, v| k.start_with?(LIST_COUNTS_FIELD) }).to eq({
-            "#{LIST_COUNTS_FIELD}.subfield|tags" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "#{LIST_COUNTS_FIELD}.widget_subfield|tags" => index_field_with(source: "widget")
+            "#{LIST_COUNTS_FIELD}.subfield|tags" => index_field_with(source: SELF_RELATIONSHIP_NAME, type_name: "Int"),
+            "#{LIST_COUNTS_FIELD}.widget_subfield|tags" => index_field_with(source: "widget", type_name: "Int")
           })
         end
 
@@ -736,12 +762,12 @@ module ElasticGraph
             end
           end
 
-          expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "widget_name_and_type.name" => index_field_with(source: "widget"),
-            "widget_name_and_type.types" => index_field_with(source: "widget"),
-            "#{LIST_COUNTS_FIELD}.widget_name_and_type" => index_field_with(source: "widget"),
-            "widget_name_and_type.#{LIST_COUNTS_FIELD}.types" => index_field_with(source: "widget")
+          expect(fields_by_path.transform_values(&:source)).to eq({
+            "id" => SELF_RELATIONSHIP_NAME,
+            "widget_name_and_type.name" => "widget",
+            "widget_name_and_type.types" => "widget",
+            "#{LIST_COUNTS_FIELD}.widget_name_and_type" => "widget",
+            "widget_name_and_type.#{LIST_COUNTS_FIELD}.types" => "widget"
           })
         end
 
@@ -783,15 +809,15 @@ module ElasticGraph
             end
           end
 
-          expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "#{LIST_COUNTS_FIELD}.widget_details" => index_field_with(source: "widget"),
-            "widget_details.#{LIST_COUNTS_FIELD}.name_and_type" => index_field_with(source: "widget"),
-            "widget_details.#{LIST_COUNTS_FIELD}.name_and_type|name" => index_field_with(source: "widget"),
-            "widget_details.#{LIST_COUNTS_FIELD}.name_and_type|types" => index_field_with(source: "widget"),
-            "widget_details.name_and_type.name" => index_field_with(source: "widget"),
-            "widget_details.name_and_type.types" => index_field_with(source: "widget"),
-            "widget_details.size" => index_field_with(source: "widget")
+          expect(fields_by_path.transform_values(&:source)).to eq({
+            "id" => SELF_RELATIONSHIP_NAME,
+            "#{LIST_COUNTS_FIELD}.widget_details" => "widget",
+            "widget_details.#{LIST_COUNTS_FIELD}.name_and_type" => "widget",
+            "widget_details.#{LIST_COUNTS_FIELD}.name_and_type|name" => "widget",
+            "widget_details.#{LIST_COUNTS_FIELD}.name_and_type|types" => "widget",
+            "widget_details.name_and_type.name" => "widget",
+            "widget_details.name_and_type.types" => "widget",
+            "widget_details.size" => "widget"
           })
         end
 
@@ -833,15 +859,15 @@ module ElasticGraph
             end
           end
 
-          expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "#{LIST_COUNTS_FIELD}.widget_details" => index_field_with(source: "widget"),
-            "#{LIST_COUNTS_FIELD}.widget_details|name_and_type" => index_field_with(source: "widget"),
-            "#{LIST_COUNTS_FIELD}.widget_details|size" => index_field_with(source: "widget"),
-            "widget_details.name_and_type.name" => index_field_with(source: "widget"),
-            "widget_details.name_and_type.types" => index_field_with(source: "widget"),
-            "widget_details.name_and_type.#{LIST_COUNTS_FIELD}.types" => index_field_with(source: "widget"),
-            "widget_details.size" => index_field_with(source: "widget")
+          expect(fields_by_path.transform_values(&:source)).to eq({
+            "id" => SELF_RELATIONSHIP_NAME,
+            "#{LIST_COUNTS_FIELD}.widget_details" => "widget",
+            "#{LIST_COUNTS_FIELD}.widget_details|name_and_type" => "widget",
+            "#{LIST_COUNTS_FIELD}.widget_details|size" => "widget",
+            "widget_details.name_and_type.name" => "widget",
+            "widget_details.name_and_type.types" => "widget",
+            "widget_details.name_and_type.#{LIST_COUNTS_FIELD}.types" => "widget",
+            "widget_details.size" => "widget"
           })
         end
 

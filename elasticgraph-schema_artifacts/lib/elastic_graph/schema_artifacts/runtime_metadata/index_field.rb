@@ -14,19 +14,22 @@ module ElasticGraph
       # Runtime metadata related to a field on a datastore index definition.
       #
       # @private
-      class IndexField < ::Data.define(:source)
+      class IndexField < ::Data.define(:source, :type_name)
         SOURCE = "source"
+        TYPE_NAME = "type_name"
 
         def self.from_hash(hash)
           new(
-            source: hash[SOURCE] || SELF_RELATIONSHIP_NAME
+            source: hash[SOURCE] || SELF_RELATIONSHIP_NAME,
+            type_name: hash.fetch(TYPE_NAME)
           )
         end
 
         def to_dumpable_hash
           {
             # Keys here are ordered alphabetically; please keep them that way.
-            SOURCE => source
+            SOURCE => source,
+            TYPE_NAME => type_name
           }
         end
       end

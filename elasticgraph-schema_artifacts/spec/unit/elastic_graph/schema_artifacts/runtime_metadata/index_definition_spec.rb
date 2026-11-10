@@ -32,15 +32,15 @@ module ElasticGraph
         it "includes fields that only have default values when serializing, even though other default runtime metadata elements get dropped, so our GraphQL logic can easily see what all the valid field paths are" do
           index_def = index_definition_with(
             fields_by_path: {
-              "foo.bar" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-              "foo.bazz" => index_field_with(source: "other")
+              "foo.bar" => index_field_with(source: SELF_RELATIONSHIP_NAME, type_name: "String"),
+              "foo.bazz" => index_field_with(source: "other", type_name: "String")
             },
             has_had_multiple_sources: false
           )
 
           expect(index_def.to_dumpable_hash["fields_by_path"]).to eq({
-            "foo.bar" => index_field_with(source: SELF_RELATIONSHIP_NAME).to_dumpable_hash,
-            "foo.bazz" => index_field_with(source: "other").to_dumpable_hash
+            "foo.bar" => index_field_with(source: SELF_RELATIONSHIP_NAME, type_name: "String").to_dumpable_hash,
+            "foo.bazz" => index_field_with(source: "other", type_name: "String").to_dumpable_hash
           })
         end
 

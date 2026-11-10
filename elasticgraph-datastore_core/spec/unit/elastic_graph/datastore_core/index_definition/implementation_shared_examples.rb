@@ -293,10 +293,10 @@ module ElasticGraph
             index = define_index
 
             expect(index.fields_by_path).to include({
-              "created_at" => index_field_with,
-              "id" => index_field_with,
-              "name" => index_field_with,
-              "nested_fields.nested_id" => index_field_with
+              "created_at" => index_field_with(type_name: "DateTime"),
+              "id" => index_field_with(type_name: "ID"),
+              "name" => index_field_with(type_name: "String"),
+              "nested_fields.nested_id" => index_field_with(type_name: "ID")
             })
           end
         end

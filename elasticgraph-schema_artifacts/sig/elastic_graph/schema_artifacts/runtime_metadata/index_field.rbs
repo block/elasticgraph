@@ -3,13 +3,15 @@ module ElasticGraph
     module RuntimeMetadata
       class IndexFieldSupertype
         attr_reader source: ::String
+        attr_reader type_name: ::String
 
-        def initialize: (source: ::String) -> void
-        def with: (?source: ::String) -> IndexField
+        def initialize: (source: ::String, type_name: ::String) -> void
+        def with: (?source: ::String, ?type_name: ::String) -> IndexField
       end
 
       class IndexField < IndexFieldSupertype
         SOURCE: "source"
+        TYPE_NAME: "type_name"
         def self.from_hash: (::Hash[::String, untyped]) -> IndexField
         def to_dumpable_hash: () -> ::Hash[::String, untyped]
       end

@@ -19,7 +19,13 @@ module ElasticGraph
           it "builds from a minimal hash" do
             enum_type = Enum::Type.from_hash({})
 
-            expect(enum_type).to eq Enum::Type.new(values_by_name: {})
+            expect(enum_type).to eq Enum::Type.new(values_by_name: {}, grouping_missing_value_placeholder: nil)
+          end
+
+          it "round-trips the `grouping_missing_value_placeholder` through its dumpable hash" do
+            enum_type = Enum::Type.new(values_by_name: {}, grouping_missing_value_placeholder: MISSING_ENUM_PLACEHOLDER)
+
+            expect(Enum::Type.from_hash(enum_type.to_dumpable_hash)).to eq(enum_type)
           end
         end
 

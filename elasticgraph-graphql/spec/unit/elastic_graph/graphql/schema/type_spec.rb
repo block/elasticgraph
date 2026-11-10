@@ -123,10 +123,10 @@ module ElasticGraph
                 t.field "list_of_non_null_int", "[Int!]"
                 t.field "non_null_list_of_int", "[Int]!"
                 t.field "non_null_list_of_non_null_int", "[Int!]!"
-                t.field "relay_connection", "PersonConnection", filterable: false, groupable: false
-                t.field "non_null_relay_connection", "PersonConnection!", filterable: false, groupable: false
-                t.field "relay_edge", "PersonEdge", filterable: false, groupable: false
-                t.field "non_null_relay_edge", "PersonEdge!", filterable: false, groupable: false
+                t.field "relay_connection", "PersonConnection", filterable: false, groupable: false, graphql_only: true
+                t.field "non_null_relay_connection", "PersonConnection!", filterable: false, groupable: false, graphql_only: true
+                t.field "relay_edge", "PersonEdge", filterable: false, groupable: false, graphql_only: true
+                t.field "non_null_relay_edge", "PersonEdge!", filterable: false, groupable: false, graphql_only: true
                 t.field "color", "Color"
                 t.field "person", "Person"
                 t.field "size", "Size"
@@ -144,12 +144,12 @@ module ElasticGraph
                 t.field "non_null_attribute", "Attribute!"
                 t.field "entity", "Entity"
                 t.field "non_null_entity", "Entity!"
-                t.field "indexed_aggregation", "PersonAggregation", filterable: false, groupable: false
-                t.field "non_null_indexed_aggregation", "PersonAggregation!", filterable: false, groupable: false
-                t.field "list_of_indexed_aggregation", "[PersonAggregation]", filterable: false, groupable: false do |f|
+                t.field "indexed_aggregation", "PersonAggregation", filterable: false, groupable: false, graphql_only: true
+                t.field "non_null_indexed_aggregation", "PersonAggregation!", filterable: false, groupable: false, graphql_only: true
+                t.field "list_of_indexed_aggregation", "[PersonAggregation]", filterable: false, groupable: false, graphql_only: true do |f|
                   f.mapping type: "object"
                 end
-                t.field "non_null_list_of_indexed_aggregation", "[PersonAggregation]!", filterable: false, groupable: false do |f|
+                t.field "non_null_list_of_indexed_aggregation", "[PersonAggregation]!", filterable: false, groupable: false, graphql_only: true do |f|
                   f.mapping type: "object"
                 end
 
@@ -1024,6 +1024,78 @@ module ElasticGraph
 
             type = schema.type_named("Thing")
             expect(type.grouping_missing_value_placeholder).to be_nil
+          end
+        end
+
+        describe "#grouping_missing_value_placeholders_by_index_leaf_path" do
+          it "maps the path of each leaf field in the type's index to the placeholder for that field's type" do
+            schema = define_schema do |s|
+              s.object_type "ThingOptions" do |t|
+                t.field "size", "Int"
+              end
+
+              s.object_type "Thing" do |t|
+                t.field "id", "ID!"
+                t.field "is_draft", "Boolean"
+                t.field "options", "ThingOptions"
+                t.index "things"
+              end
+            end
+
+            placeholders = schema.type_named("Thing").grouping_missing_value_placeholders_by_index_leaf_path
+
+            expect(placeholders).to eq({
+              "id" => MISSING_STRING_PLACEHOLDER_VALUE,
+              "is_draft" => nil,
+              "options.size" => MISSING_NUMERIC_PLACEHOLDER
+            })
+          end
+
+          it "includes the leaf fields of every index of an abstract type" do
+            schema = define_schema do |s|
+              s.object_type "T1" do |t|
+                t.field "id", "ID!"
+                t.field "size", "Int"
+                t.index "t1"
+              end
+
+              s.object_type "T2" do |t|
+                t.field "id", "ID!"
+                t.field "is_draft", "Boolean"
+                t.index "t2"
+              end
+
+              s.union_type "Thing" do |t|
+                t.subtypes "T1", "T2"
+              end
+            end
+
+            placeholders = schema.type_named("Thing").grouping_missing_value_placeholders_by_index_leaf_path
+
+            expect(placeholders).to eq({
+              "id" => MISSING_STRING_PLACEHOLDER_VALUE,
+              "size" => MISSING_NUMERIC_PLACEHOLDER,
+              "is_draft" => nil
+            })
+          end
+
+          it "uses the placeholder of a leaf field's type even when the GraphQL schema omits that type" do
+            schema = define_schema do |s|
+              s.enum_type "Color" do |t|
+                t.value "RED"
+              end
+
+              s.object_type "Thing" do |t|
+                t.field "id", "ID!"
+                t.field "color", "Color", indexing_only: true
+                t.index "things"
+              end
+            end
+
+            placeholders = schema.type_named("Thing").grouping_missing_value_placeholders_by_index_leaf_path
+
+            expect { schema.type_named("Color") }.to raise_error(Errors::NotFoundError)
+            expect(placeholders).to include("color" => MISSING_ENUM_PLACEHOLDER)
           end
         end
 

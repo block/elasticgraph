@@ -4,6 +4,7 @@
 elasticgraph_version: 1.2.1.pre
 enum_types_by_name:
   AddressSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       full_address_ASC:
         sort_field:
@@ -21,7 +22,12 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: timestamps.created_at
+  Color:
+    grouping_missing_value_placeholder: "**missing**"
+  ColorInput:
+    grouping_missing_value_placeholder: "**missing**"
   ComponentSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       created_at_ASC:
         sort_field:
@@ -112,6 +118,7 @@ enum_types_by_name:
           direction: desc
           field_path: widget_workspace_id3
   DateGroupingTruncationUnitInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       DAY:
         datastore_value: day
@@ -124,6 +131,7 @@ enum_types_by_name:
       YEAR:
         datastore_value: year
   DateTimeGroupingTruncationUnitInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       DAY:
         datastore_value: day
@@ -142,6 +150,7 @@ enum_types_by_name:
       YEAR:
         datastore_value: year
   DateTimeUnitInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       DAY:
         datastore_abbreviation: d
@@ -159,11 +168,15 @@ enum_types_by_name:
         datastore_abbreviation: s
         datastore_value: 1000
   DateUnitInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       DAY:
         datastore_abbreviation: d
         datastore_value: 86400000
+  DayOfWeek:
+    grouping_missing_value_placeholder: "**missing**"
   DistanceUnitInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       CENTIMETER:
         datastore_abbreviation: cm
@@ -184,6 +197,7 @@ enum_types_by_name:
       YARD:
         datastore_abbreviation: yd
   DistributionChannelSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       established_on_ASC:
         sort_field:
@@ -210,6 +224,7 @@ enum_types_by_name:
           direction: desc
           field_path: name
   ElectricalPartSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       created_at_ASC:
         sort_field:
@@ -244,6 +259,7 @@ enum_types_by_name:
           direction: desc
           field_path: voltage
   InventorSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       id_ASC:
         sort_field:
@@ -278,6 +294,7 @@ enum_types_by_name:
           direction: desc
           field_path: stock_ticker
   LocalTimeGroupingTruncationUnitInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       HOUR:
         datastore_value: hour
@@ -286,6 +303,7 @@ enum_types_by_name:
       SECOND:
         datastore_value: second
   LocalTimeUnitInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       HOUR:
         datastore_abbreviation: h
@@ -300,6 +318,7 @@ enum_types_by_name:
         datastore_abbreviation: s
         datastore_value: 1000
   ManufacturerSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       ceo_id_ASC:
         sort_field:
@@ -350,6 +369,7 @@ enum_types_by_name:
           direction: desc
           field_path: name
   MatchesQueryAllowedEditsPerTermInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       DYNAMIC:
         datastore_abbreviation: AUTO
@@ -359,7 +379,12 @@ enum_types_by_name:
         datastore_abbreviation: '1'
       TWO:
         datastore_abbreviation: '2'
+  Material:
+    grouping_missing_value_placeholder: "**missing**"
+  MaterialInput:
+    grouping_missing_value_placeholder: "**missing**"
   MechanicalPartSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       created_at_ASC:
         sort_field:
@@ -394,6 +419,7 @@ enum_types_by_name:
           direction: desc
           field_path: name
   NamedEntitySortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       amount_cents2_ASC:
         sort_field:
@@ -812,6 +838,7 @@ enum_types_by_name:
           direction: desc
           field_path: workspace_name
   NamedInventorSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       id_ASC:
         sort_field:
@@ -846,6 +873,7 @@ enum_types_by_name:
           direction: desc
           field_path: stock_ticker
   PartSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       created_at_ASC:
         sort_field:
@@ -888,6 +916,7 @@ enum_types_by_name:
           direction: desc
           field_path: voltage
   PhysicalStoreSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       established_on_ASC:
         sort_field:
@@ -906,6 +935,7 @@ enum_types_by_name:
           direction: desc
           field_path: id
   RetailSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       established_on_ASC:
         sort_field:
@@ -931,7 +961,16 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: name
+  SeasonResult:
+    grouping_missing_value_placeholder: "**missing**"
+  SeasonResultInput:
+    grouping_missing_value_placeholder: "**missing**"
+  Size:
+    grouping_missing_value_placeholder: "**missing**"
+  SizeInput:
+    grouping_missing_value_placeholder: "**missing**"
   SponsorSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       id_ASC:
         sort_field:
@@ -950,6 +989,7 @@ enum_types_by_name:
           direction: desc
           field_path: name
   StoreSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       established_on_ASC:
         sort_field:
@@ -976,6 +1016,7 @@ enum_types_by_name:
           direction: desc
           field_path: name
   TeamSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       country_code_ASC:
         sort_field:
@@ -1050,6 +1091,7 @@ enum_types_by_name:
           direction: desc
           field_path: staff.general_manager.salary
   WholesaleSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       id_ASC:
         sort_field:
@@ -1060,6 +1102,7 @@ enum_types_by_name:
           direction: desc
           field_path: id
   WidgetCurrencySortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       details_symbol_ASC:
         sort_field:
@@ -1134,6 +1177,7 @@ enum_types_by_name:
           direction: desc
           field_path: primary_continent
   WidgetOrAddressSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       amount_cents2_ASC:
         sort_field:
@@ -1464,6 +1508,7 @@ enum_types_by_name:
           direction: desc
           field_path: workspace_name
   WidgetSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       amount_cents2_ASC:
         sort_field:
@@ -1778,6 +1823,7 @@ enum_types_by_name:
           direction: desc
           field_path: workspace_name
   WidgetWorkspaceSortOrderInput:
+    grouping_missing_value_placeholder: "**missing**"
     values_by_name:
       id_ASC:
         sort_field:
@@ -1811,6 +1857,8 @@ enum_types_by_name:
         sort_field:
           direction: desc
           field_path: widget.id
+  link__Purpose:
+    grouping_missing_value_placeholder: "**missing**"
 graphql_extension_modules:
 - extension_ref:
     name: ElasticGraph::Apollo::GraphQL::EngineExtension
@@ -1891,26 +1939,37 @@ index_definitions_by_name:
     fields_by_path:
       __counts.shapes:
         source: __self
+        type_name: Int
       __counts.shapes|coordinates:
         source: __self
+        type_name: Int
       __counts.shapes|type:
         source: __self
+        type_name: Int
       full_address:
         source: __self
+        type_name: String
       geo_location.lat:
         source: __self
+        type_name: Float
       geo_location.lon:
         source: __self
+        type_name: Float
       id:
         source: __self
+        type_name: ID
       manufacturer_id:
         source: __self
+        type_name: ID
       shapes.coordinates:
         source: __self
+        type_name: Float
       shapes.type:
         source: __self
+        type_name: String
       timestamps.created_at:
         source: __self
+        type_name: DateTime
     route_with: id
   components:
     current_sources:
@@ -1923,44 +1982,64 @@ index_definitions_by_name:
     fields_by_path:
       __counts.owner_ids:
         source: __self
+        type_name: Int
       __counts.part_ids:
         source: __self
+        type_name: Int
       __counts.tags:
         source: __self
+        type_name: Int
       __counts.widget_tags:
         source: widget
+        type_name: Int
       created_at:
         source: __self
+        type_name: DateTime
       designer_name:
         source: design
+        type_name: String
       id:
         source: __self
+        type_name: ID
       name:
         source: __self
+        type_name: String
       owner_id:
         source: __self
+        type_name: ID
       owner_ids:
         source: __self
+        type_name: ID
       part_ids:
         source: __self
+        type_name: ID
       position.x:
         source: __self
+        type_name: Float
       position.y:
         source: __self
+        type_name: Float
       tags:
         source: __self
+        type_name: String
       widget_cost.amount_cents:
         source: widget
+        type_name: Int
       widget_cost.currency:
         source: widget
+        type_name: String
       widget_name:
         source: widget
+        type_name: String
       widget_size:
         source: widget
+        type_name: Size
       widget_tags:
         source: widget
+        type_name: String
       widget_workspace_id3:
         source: widget
+        type_name: ID
     has_had_multiple_sources: true
     route_with: id
   distribution_channels:
@@ -1969,12 +2048,16 @@ index_definitions_by_name:
     fields_by_path:
       active:
         source: __self
+        type_name: Boolean
       established_on:
         source: __self
+        type_name: Date
       id:
         source: __self
+        type_name: ID
       name:
         source: __self
+        type_name: String
     route_with: id
   electrical_parts:
     current_sources:
@@ -1985,14 +2068,19 @@ index_definitions_by_name:
     fields_by_path:
       created_at:
         source: __self
+        type_name: DateTime
       id:
         source: __self
+        type_name: ID
       manufacturer_id:
         source: __self
+        type_name: ID
       name:
         source: __self
+        type_name: String
       voltage:
         source: __self
+        type_name: Int
     route_with: id
   manufacturers:
     current_sources:
@@ -2003,16 +2091,22 @@ index_definitions_by_name:
     fields_by_path:
       ceo.id:
         source: __self
+        type_name: ID
       ceo.name:
         source: __self
+        type_name: String
       ceo.nationality:
         source: __self
+        type_name: String
       created_at:
         source: __self
+        type_name: DateTime
       id:
         source: __self
+        type_name: ID
       name:
         source: __self
+        type_name: String
     route_with: id
   mechanical_parts:
     current_sources:
@@ -2023,14 +2117,19 @@ index_definitions_by_name:
     fields_by_path:
       created_at:
         source: __self
+        type_name: DateTime
       id:
         source: __self
+        type_name: ID
       manufacturer_id:
         source: __self
+        type_name: ID
       material:
         source: __self
+        type_name: Material
       name:
         source: __self
+        type_name: String
     route_with: id
   named_inventors:
     current_sources:
@@ -2038,12 +2137,16 @@ index_definitions_by_name:
     fields_by_path:
       id:
         source: __self
+        type_name: ID
       name:
         source: __self
+        type_name: String
       nationality:
         source: __self
+        type_name: String
       stock_ticker:
         source: __self
+        type_name: String
     route_with: id
   physical_stores:
     current_sources:
@@ -2051,10 +2154,13 @@ index_definitions_by_name:
     fields_by_path:
       active:
         source: __self
+        type_name: Boolean
       established_on:
         source: __self
+        type_name: Date
       id:
         source: __self
+        type_name: ID
     route_with: id
   sponsors:
     current_sources:
@@ -2062,8 +2168,10 @@ index_definitions_by_name:
     fields_by_path:
       id:
         source: __self
+        type_name: ID
       name:
         source: __self
+        type_name: String
     route_with: id
   teams:
     current_sources:
@@ -2072,924 +2180,1384 @@ index_definitions_by_name:
     fields_by_path:
       __counts.current_players_nested:
         source: __self
+        type_name: Int
       __counts.current_players_object:
         source: __self
+        type_name: Int
       __counts.current_players_object|affiliations:
         source: __self
+        type_name: Int
       __counts.current_players_object|affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       __counts.current_players_object|affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       __counts.current_players_object|affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       __counts.current_players_object|affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       __counts.current_players_object|affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       __counts.current_players_object|affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       __counts.current_players_object|name:
         source: __self
+        type_name: Int
       __counts.current_players_object|nicknames:
         source: __self
+        type_name: Int
       __counts.current_players_object|seasons_nested:
         source: __self
+        type_name: Int
       __counts.current_players_object|seasons_object:
         source: __self
+        type_name: Int
       __counts.current_players_object|seasons_object|awards:
         source: __self
+        type_name: Int
       __counts.current_players_object|seasons_object|games_played:
         source: __self
+        type_name: Int
       __counts.current_players_object|seasons_object|year:
         source: __self
+        type_name: Int
       __counts.details|uniform_colors:
         source: __self
+        type_name: Int
       __counts.forbes_valuation_moneys_nested:
         source: __self
+        type_name: Int
       __counts.forbes_valuation_moneys_object:
         source: __self
+        type_name: Int
       __counts.forbes_valuation_moneys_object|amount_cents:
         source: __self
+        type_name: Int
       __counts.forbes_valuation_moneys_object|currency:
         source: __self
+        type_name: Int
       __counts.forbes_valuations:
         source: __self
+        type_name: Int
       __counts.nested_fields2|current_players:
         source: __self
+        type_name: Int
       __counts.nested_fields2|forbes_valuation_moneys:
         source: __self
+        type_name: Int
       __counts.nested_fields2|the_seasons:
         source: __self
+        type_name: Int
       __counts.past_names:
         source: __self
+        type_name: Int
       __counts.seasons_nested:
         source: __self
+        type_name: Int
       __counts.seasons_object:
         source: __self
+        type_name: Int
       __counts.seasons_object|count:
         source: __self
+        type_name: Int
       __counts.seasons_object|notes:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_nested:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|affiliations:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|name:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|nicknames:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|seasons_nested:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|seasons_object:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|seasons_object|awards:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|seasons_object|games_played:
         source: __self
+        type_name: Int
       __counts.seasons_object|players_object|seasons_object|year:
         source: __self
+        type_name: Int
       __counts.seasons_object|result:
         source: __self
+        type_name: Int
       __counts.seasons_object|stadium_location:
         source: __self
+        type_name: Int
       __counts.seasons_object|stadium_location|lat:
         source: __self
+        type_name: Int
       __counts.seasons_object|stadium_location|lon:
         source: __self
+        type_name: Int
       __counts.seasons_object|started_at:
         source: __self
+        type_name: Int
       __counts.seasons_object|the_record:
         source: __self
+        type_name: Int
       __counts.seasons_object|the_record|first_win_on:
         source: __self
+        type_name: Int
       __counts.seasons_object|the_record|last_win_date:
         source: __self
+        type_name: Int
       __counts.seasons_object|the_record|loss_count:
         source: __self
+        type_name: Int
       __counts.seasons_object|the_record|win_count:
         source: __self
+        type_name: Int
       __counts.seasons_object|was_shortened:
         source: __self
+        type_name: Int
       __counts.seasons_object|won_games_at:
         source: __self
+        type_name: Int
       __counts.seasons_object|year:
         source: __self
+        type_name: Int
       __counts.staff|coaches:
         source: __self
+        type_name: Int
       __counts.the_nested_fields|current_players:
         source: __self
+        type_name: Int
       __counts.the_nested_fields|forbes_valuation_moneys:
         source: __self
+        type_name: Int
       __counts.the_nested_fields|the_seasons:
         source: __self
+        type_name: Int
       __counts.won_championships_at:
         source: __self
+        type_name: Int
       country_code:
         source: __self
+        type_name: ID
       current_name:
         source: __self
+        type_name: String
       current_players_nested.__counts.affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       current_players_nested.__counts.affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       current_players_nested.__counts.affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       current_players_nested.__counts.affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       current_players_nested.__counts.affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       current_players_nested.__counts.affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       current_players_nested.__counts.nicknames:
         source: __self
+        type_name: Int
       current_players_nested.__counts.seasons_nested:
         source: __self
+        type_name: Int
       current_players_nested.__counts.seasons_object:
         source: __self
+        type_name: Int
       current_players_nested.__counts.seasons_object|awards:
         source: __self
+        type_name: Int
       current_players_nested.__counts.seasons_object|games_played:
         source: __self
+        type_name: Int
       current_players_nested.__counts.seasons_object|year:
         source: __self
+        type_name: Int
       current_players_nested.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       current_players_nested.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       current_players_nested.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       current_players_nested.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       current_players_nested.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       current_players_nested.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       current_players_nested.name:
         source: __self
+        type_name: String
       current_players_nested.nicknames:
         source: __self
+        type_name: String
       current_players_nested.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       current_players_nested.seasons_nested.awards:
         source: __self
+        type_name: String
       current_players_nested.seasons_nested.games_played:
         source: __self
+        type_name: Int
       current_players_nested.seasons_nested.year:
         source: __self
+        type_name: Int
       current_players_nested.seasons_object.awards:
         source: __self
+        type_name: String
       current_players_nested.seasons_object.games_played:
         source: __self
+        type_name: Int
       current_players_nested.seasons_object.year:
         source: __self
+        type_name: Int
       current_players_object.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       current_players_object.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       current_players_object.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       current_players_object.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       current_players_object.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       current_players_object.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       current_players_object.name:
         source: __self
+        type_name: String
       current_players_object.nicknames:
         source: __self
+        type_name: String
       current_players_object.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       current_players_object.seasons_nested.awards:
         source: __self
+        type_name: String
       current_players_object.seasons_nested.games_played:
         source: __self
+        type_name: Int
       current_players_object.seasons_nested.year:
         source: __self
+        type_name: Int
       current_players_object.seasons_object.awards:
         source: __self
+        type_name: String
       current_players_object.seasons_object.games_played:
         source: __self
+        type_name: Int
       current_players_object.seasons_object.year:
         source: __self
+        type_name: Int
       details.count:
         source: __self
+        type_name: Int
       details.uniform_colors:
         source: __self
+        type_name: String
       forbes_valuation_moneys_nested.amount_cents:
         source: __self
+        type_name: Int
       forbes_valuation_moneys_nested.currency:
         source: __self
+        type_name: String
       forbes_valuation_moneys_object.amount_cents:
         source: __self
+        type_name: Int
       forbes_valuation_moneys_object.currency:
         source: __self
+        type_name: String
       forbes_valuations:
         source: __self
+        type_name: JsonSafeLong
       formed_on:
         source: __self
+        type_name: Date
       id:
         source: __self
+        type_name: ID
       league:
         source: __self
+        type_name: String
       nested_fields2.current_players.__counts.affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       nested_fields2.current_players.__counts.affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       nested_fields2.current_players.__counts.affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       nested_fields2.current_players.__counts.affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       nested_fields2.current_players.__counts.affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       nested_fields2.current_players.__counts.affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       nested_fields2.current_players.__counts.nicknames:
         source: __self
+        type_name: Int
       nested_fields2.current_players.__counts.seasons_nested:
         source: __self
+        type_name: Int
       nested_fields2.current_players.__counts.seasons_object:
         source: __self
+        type_name: Int
       nested_fields2.current_players.__counts.seasons_object|awards:
         source: __self
+        type_name: Int
       nested_fields2.current_players.__counts.seasons_object|games_played:
         source: __self
+        type_name: Int
       nested_fields2.current_players.__counts.seasons_object|year:
         source: __self
+        type_name: Int
       nested_fields2.current_players.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       nested_fields2.current_players.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       nested_fields2.current_players.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       nested_fields2.current_players.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       nested_fields2.current_players.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       nested_fields2.current_players.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       nested_fields2.current_players.name:
         source: __self
+        type_name: String
       nested_fields2.current_players.nicknames:
         source: __self
+        type_name: String
       nested_fields2.current_players.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       nested_fields2.current_players.seasons_nested.awards:
         source: __self
+        type_name: String
       nested_fields2.current_players.seasons_nested.games_played:
         source: __self
+        type_name: Int
       nested_fields2.current_players.seasons_nested.year:
         source: __self
+        type_name: Int
       nested_fields2.current_players.seasons_object.awards:
         source: __self
+        type_name: String
       nested_fields2.current_players.seasons_object.games_played:
         source: __self
+        type_name: Int
       nested_fields2.current_players.seasons_object.year:
         source: __self
+        type_name: Int
       nested_fields2.forbes_valuation_moneys.amount_cents:
         source: __self
+        type_name: Int
       nested_fields2.forbes_valuation_moneys.currency:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.__counts.notes:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_nested:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|affiliations:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|name:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|nicknames:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|seasons_nested:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|seasons_object:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|seasons_object|awards:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|seasons_object|games_played:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.players_object|seasons_object|year:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.__counts.won_games_at:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.count:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.notes:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_nested.__counts.affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.__counts.affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.__counts.affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.__counts.affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.__counts.affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.__counts.affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.__counts.nicknames:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.__counts.seasons_nested:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.__counts.seasons_object:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.__counts.seasons_object|awards:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.__counts.seasons_object|games_played:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.__counts.seasons_object|year:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_nested.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       nested_fields2.the_seasons.players_nested.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_nested.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       nested_fields2.the_seasons.players_nested.name:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_nested.nicknames:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_nested.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.seasons_nested.awards:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_nested.seasons_nested.games_played:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.seasons_nested.year:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.seasons_object.awards:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_nested.seasons_object.games_played:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_nested.seasons_object.year:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_object.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_object.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_object.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       nested_fields2.the_seasons.players_object.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_object.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_object.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       nested_fields2.the_seasons.players_object.name:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_object.nicknames:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_object.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_object.seasons_nested.awards:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_object.seasons_nested.games_played:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_object.seasons_nested.year:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_object.seasons_object.awards:
         source: __self
+        type_name: String
       nested_fields2.the_seasons.players_object.seasons_object.games_played:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.players_object.seasons_object.year:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.result:
         source: __self
+        type_name: SeasonResult
       nested_fields2.the_seasons.stadium_location.lat:
         source: __self
+        type_name: Float
       nested_fields2.the_seasons.stadium_location.lon:
         source: __self
+        type_name: Float
       nested_fields2.the_seasons.started_at:
         source: __self
+        type_name: DateTime
       nested_fields2.the_seasons.the_record.first_win_on:
         source: __self
+        type_name: Date
       nested_fields2.the_seasons.the_record.last_win_date:
         source: __self
+        type_name: Date
       nested_fields2.the_seasons.the_record.loss_count:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.the_record.win_count:
         source: __self
+        type_name: Int
       nested_fields2.the_seasons.was_shortened:
         source: __self
+        type_name: Boolean
       nested_fields2.the_seasons.won_games_at:
         source: __self
+        type_name: DateTime
       nested_fields2.the_seasons.year:
         source: __self
+        type_name: Int
       past_names:
         source: __self
+        type_name: String
       seasons_nested.__counts.notes:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_nested:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|affiliations:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|name:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|nicknames:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|seasons_nested:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|seasons_object:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|seasons_object|awards:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|seasons_object|games_played:
         source: __self
+        type_name: Int
       seasons_nested.__counts.players_object|seasons_object|year:
         source: __self
+        type_name: Int
       seasons_nested.__counts.won_games_at:
         source: __self
+        type_name: Int
       seasons_nested.count:
         source: __self
+        type_name: Int
       seasons_nested.notes:
         source: __self
+        type_name: String
       seasons_nested.players_nested.__counts.affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.__counts.affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.__counts.affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.__counts.affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.__counts.affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.__counts.affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.__counts.nicknames:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.__counts.seasons_nested:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.__counts.seasons_object:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.__counts.seasons_object|awards:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.__counts.seasons_object|games_played:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.__counts.seasons_object|year:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       seasons_nested.players_nested.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       seasons_nested.players_nested.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       seasons_nested.players_nested.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       seasons_nested.players_nested.name:
         source: __self
+        type_name: String
       seasons_nested.players_nested.nicknames:
         source: __self
+        type_name: String
       seasons_nested.players_nested.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.seasons_nested.awards:
         source: __self
+        type_name: String
       seasons_nested.players_nested.seasons_nested.games_played:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.seasons_nested.year:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.seasons_object.awards:
         source: __self
+        type_name: String
       seasons_nested.players_nested.seasons_object.games_played:
         source: __self
+        type_name: Int
       seasons_nested.players_nested.seasons_object.year:
         source: __self
+        type_name: Int
       seasons_nested.players_object.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       seasons_nested.players_object.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       seasons_nested.players_object.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       seasons_nested.players_object.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       seasons_nested.players_object.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       seasons_nested.players_object.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       seasons_nested.players_object.name:
         source: __self
+        type_name: String
       seasons_nested.players_object.nicknames:
         source: __self
+        type_name: String
       seasons_nested.players_object.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       seasons_nested.players_object.seasons_nested.awards:
         source: __self
+        type_name: String
       seasons_nested.players_object.seasons_nested.games_played:
         source: __self
+        type_name: Int
       seasons_nested.players_object.seasons_nested.year:
         source: __self
+        type_name: Int
       seasons_nested.players_object.seasons_object.awards:
         source: __self
+        type_name: String
       seasons_nested.players_object.seasons_object.games_played:
         source: __self
+        type_name: Int
       seasons_nested.players_object.seasons_object.year:
         source: __self
+        type_name: Int
       seasons_nested.result:
         source: __self
+        type_name: SeasonResult
       seasons_nested.stadium_location.lat:
         source: __self
+        type_name: Float
       seasons_nested.stadium_location.lon:
         source: __self
+        type_name: Float
       seasons_nested.started_at:
         source: __self
+        type_name: DateTime
       seasons_nested.the_record.first_win_on:
         source: __self
+        type_name: Date
       seasons_nested.the_record.last_win_date:
         source: __self
+        type_name: Date
       seasons_nested.the_record.loss_count:
         source: __self
+        type_name: Int
       seasons_nested.the_record.win_count:
         source: __self
+        type_name: Int
       seasons_nested.was_shortened:
         source: __self
+        type_name: Boolean
       seasons_nested.won_games_at:
         source: __self
+        type_name: DateTime
       seasons_nested.year:
         source: __self
+        type_name: Int
       seasons_object.count:
         source: __self
+        type_name: Int
       seasons_object.notes:
         source: __self
+        type_name: String
       seasons_object.players_nested.__counts.affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       seasons_object.players_nested.__counts.affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       seasons_object.players_nested.__counts.affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       seasons_object.players_nested.__counts.affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       seasons_object.players_nested.__counts.affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       seasons_object.players_nested.__counts.affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       seasons_object.players_nested.__counts.nicknames:
         source: __self
+        type_name: Int
       seasons_object.players_nested.__counts.seasons_nested:
         source: __self
+        type_name: Int
       seasons_object.players_nested.__counts.seasons_object:
         source: __self
+        type_name: Int
       seasons_object.players_nested.__counts.seasons_object|awards:
         source: __self
+        type_name: Int
       seasons_object.players_nested.__counts.seasons_object|games_played:
         source: __self
+        type_name: Int
       seasons_object.players_nested.__counts.seasons_object|year:
         source: __self
+        type_name: Int
       seasons_object.players_nested.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       seasons_object.players_nested.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       seasons_object.players_nested.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       seasons_object.players_nested.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       seasons_object.players_nested.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       seasons_object.players_nested.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       seasons_object.players_nested.name:
         source: __self
+        type_name: String
       seasons_object.players_nested.nicknames:
         source: __self
+        type_name: String
       seasons_object.players_nested.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       seasons_object.players_nested.seasons_nested.awards:
         source: __self
+        type_name: String
       seasons_object.players_nested.seasons_nested.games_played:
         source: __self
+        type_name: Int
       seasons_object.players_nested.seasons_nested.year:
         source: __self
+        type_name: Int
       seasons_object.players_nested.seasons_object.awards:
         source: __self
+        type_name: String
       seasons_object.players_nested.seasons_object.games_played:
         source: __self
+        type_name: Int
       seasons_object.players_nested.seasons_object.year:
         source: __self
+        type_name: Int
       seasons_object.players_object.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       seasons_object.players_object.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       seasons_object.players_object.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       seasons_object.players_object.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       seasons_object.players_object.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       seasons_object.players_object.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       seasons_object.players_object.name:
         source: __self
+        type_name: String
       seasons_object.players_object.nicknames:
         source: __self
+        type_name: String
       seasons_object.players_object.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       seasons_object.players_object.seasons_nested.awards:
         source: __self
+        type_name: String
       seasons_object.players_object.seasons_nested.games_played:
         source: __self
+        type_name: Int
       seasons_object.players_object.seasons_nested.year:
         source: __self
+        type_name: Int
       seasons_object.players_object.seasons_object.awards:
         source: __self
+        type_name: String
       seasons_object.players_object.seasons_object.games_played:
         source: __self
+        type_name: Int
       seasons_object.players_object.seasons_object.year:
         source: __self
+        type_name: Int
       seasons_object.result:
         source: __self
+        type_name: SeasonResult
       seasons_object.stadium_location.lat:
         source: __self
+        type_name: Float
       seasons_object.stadium_location.lon:
         source: __self
+        type_name: Float
       seasons_object.started_at:
         source: __self
+        type_name: DateTime
       seasons_object.the_record.first_win_on:
         source: __self
+        type_name: Date
       seasons_object.the_record.last_win_date:
         source: __self
+        type_name: Date
       seasons_object.the_record.loss_count:
         source: __self
+        type_name: Int
       seasons_object.the_record.win_count:
         source: __self
+        type_name: Int
       seasons_object.was_shortened:
         source: __self
+        type_name: Boolean
       seasons_object.won_games_at:
         source: __self
+        type_name: DateTime
       seasons_object.year:
         source: __self
+        type_name: Int
       stadium_location.lat:
         source: __self
+        type_name: Float
       stadium_location.lon:
         source: __self
+        type_name: Float
       staff.coaches.id:
         source: __self
+        type_name: ID
       staff.coaches.name:
         source: __self
+        type_name: String
       staff.coaches.salary:
         source: profile
+        type_name: Int
       staff.general_manager.id:
         source: __self
+        type_name: ID
       staff.general_manager.name:
         source: __self
+        type_name: String
       staff.general_manager.salary:
         source: profile
+        type_name: Int
       the_nested_fields.current_players.__counts.affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.__counts.affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.__counts.affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.__counts.affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.__counts.affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.__counts.affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.__counts.nicknames:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.__counts.seasons_nested:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.__counts.seasons_object:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.__counts.seasons_object|awards:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.__counts.seasons_object|games_played:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.__counts.seasons_object|year:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       the_nested_fields.current_players.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       the_nested_fields.current_players.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       the_nested_fields.current_players.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       the_nested_fields.current_players.name:
         source: __self
+        type_name: String
       the_nested_fields.current_players.nicknames:
         source: __self
+        type_name: String
       the_nested_fields.current_players.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.seasons_nested.awards:
         source: __self
+        type_name: String
       the_nested_fields.current_players.seasons_nested.games_played:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.seasons_nested.year:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.seasons_object.awards:
         source: __self
+        type_name: String
       the_nested_fields.current_players.seasons_object.games_played:
         source: __self
+        type_name: Int
       the_nested_fields.current_players.seasons_object.year:
         source: __self
+        type_name: Int
       the_nested_fields.forbes_valuation_moneys.amount_cents:
         source: __self
+        type_name: Int
       the_nested_fields.forbes_valuation_moneys.currency:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.__counts.notes:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_nested:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|affiliations:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|name:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|nicknames:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|seasons_nested:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|seasons_object:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|seasons_object|awards:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|seasons_object|games_played:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.players_object|seasons_object|year:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.__counts.won_games_at:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.count:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.notes:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_nested.__counts.affiliations|sponsorships_nested:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.__counts.affiliations|sponsorships_object:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.__counts.affiliations|sponsorships_object|annual_total:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.__counts.affiliations|sponsorships_object|annual_total|amount_cents:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.__counts.affiliations|sponsorships_object|annual_total|currency:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.__counts.affiliations|sponsorships_object|sponsor_id:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.__counts.nicknames:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.__counts.seasons_nested:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.__counts.seasons_object:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.__counts.seasons_object|awards:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.__counts.seasons_object|games_played:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.__counts.seasons_object|year:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_nested.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       the_nested_fields.the_seasons.players_nested.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_nested.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       the_nested_fields.the_seasons.players_nested.name:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_nested.nicknames:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_nested.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.seasons_nested.awards:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_nested.seasons_nested.games_played:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.seasons_nested.year:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.seasons_object.awards:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_nested.seasons_object.games_played:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_nested.seasons_object.year:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_object.affiliations.sponsorships_nested.annual_total.amount_cents:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_object.affiliations.sponsorships_nested.annual_total.currency:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_object.affiliations.sponsorships_nested.sponsor_id:
         source: __self
+        type_name: ID
       the_nested_fields.the_seasons.players_object.affiliations.sponsorships_object.annual_total.amount_cents:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_object.affiliations.sponsorships_object.annual_total.currency:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_object.affiliations.sponsorships_object.sponsor_id:
         source: __self
+        type_name: ID
       the_nested_fields.the_seasons.players_object.name:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_object.nicknames:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_object.seasons_nested.__counts.awards:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_object.seasons_nested.awards:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_object.seasons_nested.games_played:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_object.seasons_nested.year:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_object.seasons_object.awards:
         source: __self
+        type_name: String
       the_nested_fields.the_seasons.players_object.seasons_object.games_played:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.players_object.seasons_object.year:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.result:
         source: __self
+        type_name: SeasonResult
       the_nested_fields.the_seasons.stadium_location.lat:
         source: __self
+        type_name: Float
       the_nested_fields.the_seasons.stadium_location.lon:
         source: __self
+        type_name: Float
       the_nested_fields.the_seasons.started_at:
         source: __self
+        type_name: DateTime
       the_nested_fields.the_seasons.the_record.first_win_on:
         source: __self
+        type_name: Date
       the_nested_fields.the_seasons.the_record.last_win_date:
         source: __self
+        type_name: Date
       the_nested_fields.the_seasons.the_record.loss_count:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.the_record.win_count:
         source: __self
+        type_name: Int
       the_nested_fields.the_seasons.was_shortened:
         source: __self
+        type_name: Boolean
       the_nested_fields.the_seasons.won_games_at:
         source: __self
+        type_name: DateTime
       the_nested_fields.the_seasons.year:
         source: __self
+        type_name: Int
       won_championships_at:
         source: __self
+        type_name: DateTime
     has_had_multiple_sources: true
     rollover:
       frequency: yearly
@@ -3009,42 +3577,61 @@ index_definitions_by_name:
     fields_by_path:
       __counts.widget_fee_currencies:
         source: __self
+        type_name: Int
       __counts.widget_names2:
         source: __self
+        type_name: Int
       __counts.widget_options|colors:
         source: __self
+        type_name: Int
       __counts.widget_options|sizes:
         source: __self
+        type_name: Int
       __counts.widget_tags:
         source: __self
+        type_name: Int
       details.symbol:
         source: __self
+        type_name: String
       details.unit:
         source: __self
+        type_name: String
       id:
         source: __self
+        type_name: ID
       introduced_on:
         source: __self
+        type_name: Date
       max_weight_in_ng:
         source: __self
+        type_name: JsonSafeLong
       name:
         source: __self
+        type_name: String
       nested_fields.max_widget_cost:
         source: __self
+        type_name: Int
       oldest_widget_created_at:
         source: __self
+        type_name: DateTime
       primary_continent:
         source: __self
+        type_name: String
       widget_fee_currencies:
         source: __self
+        type_name: String
       widget_names2:
         source: __self
+        type_name: String
       widget_options.colors:
         source: __self
+        type_name: Color
       widget_options.sizes:
         source: __self
+        type_name: Size
       widget_tags:
         source: __self
+        type_name: String
     rollover:
       frequency: yearly
       timestamp_field_path: introduced_on
@@ -3055,12 +3642,16 @@ index_definitions_by_name:
     fields_by_path:
       id:
         source: __self
+        type_name: ID
       name:
         source: __self
+        type_name: String
       widget.created_at:
         source: __self
+        type_name: DateTime
       widget.id:
         source: __self
+        type_name: ID
     route_with: id
   widgets:
     current_sources:
@@ -3072,114 +3663,169 @@ index_definitions_by_name:
     fields_by_path:
       __counts.amounts:
         source: __self
+        type_name: Int
       __counts.component_ids:
         source: __self
+        type_name: Int
       __counts.fees:
         source: __self
+        type_name: Int
       __counts.fees|amount_cents:
         source: __self
+        type_name: Int
       __counts.fees|currency:
         source: __self
+        type_name: Int
       __counts.release_dates:
         source: __self
+        type_name: Int
       __counts.release_timestamps:
         source: __self
+        type_name: Int
       __counts.tags:
         source: __self
+        type_name: Int
       amount_cents:
         source: __self
+        type_name: Int
       amounts:
         source: __self
+        type_name: Int
       component_ids:
         source: __self
+        type_name: ID
       cost.amount_cents:
         source: __self
+        type_name: Int
       cost.currency:
         source: __self
+        type_name: String
       cost_currency_introduced_on:
         source: __self
+        type_name: Date
       cost_currency_name:
         source: __self
+        type_name: String
       cost_currency_primary_continent:
         source: __self
+        type_name: String
       cost_currency_symbol:
         source: __self
+        type_name: String
       cost_currency_unit:
         source: __self
+        type_name: String
       created_at:
         source: __self
+        type_name: DateTime
       created_at_time_of_day:
         source: __self
+        type_name: LocalTime
       created_on:
         source: __self
+        type_name: Date
       description:
         source: __self
+        type_name: String
       fees.amount_cents:
         source: __self
+        type_name: Int
       fees.currency:
         source: __self
+        type_name: String
       id:
         source: __self
+        type_name: ID
       internal_details.name:
         source: __self
+        type_name: String
       internal_highlightable_details.name:
         source: __self
+        type_name: String
       internal_highlightable_name:
         source: __self
+        type_name: String
       internal_name:
         source: __self
+        type_name: String
       inventor.id:
         source: __self
+        type_name: ID
       inventor.name:
         source: __self
+        type_name: String
       inventor.nationality:
         source: __self
+        type_name: String
       inventor.stock_ticker:
         source: __self
+        type_name: String
       metadata:
         source: __self
+        type_name: Untyped
       name:
         source: __self
+        type_name: String
       name_text:
         source: __self
+        type_name: String
       named_inventor.id:
         source: __self
+        type_name: ID
       named_inventor.name:
         source: __self
+        type_name: String
       named_inventor.nationality:
         source: __self
+        type_name: String
       named_inventor.stock_ticker:
         source: __self
+        type_name: String
       options.color:
         source: __self
+        type_name: Color
       options.is_draft:
         source: __self
+        type_name: Boolean
       options.size:
         source: __self
+        type_name: Size
       options.the_sighs:
         source: __self
+        type_name: Size
       release_dates:
         source: __self
+        type_name: Date
       release_timestamps:
         source: __self
+        type_name: DateTime
       tags:
         source: __self
+        type_name: String
       the_opts.color:
         source: __self
+        type_name: Color
       the_opts.is_draft:
         source: __self
+        type_name: Boolean
       the_opts.size:
         source: __self
+        type_name: Size
       the_opts.the_sighs:
         source: __self
+        type_name: Size
       weight_in_ng:
         source: __self
+        type_name: JsonSafeLong
       weight_in_ng_str:
         source: __self
+        type_name: LongString
       workspace_id2:
         source: __self
+        type_name: ID
       workspace_name:
         source: workspace
+        type_name: String
     has_had_multiple_sources: true
     rollover:
       frequency: yearly

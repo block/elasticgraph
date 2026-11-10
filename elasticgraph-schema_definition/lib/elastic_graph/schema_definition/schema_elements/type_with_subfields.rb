@@ -519,10 +519,10 @@ module ElasticGraph
           indexing_fields_by_name_in_index.flat_map do |name, field|
             path = path_prefix + name
             source = field.source&.relationship_name || parent_source
-            index_field = SchemaArtifacts::RuntimeMetadata::IndexField.new(source: source)
+            list_count_index_field = SchemaArtifacts::RuntimeMetadata::IndexField.new(source: source, type_name: schema_def_state.type_ref("Int").name)
 
             list_count_field_tuples = field.paths_to_lists_for_count_indexing.map do |subpath|
-              [list_counts_state.path_to_count_subfield(subpath), index_field] # : [::String, SchemaArtifacts::RuntimeMetadata::IndexField]
+              [list_counts_state.path_to_count_subfield(subpath), list_count_index_field] # : [::String, SchemaArtifacts::RuntimeMetadata::IndexField]
             end
 
             if (object_type = field.type.fully_unwrapped.as_object_type)
@@ -539,7 +539,8 @@ module ElasticGraph
                 list_counts_state: new_list_counts_state
               )
             else
-              [[path, index_field]] # : ::Array[[::String, SchemaArtifacts::RuntimeMetadata::IndexField]]
+              leaf_index_field = SchemaArtifacts::RuntimeMetadata::IndexField.new(source: source, type_name: field.type.fully_unwrapped.name)
+              [[path, leaf_index_field]] # : ::Array[[::String, SchemaArtifacts::RuntimeMetadata::IndexField]]
             end + list_count_field_tuples
           end
         end

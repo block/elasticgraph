@@ -410,6 +410,37 @@ module ElasticGraph
           })
         end
 
+        it "retains the runtime metadata of the types of all index fields, including types that only `indexing_only` fields reference" do
+          ::File.write("schema.rb", <<~EOS)
+            ElasticGraph.define_schema do |schema|
+              schema.scalar_type "Code" do |t|
+                t.mapping type: "keyword"
+              end
+
+              schema.enum_type "Color" do |t|
+                t.value "RED"
+              end
+
+              schema.object_type "Widget" do |t|
+                t.field "id", "ID!"
+                t.field "code", "Code", indexing_only: true
+                t.field "color", "Color", indexing_only: true
+                t.index "widgets"
+              end
+            end
+          EOS
+
+          run_rake("schema_artifacts:dump")
+
+          # Nothing in the GraphQL schema references `Code` or `Color`, so they get pruned from the SDL...
+          expect(read_artifact(GRAPHQL_SCHEMA_FILE)).to exclude("Code", "Color")
+
+          # ...but the GraphQL layer still needs their runtime metadata to group on the index fields of those types.
+          runtime_meta = ::YAML.safe_load(read_artifact(RUNTIME_METADATA_FILE))
+          expect(runtime_meta.fetch("scalar_types_by_name").keys).to include("Code")
+          expect(runtime_meta.fetch("enum_types_by_name").keys).to include("Color")
+        end
+
         it "successfully checks schema artifacts when the rake task is run within a minimal schema definition bundle" do
           # We want to ensure that `elasticgraph-schema_definition` gem declares (in its gemspec) all the
           # dependencies necessary for the schema definition rake tasks. Unfortunately, its test suite

@@ -114,7 +114,7 @@ module ElasticGraph
         )
       end
 
-      it "is not dumped for any other types of enums (including user-defined ones) since there is no runtime metadata to store for them" do
+      it "dumps the grouping missing value placeholder of every enum type (including user-defined ones), so that groupings on any enum can use it" do
         results = define_schema do |s|
           s.enum_type "Color" do |t|
             t.values "RED", "BLUE", "GREEN"
@@ -129,17 +129,10 @@ module ElasticGraph
         end
 
         runtime_metadata = SchemaArtifacts::RuntimeMetadata::Schema.from_hash(results.runtime_metadata.to_dumpable_hash)
-        expect(runtime_metadata.enum_types_by_name.keys).to contain_exactly(
-          "DateGroupingTruncationUnit", "DateGroupingTruncationUnitInput",
-          "DateTimeGroupingTruncationUnit", "DateTimeGroupingTruncationUnitInput",
-          "DateTimeUnit", "DateTimeUnitInput",
-          "DateUnit", "DateUnitInput",
-          "DistanceUnit", "DistanceUnitInput",
-          "LocalTimeGroupingTruncationUnit", "LocalTimeGroupingTruncationUnitInput",
-          "LocalTimeUnit", "LocalTimeUnitInput",
-          "MatchesQueryAllowedEditsPerTerm", "MatchesQueryAllowedEditsPerTermInput",
-          "WidgetSortOrderInput"
-        )
+        placeholders_by_enum_name = runtime_metadata.enum_types_by_name.transform_values(&:grouping_missing_value_placeholder)
+
+        expect(placeholders_by_enum_name.keys).to include("Color", "ColorInput", "DayOfWeek", "DistanceUnit", "WidgetSortOrderInput")
+        expect(placeholders_by_enum_name.values.uniq).to eq [MISSING_ENUM_PLACEHOLDER]
       end
 
       it "uses dot-separated paths for nested sort fields" do

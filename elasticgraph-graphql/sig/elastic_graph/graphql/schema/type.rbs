@@ -9,6 +9,7 @@ module ElasticGraph
         attr_reader graphql_type: ::GraphQL::Schema::_Type
         attr_reader grouping_missing_value_placeholder: ::String? | ::Numeric?
         def search_index_definitions: () -> ::Array[DatastoreCore::_IndexDefinition]
+        def grouping_missing_value_placeholders_by_index_leaf_path: () -> ::Hash[::String, (::String | ::Numeric)?]
         def source_type: () -> Type?
         def subtypes: () -> ::Set[Type]
         def shares_index_with_non_subtypes?: () -> bool

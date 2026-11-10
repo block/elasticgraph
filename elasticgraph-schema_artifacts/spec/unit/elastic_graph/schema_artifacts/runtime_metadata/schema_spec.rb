@@ -122,7 +122,7 @@ module ElasticGraph
                 ],
                 current_sources: [SELF_RELATIONSHIP_NAME],
                 fields_by_path: {
-                  "foo.bar" => IndexField.new(source: "other")
+                  "foo.bar" => IndexField.new(source: "other", type_name: "String")
                 },
                 has_had_multiple_sources: false,
                 sourced_from_nested_paths_by_qualified_relationship: {
@@ -243,6 +243,7 @@ module ElasticGraph
             },
             "enum_types_by_name" => {
               "WidgetSort" => {
+                "grouping_missing_value_placeholder" => MISSING_ENUM_PLACEHOLDER,
                 "values_by_name" => {
                   "id_ASC" => {"sort_field" => {
                     "field_path" => "id",
@@ -255,6 +256,7 @@ module ElasticGraph
                 }
               },
               "DistanceUnit" => {
+                "grouping_missing_value_placeholder" => MISSING_ENUM_PLACEHOLDER,
                 "values_by_name" => {
                   "MILE" => {"datastore_abbreviation" => "mi"},
                   "KILOMETER" => {"datastore_abbreviation" => "km"}
@@ -271,7 +273,8 @@ module ElasticGraph
                 "current_sources" => [SELF_RELATIONSHIP_NAME],
                 "fields_by_path" => {
                   "foo.bar" => {
-                    "source" => "other"
+                    "source" => "other",
+                    "type_name" => "String"
                   }
                 },
                 "sourced_from_nested_paths_by_qualified_relationship" => {
@@ -365,12 +368,13 @@ module ElasticGraph
               "id_ASC" => enum_value_with(sort_field: SortField.new("id", :asc)),
               "id_DESC" => enum_value_with(sort_field: SortField.new("id", :desc))
             }),
-            "NoValues" => enum_type_with(values_by_name: {})
+            "PlaceholderOnly" => enum_type_with(values_by_name: {}),
+            "NoValues" => enum_type_with(values_by_name: {}, grouping_missing_value_placeholder: nil)
           })
 
           schema = Schema.from_hash(schema.to_dumpable_hash)
 
-          expect(schema.enum_types_by_name.keys).to contain_exactly("HasValues")
+          expect(schema.enum_types_by_name.keys).to contain_exactly("HasValues", "PlaceholderOnly")
         end
 
         it "builds from a minimal hash" do

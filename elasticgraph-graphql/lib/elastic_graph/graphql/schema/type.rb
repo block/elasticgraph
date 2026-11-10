@@ -31,7 +31,6 @@ module ElasticGraph
           index_definitions,
           object_runtime_metadata,
           enum_runtime_metadata,
-          scalar_runtime_metadata,
           resolvers_needing_lookahead
         )
           @schema = schema
@@ -51,7 +50,7 @@ module ElasticGraph
           end
 
           @fields_by_name = build_fields_by_name_hash(schema, graphql_type).freeze
-          @grouping_missing_value_placeholder = determine_grouping_missing_value_placeholder(scalar_runtime_metadata&.grouping_missing_value_placeholder)
+          @grouping_missing_value_placeholder = schema.grouping_missing_value_placeholder_for(graphql_type.unwrap.graphql_name)
         end
 
         def name
@@ -256,6 +255,14 @@ module ElasticGraph
           unwrapped_has_category?(:relay_edge)
         end
 
+        # Maps the path of each leaf field in this type's search indices to the placeholder that groupings on
+        # that field use for missing values.
+        def grouping_missing_value_placeholders_by_index_leaf_path
+          @grouping_missing_value_placeholders_by_index_leaf_path ||= search_index_definitions
+            .flat_map { |index_def| index_def.fields_by_path.to_a }
+            .to_h { |path, index_field| [path, @schema.grouping_missing_value_placeholder_for(index_field.type_name)] }
+        end
+
         # Indicates this type should be hidden in the GraphQL schema so as to not be queryable.
         # We only hide a type if both of the following are true:
         #
@@ -268,28 +275,14 @@ module ElasticGraph
 
         private
 
-        def determine_grouping_missing_value_placeholder(scalar_placeholder)
-          if enum?
-            MISSING_ENUM_PLACEHOLDER
-          elsif scalar_placeholder == MISSING_STRING_PLACEHOLDER
-            # We replace the MISSING_STRING_PLACEHOLDER ($SECURE_RANDOM) with the secure random value
-            # generated and stored at MISSING_STRING_PLACEHOLDER_VALUE.
-            MISSING_STRING_PLACEHOLDER_VALUE
-          else
-            # Note that if the type is not a scalar then scalar_placeholder will be nil.
-            # We don't use missing value placeholders (or group aggregations) on fields
-            # that are not scalars or enums.
-            scalar_placeholder
-          end
-        end
-
         def lookup_enum_value_by_name(enum_value_name)
           graphql_enum_value = @graphql_type.values.fetch(enum_value_name)
+          enum_runtime_metadata = @enum_runtime_metadata # : SchemaArtifacts::RuntimeMetadata::Enum::Type
 
           EnumValue.new(
             name: graphql_enum_value.graphql_name,
             type: self,
-            runtime_metadata: @enum_runtime_metadata&.values_by_name&.dig(enum_value_name)
+            runtime_metadata: enum_runtime_metadata.values_by_name[enum_value_name]
           )
         rescue KeyError => e
           msg = "No enum value named #{enum_value_name} (on type #{name}) could be found"

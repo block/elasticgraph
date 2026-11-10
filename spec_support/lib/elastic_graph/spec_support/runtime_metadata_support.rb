@@ -122,12 +122,12 @@ module ElasticGraph
           )
         end
 
-        def index_field_with(source: SELF_RELATIONSHIP_NAME)
-          IndexField.new(source: source)
+        def index_field_with(type_name:, source: SELF_RELATIONSHIP_NAME)
+          IndexField.new(source: source, type_name: type_name)
         end
 
-        def enum_type_with(values_by_name: {})
-          Enum::Type.new(values_by_name: values_by_name)
+        def enum_type_with(values_by_name: {}, grouping_missing_value_placeholder: MISSING_ENUM_PLACEHOLDER)
+          Enum::Type.new(values_by_name: values_by_name, grouping_missing_value_placeholder: grouping_missing_value_placeholder)
         end
 
         def enum_value_with(

@@ -121,7 +121,10 @@ module ElasticGraph
             .transform_values(&:runtime_metadata)
             .compact
 
-          SchemaArtifacts::RuntimeMetadata::Enum::Type.new(values_by_name: runtime_metadata_values_by_name)
+          SchemaArtifacts::RuntimeMetadata::Enum::Type.new(
+            values_by_name: runtime_metadata_values_by_name,
+            grouping_missing_value_placeholder: MISSING_ENUM_PLACEHOLDER
+          )
         end
 
         # @return [String] GraphQL SDL form of the enum type
