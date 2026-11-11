@@ -723,7 +723,7 @@ DEPENDENCIES
   jekyll (~> 4.4, >= 4.4.1)
   memory_profiler (~> 1.1)
   method_source (~> 1.1)
-  nokogiri (~> 1.19)
+  nokogiri (~> 1.19, >= 1.19.5)
   rack-test (~> 2.3)
   redcarpet (~> 3.6, >= 3.6.1)
   rouge!

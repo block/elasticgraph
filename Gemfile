@@ -22,7 +22,7 @@ group :development do
   gem "flatware-rspec", "~> 2.4", platforms: :ruby
   gem "httpx", "~> 1.9"
   gem "memory_profiler", "~> 1.1"
-  gem "nokogiri", "~> 1.19"
+  gem "nokogiri", "~> 1.19", ">= 1.19.5"
   gem "method_source", "~> 1.1"
   gem "rack-test", "~> 2.3"
   gem "rspec", "~> 3.13", ">= 3.13.2"
