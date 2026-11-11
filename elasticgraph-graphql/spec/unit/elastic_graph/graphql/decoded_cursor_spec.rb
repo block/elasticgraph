@@ -28,6 +28,15 @@ module ElasticGraph
           expect(cursor).to match(/\A[a-zA-Z0-9_-]{32,128}\z/)
         end
 
+        it "uses the standard JSON generator without requiring fast_generate" do
+          json = ::JSON.generate(sort_values)
+          json_api = Module.new
+          json_api.define_singleton_method(:generate, &::JSON.method(:generate))
+          stub_const("JSON", json_api)
+
+          expect(DecodedCursor.new(sort_values).encode).to eq(::Base64.urlsafe_encode64(json, padding: false))
+        end
+
         it "returns the special singleton cursor string when called on the singleton cursor" do
           cursor = DecodedCursor::SINGLETON.encode
 
