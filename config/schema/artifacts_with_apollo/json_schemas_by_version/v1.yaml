@@ -1040,6 +1040,12 @@ json_schema_version: 1
     required:
     - x
     - "y"
+  SeasonResult:
+    type: string
+    enum:
+    - WON_CHAMPIONSHIP
+    - MADE_PLAYOFFS
+    - MISSED_PLAYOFFS
   Size:
     type: string
     enum:
@@ -1395,6 +1401,13 @@ json_schema_version: 1
         ElasticGraph:
           type: TeamRecord
           nameInIndex: the_record
+      result:
+        anyOf:
+        - "$ref": "#/$defs/SeasonResult"
+        - type: 'null'
+        ElasticGraph:
+          type: SeasonResult
+          nameInIndex: result
       year:
         anyOf:
         - "$ref": "#/$defs/Int"
@@ -1466,6 +1479,7 @@ json_schema_version: 1
         default: TeamSeason
     required:
     - record
+    - result
     - year
     - notes
     - count

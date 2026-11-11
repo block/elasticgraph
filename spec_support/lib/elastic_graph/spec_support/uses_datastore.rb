@@ -236,6 +236,23 @@ RSpec.shared_context "datastore support", :capture_logs do
     end
   end
 
+  # Returns, for each performed search, the sorted field paths that have a `missing` aggregation. A grouping without
+  # a missing value placeholder needs a `missing` aggregation alongside its `terms` aggregation, at every sub-aggregation
+  # level. That makes the number of aggregations grow exponentially with the number of such groupings.
+  def missing_aggregation_field_paths_from_queries(cluster_name)
+    datastore_msearch_requests(cluster_name).flat_map do |req|
+      req.body.split("\n").each_slice(2).map do |_header_line, body_line|
+        missing_aggregation_field_paths_in(JSON.parse(body_line)["aggs"]).uniq.sort
+      end
+    end
+  end
+
+  def missing_aggregation_field_paths_in(aggs)
+    (aggs || {}).values.flat_map do |clause|
+      [clause.dig("missing", "field"), *missing_aggregation_field_paths_in(clause["aggs"])].compact
+    end
+  end
+
   def unrefreshed_bulk_calls(cluster_name)
     datastore_write_requests(cluster_name)
       .select { |req| req.url.path == "/_bulk" }
@@ -280,6 +297,16 @@ RSpec.shared_context "datastore support", :capture_logs do
       expect(indices_excluded_from_searches("other1").flatten).to eq []
       expect(indices_excluded_from_searches("other2").flatten).to eq []
       expect(indices_excluded_from_searches("other3").flatten).to eq []
+    end
+
+    # `missing` aggregations make the number of aggregations grow exponentially (see `missing_aggregation_field_paths_from_queries`),
+    # so tests that expect them must be tagged with `:expect_missing_aggregations` and should use
+    # `expect_last_query_to_use_missing_aggregations_on` to specify which field paths get them.
+    unless ex.metadata[:expect_missing_aggregations]
+      expect(missing_aggregation_field_paths_from_queries("main").flatten).to eq []
+      expect(missing_aggregation_field_paths_from_queries("other1").flatten).to eq []
+      expect(missing_aggregation_field_paths_from_queries("other2").flatten).to eq []
+      expect(missing_aggregation_field_paths_from_queries("other3").flatten).to eq []
     end
 
     # Verify that all queries specify what indices to search. If the index search expression is `""`,
@@ -394,6 +421,10 @@ RSpec.shared_context "datastore support", :capture_logs do
 
   def expect_to_have_excluded_indices(cluster_name, *excluded_indices_for_last_n_queries)
     expect(indices_excluded_from_searches(cluster_name).last(excluded_indices_for_last_n_queries.size)).to eq(excluded_indices_for_last_n_queries)
+  end
+
+  def expect_last_query_to_use_missing_aggregations_on(field_paths)
+    expect(missing_aggregation_field_paths_from_queries("main").last(1)).to eq([field_paths])
   end
 
   def make_datastore_calls(cluster_name, *methods_and_paths)

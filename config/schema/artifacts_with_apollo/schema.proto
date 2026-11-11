@@ -258,6 +258,16 @@ message Position {
   optional double y = 2;
 }
 
+enum SeasonResult {
+  // The default value when no enum value has been explicitly set. Do not use this value.
+  // See https://protobuf.dev/programming-guides/proto3/#enum-default.
+  SEASON_RESULT_UNSPECIFIED = 0;
+
+  SEASON_RESULT_WON_CHAMPIONSHIP = 1;
+  SEASON_RESULT_MADE_PLAYOFFS = 2;
+  SEASON_RESULT_MISSED_PLAYOFFS = 3;
+}
+
 enum Size {
   // The default value when no enum value has been explicitly set. Do not use this value.
   // See https://protobuf.dev/programming-guides/proto3/#enum-default.
@@ -333,6 +343,7 @@ message TeamRecord {
 
 message TeamSeason {
   optional .elasticgraph.TeamRecord record = 1;
+  optional .elasticgraph.SeasonResult result = 11;
   optional int32 year = 2;
   repeated string notes = 3;
   optional int32 count = 4;

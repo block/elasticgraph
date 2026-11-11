@@ -602,7 +602,7 @@ module ElasticGraph
           expect(results).to eq([{"doc_count" => 0, "key" => {}}])
         end
 
-        it "can group sub-aggregations on a single date field" do
+        it "can group sub-aggregations on a single date field", :expect_missing_aggregations do
           query = aggregation_query_of(name: "teams", sub_aggregations: [
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(name: "seasons_nested", groupings: [
               date_histogram_grouping_of("seasons_nested", "started_at", "year")
@@ -627,9 +627,11 @@ module ElasticGraph
               }
             }.with_missing_value_bucket(0)
           }])
+
+          expect_last_query_to_use_missing_aggregations_on(["seasons_nested.started_at"])
         end
 
-        it "can group sub-aggregations on multiple date fields" do
+        it "can group sub-aggregations on multiple date fields", :expect_missing_aggregations do
           query = aggregation_query_of(name: "teams", sub_aggregations: [
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(name: "seasons_nested", groupings: [
               date_histogram_grouping_of("seasons_nested", "started_at", "year"),
@@ -667,9 +669,11 @@ module ElasticGraph
               "buckets" => []
             }}.with_missing_value_bucket(0))
           }])
+
+          expect_last_query_to_use_missing_aggregations_on(["seasons_nested.started_at", "seasons_nested.won_games_at"])
         end
 
-        it "can group sub-aggregations on a single non-date field and a single date field" do
+        it "can group sub-aggregations on a single non-date field and a single date field", :expect_missing_aggregations do
           query = aggregation_query_of(name: "teams", sub_aggregations: [
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(name: "seasons_nested", groupings: [
               date_histogram_grouping_of("seasons_nested", "started_at", "year"),
@@ -722,9 +726,11 @@ module ElasticGraph
               "buckets" => []
             }})
           }])
+
+          expect_last_query_to_use_missing_aggregations_on(["seasons_nested.started_at"])
         end
 
-        it "can group sub-aggregations on multiple non-date fields and a single date field" do
+        it "can group sub-aggregations on multiple non-date fields and a single date field", :expect_missing_aggregations do
           query = aggregation_query_of(name: "teams", sub_aggregations: [
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(name: "seasons_nested", groupings: [
               date_histogram_grouping_of("seasons_nested", "started_at", "year"),
@@ -799,9 +805,11 @@ module ElasticGraph
               "buckets" => []
             }})
           }])
+
+          expect_last_query_to_use_missing_aggregations_on(["seasons_nested.started_at"])
         end
 
-        it "can group sub-aggregations on multiple non-date fields and multiple date fields" do
+        it "can group sub-aggregations on multiple non-date fields and multiple date fields", :expect_missing_aggregations do
           query = aggregation_query_of(name: "teams", sub_aggregations: [
             nested_sub_aggregation_of(path_in_index: ["seasons_nested"], query: sub_aggregation_query_of(name: "seasons_nested", groupings: [
               date_histogram_grouping_of("seasons_nested", "started_at", "year"),
@@ -910,6 +918,8 @@ module ElasticGraph
               "buckets" => []
             }}))
           }])
+
+          expect_last_query_to_use_missing_aggregations_on(["seasons_nested.started_at", "seasons_nested.won_games_at"])
         end
 
         it "accounts for an extra filtering layer in the `buckets_path` meta" do
@@ -945,7 +955,7 @@ module ElasticGraph
           }])
         end
 
-        it "ignores date histogram buckets that have no documents in them" do
+        it "ignores date histogram buckets that have no documents in them", :expect_missing_aggregations do
           index_into(
             graphql,
             build(
@@ -971,6 +981,8 @@ module ElasticGraph
             date_histogram_bucket(2021, 1),
             date_histogram_bucket(2022, 2)
           ])
+
+          expect_last_query_to_use_missing_aggregations_on(["seasons_nested.started_at"])
         end
 
         it "gets `doc_count_error_upper_bound` based on the `needs_doc_count_error` query flag" do

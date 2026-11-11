@@ -12252,6 +12252,152 @@ type SearchHighlight {
   snippets: [String!]!
 }
 
+enum SeasonResult {
+  MADE_PLAYOFFS
+  MISSED_PLAYOFFS
+  WON_CHAMPIONSHIP
+}
+
+"""
+Input type used to specify filters on `SeasonResult` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input SeasonResultFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `SeasonResultFilterInput` input because of collisions
+  between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [SeasonResultFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [SeasonResultFilterInput!]
+
+  """
+  Matches records where the field value is equal to any of the provided values.
+  This works just like an IN operator in SQL.
+
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
+  """
+  equal_to_any_of: [SeasonResultInput]
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: SeasonResultFilterInput
+}
+
+enum SeasonResultInput {
+  MADE_PLAYOFFS
+  MISSED_PLAYOFFS
+  WON_CHAMPIONSHIP
+}
+
+"""
+Input type used to specify filters on elements of a `[SeasonResult]` field.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input SeasonResultListElementFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `SeasonResultListElementFilterInput` input because of
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [SeasonResultListElementFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [SeasonResultListElementFilterInput!]
+
+  """
+  Matches records where the field value is equal to any of the provided values.
+  This works just like an IN operator in SQL.
+
+  When `null` is passed, matches all documents. When an empty list is passed,
+  this part of the filter matches no documents. When `null` is passed in the
+  list, this part of the filter matches records where the field value is `null`.
+  """
+  equal_to_any_of: [SeasonResultInput!]
+}
+
+"""
+Input type used to specify filters on `[SeasonResult]` fields.
+
+Will match all documents if passed as an empty object (or as `null`).
+"""
+input SeasonResultListFilterInput {
+  """
+  Matches records where all of the provided sub-filters evaluate to true. This works just like an AND operator in SQL.
+
+  Note: multiple filters are automatically ANDed together. This is only needed when you have multiple filters that can't
+  be provided on a single `SeasonResultListFilterInput` input because of
+  collisions between key names. For example, if you want to AND multiple
+  OR'd sub-filters (the equivalent of (A OR B) AND (C OR D)), you could do all_of: [{any_of: [...]}, {any_of: [...]}].
+
+  When `null` or an empty list is passed, matches all documents.
+  """
+  all_of: [SeasonResultListFilterInput!]
+
+  """
+  Matches records where any of the provided sub-filters evaluate to true.
+  This works just like an OR operator in SQL.
+
+  When `null` is passed, matches all documents.
+  When an empty list is passed, this part of the filter matches no documents.
+  """
+  any_of: [SeasonResultListFilterInput!]
+
+  """
+  Matches records where any of the list elements match the provided sub-filter.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  any_satisfy: SeasonResultListElementFilterInput
+
+  """
+  Used to filter on the number of non-null elements in this list field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  count: IntFilterInput
+
+  """
+  Matches records where the provided sub-filter evaluates to false.
+  This works just like a NOT operator in SQL.
+
+  When `null` or an empty object is passed, matches no documents.
+  """
+  not: SeasonResultListFilterInput
+}
+
 enum Size {
   LARGE
   MEDIUM
@@ -15186,6 +15332,7 @@ type TeamSeason {
   players_nested: [Player!]!
   players_object: [Player!]!
   record: TeamRecord
+  result: SeasonResult
   stadium_location: GeoLocation
   started_at: DateTime
   was_shortened: Boolean
@@ -15216,6 +15363,11 @@ type TeamSeasonAggregatedValues {
   Computed aggregate values for the `record` field.
   """
   record: TeamRecordAggregatedValues
+
+  """
+  Computed aggregate values for the `result` field.
+  """
+  result: NonNumericAggregatedValues
 
   """
   Computed aggregate values for the `stadium_location` field.
@@ -15314,6 +15466,13 @@ input TeamSeasonFieldsListFilterInput {
   When `null` or an empty object is passed, matches all documents.
   """
   record: TeamRecordFieldsListFilterInput
+
+  """
+  Used to filter on the `result` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  result: SeasonResultListFilterInput
 
   """
   Used to filter on the `stadium_location` field.
@@ -15422,6 +15581,13 @@ input TeamSeasonFilterInput {
   record: TeamRecordFilterInput
 
   """
+  Used to filter on the `result` field.
+
+  When `null` or an empty object is passed, matches all documents.
+  """
+  result: SeasonResultFilterInput
+
+  """
   Used to filter on the `stadium_location` field.
 
   When `null` or an empty object is passed, matches all documents.
@@ -15495,6 +15661,11 @@ type TeamSeasonGroupedBy {
   record: TeamRecordGroupedBy
 
   """
+  The `result` field value for this group.
+  """
+  result: SeasonResult
+
+  """
   Offers the different grouping options for the `stadium_location` value within this group.
   """
   stadium_location: GeoLocationGroupedBy
@@ -15544,6 +15715,11 @@ type TeamSeasonHighlights {
   Search highlights for the `players_object`, providing snippets of the matching text.
   """
   players_object: PlayerHighlights
+
+  """
+  Search highlights for the `result`, providing snippets of the matching text.
+  """
+  result: [String!]!
 }
 
 """

@@ -201,6 +201,8 @@ index_templates:
                   first_win_on:
                     type: date
                     format: strict_date
+              result:
+                type: keyword
               year:
                 type: integer
               notes:
@@ -402,6 +404,8 @@ index_templates:
                   first_win_on:
                     type: date
                     format: strict_date
+              result:
+                type: keyword
               year:
                 type: integer
               notes:
@@ -653,6 +657,8 @@ index_templates:
                       first_win_on:
                         type: date
                         format: strict_date
+                  result:
+                    type: keyword
                   year:
                     type: integer
                   notes:
@@ -942,6 +948,8 @@ index_templates:
                       first_win_on:
                         type: date
                         format: strict_date
+                  result:
+                    type: keyword
                   year:
                     type: integer
                   notes:
@@ -1211,6 +1219,8 @@ index_templates:
               seasons_object|the_record|last_win_date:
                 type: integer
               seasons_object|the_record|first_win_on:
+                type: integer
+              seasons_object|result:
                 type: integer
               seasons_object|year:
                 type: integer

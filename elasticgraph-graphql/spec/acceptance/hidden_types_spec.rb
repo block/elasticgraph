@@ -95,6 +95,7 @@ module ElasticGraph
             type_and_filters_for("Untyped") +
             type_and_filters_for("LongString") +
             type_and_filters_for("Material", as_input_enum: true) +
+            type_and_filters_for("SeasonResult", include_list: true, as_input_enum: true) +
             type_and_filters_for("Size", include_list: true, as_input_enum: true) +
             type_and_filters_for("TeamNestedFields") + ["TeamNestedFieldsHighlights"] +
             type_and_filters_for("Affiliations") +
