@@ -1,6 +1,7 @@
 module ElasticGraph
   DATASTORE_DATE_FORMAT: ::String
   DATASTORE_DATE_TIME_FORMAT: ::String
+  GEO_TILE_ZOOM_LEVELS: ::Range[::Integer]
   TIMEOUT_MS_HEADER: ::String
   INT_MIN: ::Integer
   INT_MAX: ::Integer

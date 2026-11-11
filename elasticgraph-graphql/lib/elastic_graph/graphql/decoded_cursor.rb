@@ -55,7 +55,7 @@ module ElasticGraph
       # Encodes the cursor to a string using JSON and Base64 encoding.
       def encode
         @encode ||= begin
-          json = ::JSON.fast_generate(sort_values)
+          json = ::JSON.generate(sort_values)
           ::Base64.urlsafe_encode64(json, padding: false)
         end
       end

@@ -146,6 +146,9 @@ module ElasticGraph
         :offset, :amount, :unit, :time_zone, :truncation_unit,
         # TODO: Drop support for legacy grouping schema that uses `granularity` and `offset_days`
         :granularity, :offset_days,
+        # Geographic grouping fields and arguments.
+        :as_geo_tile, :zoom_level, :x, :y, :map_center_point, :bounds, :corners,
+        :north, :south, :east, :west, :northwest, :northeast, :southwest, :southeast,
         # For aggregation counts.
         :approximate_value, :exact_value, :upper_bound,
         # For pagination.

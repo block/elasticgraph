@@ -1,0 +1,32 @@
+query VenueCountsByGeoTile {
+  venueAggregations {
+    nodes {
+      count
+      groupedBy {
+        location {
+          asGeoTile(zoomLevel: 8) {
+            zoomLevel
+            x
+            y
+            mapCenterPoint {
+              latitude
+              longitude
+            }
+            bounds {
+              north
+              south
+              east
+              west
+            }
+            corners {
+              northwest { latitude longitude }
+              northeast { latitude longitude }
+              southwest { latitude longitude }
+              southeast { latitude longitude }
+            }
+          }
+        }
+      }
+    }
+  }
+}

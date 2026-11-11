@@ -114,10 +114,11 @@ module ElasticGraph
               FloatAggregatedValues IntAggregatedValues JsonSafeLongAggregatedValues LongStringAggregatedValues NonNumericAggregatedValues
               DateAggregatedValues DateTimeAggregatedValues LocalTimeAggregatedValues
               Company Cursor PageInfo Person Query TextFilterInput GeoLocation
+              GeoLocationGroupedBy GeoTile GeoTileBounds GeoTileCorners
               DateTimeGroupingOffsetInput DateTimeUnitInput DateTimeTimeOfDayFilterInput
               DateGroupedBy DateGroupingGranularityInput DateGroupingOffsetInput DateGroupingTruncationUnitInput DateUnitInput
               DateTimeGroupedBy DateTimeGroupingGranularityInput DateTimeGroupingTruncationUnitInput TimeZone
-              DayOfWeek DayOfWeekGroupingOffsetInput DistanceUnitInput GeoLocationFilterInput GeoLocationDistanceFilterInput
+              DayOfWeek DayOfWeekGroupingOffsetInput DistanceUnitInput GeoLocationFilterInput GeoLocationDistanceFilterInput GeoLocationListFilterInput GeoLocationListElementFilterInput
               IntListFilterInput IntListElementFilterInput AggregationCountDetail
               LocalTimeGroupingOffsetInput LocalTimeGroupingTruncationUnitInput LocalTimeUnitInput MatchesQueryFilterInput
               MatchesPhraseFilterInput MatchesQueryAllowedEditsPerTermInput

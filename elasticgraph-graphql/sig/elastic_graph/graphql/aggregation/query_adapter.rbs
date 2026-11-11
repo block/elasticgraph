@@ -113,6 +113,11 @@ module ElasticGraph
           get_offset: ^(::Hash[::String, untyped]) -> ::String?
         ) -> ::Array[DateHistogramGrouping]
 
+        def geo_tile_groupings_from: (
+          field_path: ::Array[PathSegment],
+          node: ::GraphQL::Execution::Lookahead,
+        ) -> ::Array[GeoTileGrouping]
+
         def interval_from: (
           ::GraphQL::Execution::Lookahead,
           ::Hash[::String, untyped],

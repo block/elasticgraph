@@ -64,6 +64,9 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+        env:
+          # Ruby 3.2.11 headers use bool without including stdbool.h when building native gems.
+          BUNDLE_BUILD__IO___EVENT: ${{ matrix.ruby == '3.2' && '--with-cppflags="-include stdbool.h"' || '' }}
 
       - name: Setup Docker Compose
         uses: KengoTODA/actions-setup-docker-compose@059437ac4daa2ca1c52f19e3c311aaf52cb4ccef # main
