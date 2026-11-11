@@ -150,25 +150,30 @@ module ElasticGraph
 
           missing_bucket_inner_agg_hash = inner_agg_hash.key?("aggs") ? inner_agg_hash : {} # : ::Hash[::String, untyped]
 
-          AggregationDetail.new(
-            {
-              agg_key => grouping.non_composite_clause_for(query).merge(inner_agg_hash),
+          wrapped_clauses = {
+            agg_key => grouping.non_composite_clause_for(query).merge(inner_agg_hash),
 
-              # Here we include a `missing` aggregation as a sibling to the main grouping aggregation. We do this
-              # so that we get a bucket of documents that have `null` values for the field we are grouping on, in
-              # order to provide the same behavior as the `CompositeGroupingAdapter` (which uses the built-in
-              # `missing_bucket` option).
-              #
-              # To work correctly, we need to include this `missing` aggregation as a sibling at _every_ level of
-              # the aggregation structure, and the `missing` aggregation needs the same child aggregations as the
-              # main grouping aggregation has. Given the recursive nature of how this is applied, this results in
-              # a fairly complex structure, even though conceptually the idea behind this isn't _too_ bad.
-              Key.missing_value_bucket_key(agg_key) => {
-                "missing" => {"field" => grouping.encoded_index_field_path}
-              }.merge(missing_bucket_inner_agg_hash)
-            },
-            {"buckets_path" => [agg_key]}
-          )
+            # Here we include a `missing` aggregation as a sibling to the main grouping aggregation. We do this
+            # so that we get a bucket of documents that have `null` values for the field we are grouping on, in
+            # order to provide the same behavior as the `CompositeGroupingAdapter` (which uses the built-in
+            # `missing_bucket` option).
+            #
+            # To work correctly, we need to include this `missing` aggregation as a sibling at _every_ level of
+            # the aggregation structure, and the `missing` aggregation needs the same child aggregations as the
+            # main grouping aggregation has. Given the recursive nature of how this is applied, this results in
+            # a fairly complex structure, even though conceptually the idea behind this isn't _too_ bad.
+            Key.missing_value_bucket_key(agg_key) => {
+              "missing" => {"field" => grouping.encoded_index_field_path}
+            }.merge(missing_bucket_inner_agg_hash)
+          }
+
+          if query.needs_doc_count_error && grouping.bounds_count_error_with_value_count?
+            wrapped_clauses = wrapped_clauses.merge({
+              Key.value_count_key(agg_key) => {"value_count" => {"field" => grouping.encoded_index_field_path}}
+            })
+          end
+
+          AggregationDetail.new(wrapped_clauses, {"buckets_path" => [agg_key]})
         end
       end
     end

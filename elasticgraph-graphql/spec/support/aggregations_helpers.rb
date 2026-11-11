@@ -10,6 +10,7 @@ require "elastic_graph/graphql/aggregation/composite_grouping_adapter"
 require "elastic_graph/graphql/aggregation/computation"
 require "elastic_graph/graphql/aggregation/date_histogram_grouping"
 require "elastic_graph/graphql/aggregation/field_term_grouping"
+require "elastic_graph/graphql/aggregation/geo_tile_grouping"
 require "elastic_graph/graphql/aggregation/key"
 require "elastic_graph/graphql/aggregation/nested_sub_aggregation"
 require "elastic_graph/graphql/aggregation/non_composite_grouping_adapter"
@@ -88,6 +89,11 @@ module ElasticGraph
     def field_term_grouping_of(*field_names_in_index, field_names_in_graphql_query: field_names_in_index)
       field_path = build_field_path(names_in_index: field_names_in_index, names_in_graphql_query: field_names_in_graphql_query)
       GraphQL::Aggregation::FieldTermGrouping.new(field_path: field_path)
+    end
+
+    def geo_tile_grouping_of(*field_names_in_index, zoom_level:, field_names_in_graphql_query: field_names_in_index + ["as_geo_tile"])
+      field_path = build_field_path(names_in_index: field_names_in_index, names_in_graphql_query: field_names_in_graphql_query)
+      GraphQL::Aggregation::GeoTileGrouping.new(field_path: field_path, zoom_level: zoom_level)
     end
 
     def nested_sub_aggregation_of(path_in_index: nil, query: nil, path_in_graphql_query: path_in_index)

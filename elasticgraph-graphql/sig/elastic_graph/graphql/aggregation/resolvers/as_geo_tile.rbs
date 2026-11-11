@@ -1,0 +1,11 @@
+module ElasticGraph
+  class GraphQL
+    module Aggregation
+      module Resolvers
+        class AsGeoTile
+          include _GraphQLResolverWithLookahead
+        end
+      end
+    end
+  end
+end

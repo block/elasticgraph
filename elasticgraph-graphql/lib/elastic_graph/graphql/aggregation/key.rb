@@ -54,6 +54,12 @@ module ElasticGraph
           Key.encode([base_key, "m"])
         end
 
+        # Encodes the key used for a `value_count` aggregation used to bound the count error of
+        # groupings whose datastore aggregation reports no count error.
+        def self.value_count_key(base_key)
+          Key.encode([base_key, "vc"])
+        end
+
         # Extracts an aggregation name from a string that could either already be an aggregation name, or could
         # be an encoded key. We need this for dealing with the multiple forms that aggregation responses take:
         #

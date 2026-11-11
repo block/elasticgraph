@@ -19,6 +19,7 @@ module ElasticGraph
         result = graphql_resolvers_by_name
 
         expect(result.keys).to contain_exactly(
+          :as_geo_tile,
           :get_record_field_value,
           :list_records,
           :nested_relationships,
@@ -118,6 +119,7 @@ module ElasticGraph
             To continue, register the named resolvers with `schema.register_graphql_resolver`
             or update the fields listed above to use one of the other registered resolvers:
 
+              - :as_geo_tile
               - :get_record_field_value
               - :list_records
               - :nested_relationships

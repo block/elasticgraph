@@ -23,7 +23,8 @@ module ElasticGraph
           ::Hash[::String, untyped],
           ::Array[::String],
           ?parent_key_fields: ::Hash[::String, untyped],
-          ?parent_key_values: ::Array[untyped]
+          ?parent_key_values: ::Array[untyped],
+          ?parent_count_error: ::Integer?
         ) -> ::Array[::Hash[::String, untyped]]
 
         def self.sort_and_truncate_buckets: (
@@ -32,6 +33,7 @@ module ElasticGraph
         ) -> ::Array[::Hash[::String, untyped]]
 
         def self.missing_bucket_path_from: (::Array[::String]) -> ::Array[::String]
+        def self.value_count_path_from: (::Array[::String]) -> ::Array[::String]
       end
     end
   end

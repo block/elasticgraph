@@ -15,11 +15,9 @@ module ElasticGraph
       module Resolvers
         class GroupedBy < ::Data.define(:bucket, :field_path)
           def resolve(field:, object:, args:, context:, lookahead:)
-            new_field_path = field_path + [PathSegment.for(field: field, lookahead: lookahead)]
-            return with(field_path: new_field_path) if field.type.object?
+            return with(field_path: field_path_for(field, lookahead)) if field.type.object?
 
-            bucket_entry = Support::HashUtil.verbose_fetch(bucket, "key")
-            value = Support::HashUtil.verbose_fetch(bucket_entry, FieldPathEncoder.encode(new_field_path.map(&:name_in_graphql_query)))
+            value = key_value_for(field: field, lookahead: lookahead)
 
             if field.type.unwrap_fully.name == "Boolean"
               work_around_terms_aggregation_boolean_value(value)
@@ -28,7 +26,18 @@ module ElasticGraph
             end
           end
 
+          # Reads a raw grouping key using the selected field's full path and aliases.
+          def key_value_for(field:, lookahead:)
+            bucket_entry = Support::HashUtil.verbose_fetch(bucket, "key")
+            Support::HashUtil.verbose_fetch(bucket_entry, FieldPathEncoder.encode(field_path_for(field, lookahead).map(&:name_in_graphql_query)))
+          end
+
           private
+
+          # Extends the grouping path with the selected field, including any client alias.
+          def field_path_for(field, lookahead)
+            field_path + [PathSegment.for(field: field, lookahead: lookahead)]
+          end
 
           # Elasticsearch/OpenSearch generally return `true`/`false` for Boolean fields. However, there's one exception to that[^1]:
           #
