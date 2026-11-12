@@ -91,10 +91,13 @@ module ElasticGraph
                 f.resolve_with :apollo_entity_ref, source_id_field: id_field_name_in_index, exposed_id_field: exposed_id_field
               end
 
-              f.groupable = f.groupable != false && groupable_by_id?(f, id_field_name_in_index)
-              f.grouped_by_field_type = f.type.fully_unwrapped.name
-              f.customize_grouped_by_field do |grouped_by_field|
-                grouped_by_field.resolve_with :apollo_entity_grouped_by_ref, exposed_id_field: exposed_id_field
+              if f.groupable != false && groupable_by_id?(f, id_field_name_in_index)
+                f.grouped_by_field_type = f.type.fully_unwrapped.name
+                f.customize_grouped_by_field do |grouped_by_field|
+                  grouped_by_field.resolve_with :apollo_entity_grouped_by_ref, exposed_id_field: exposed_id_field
+                end
+              else
+                f.groupable = false
               end
             end
 
