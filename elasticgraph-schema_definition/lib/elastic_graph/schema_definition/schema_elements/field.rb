@@ -90,6 +90,8 @@ module ElasticGraph
       #   @private
       # @!attribute [rw] as_input
       #   @private
+      # @!attribute [rw] object_grouping_leaf_type_name
+      #   @private
       class Field < Struct.new(
         :name, :original_type, :parent_type, :original_type_for_derived_types, :schema_def_state, :accuracy_confidence,
         :filter_customizations, :grouped_by_customizations, :grouped_by_field_type, :highlights_customizations, :sub_aggregations_customizations,
@@ -97,7 +99,7 @@ module ElasticGraph
         :sortable, :filterable, :aggregatable, :groupable, :highlightable, :returnable,
         :graphql_only, :source, :runtime_field_script, :relationship, :singular_name,
         :computation_function, :as_input,
-        :name_in_index, :resolver
+        :name_in_index, :resolver, :object_grouping_leaf_type_name
       )
         include Mixins::HasDocumentation
         include Mixins::HasDirectives
@@ -143,7 +145,8 @@ module ElasticGraph
             singular_name: singular,
             name_in_index: name_in_index,
             as_input: as_input,
-            resolver: resolver
+            resolver: resolver,
+            object_grouping_leaf_type_name: nil
           )
 
           if name != name_in_index
@@ -841,6 +844,14 @@ module ElasticGraph
             add_grouped_by_field_documentation(f)
 
             grouped_by_customizations.each { |block| block.call(f) }
+
+            # An object-typed field can be grouped by a leaf index field (such as an Apollo entity ref). The field's own
+            # type has no missing value placeholder, so we record the leaf type for the query engine to use.
+            unless type_for_derived_types.fully_unwrapped.leaf?
+              f.object_grouping_leaf_type_name = self.parent_type.indexing_field_at(f.name_in_index)&.type&.fully_unwrapped&.then do |type|
+                type.name if type.leaf?
+              end
+            end
           end
         end
 
@@ -1124,7 +1135,8 @@ module ElasticGraph
             name_in_index: name_in_index,
             computation_function: computation_function,
             relation: relationship&.runtime_metadata,
-            resolver: resolver
+            resolver: resolver,
+            object_grouping_leaf_type_name: object_grouping_leaf_type_name
           )
         end
 
@@ -1134,19 +1146,7 @@ module ElasticGraph
         # @private
         def backing_indexing_field
           return nil unless graphql_only
-
-          type = parent_type
-          field = nil
-
-          name_in_index.split(".").each do |path_part|
-            if (field = type&.indexing_fields_by_name_in_index&.fetch(path_part, nil))
-              type = field.type.fully_unwrapped.as_object_type
-            else
-              return nil
-            end
-          end
-
-          field
+          parent_type.indexing_field_at(name_in_index)
         end
 
         private

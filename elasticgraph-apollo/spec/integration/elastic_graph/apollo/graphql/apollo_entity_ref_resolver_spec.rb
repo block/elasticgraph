@@ -66,7 +66,7 @@ module ElasticGraph
           )
         end
 
-        it "groups by an entity ref field in a sub-aggregation, including a group for the missing id", :expect_missing_aggregations do
+        it "groups by an entity ref field in a sub-aggregation, including a group for the missing id" do
           sponsorship = ->(sponsor_id) { build(:sponsorship, sponsor_id: sponsor_id) }
           players = ->(*sponsor_ids) { [build(:player, affiliations: build(:affiliations, sponsorships: sponsor_ids.map(&sponsorship)))] }
           index_records(
@@ -104,7 +104,6 @@ module ElasticGraph
             {"grouped_by" => {"the_sponsor" => {"id" => "s2"}}, "count_detail" => {"approximate_value" => 1}},
             {"grouped_by" => {"the_sponsor" => nil}, "count_detail" => {"approximate_value" => 1}}
           )
-          expect_last_query_to_use_missing_aggregations_on(["current_players_nested.affiliations.sponsorships_nested.sponsor_id"])
         end
 
         it "groups list entity references on individual ids without counting duplicate ids twice per document" do

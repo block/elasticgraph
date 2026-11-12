@@ -66,7 +66,8 @@ module ElasticGraph
                     computation_function: nil,
                     name_in_index: "name_index",
                     relation: nil,
-                    resolver: ConfiguredGraphQLResolver.new(:self, {arg1: 17})
+                    resolver: ConfiguredGraphQLResolver.new(:self, {arg1: 17}),
+                    object_grouping_leaf_type_name: "String"
                   ),
                   "parent" => GraphQLField.new(
                     computation_function: nil,
@@ -77,13 +78,15 @@ module ElasticGraph
                       additional_filter: {"flag_field" => {"equalToAnyOf" => [true]}},
                       foreign_key_nested_paths: ["grandparents", "grandparents.parents"]
                     ),
-                    resolver: ConfiguredGraphQLResolver.new(:self, {})
+                    resolver: ConfiguredGraphQLResolver.new(:self, {}),
+                    object_grouping_leaf_type_name: nil
                   ),
                   "sum" => GraphQLField.new(
                     computation_function: :sum,
                     name_in_index: "sum",
                     relation: nil,
-                    resolver: ConfiguredGraphQLResolver.new(:self, {})
+                    resolver: ConfiguredGraphQLResolver.new(:self, {}),
+                    object_grouping_leaf_type_name: nil
                   )
                 },
                 elasticgraph_category: :some_category,
@@ -197,6 +200,7 @@ module ElasticGraph
                 "graphql_fields_by_name" => {
                   "name_graphql" => {
                     "name_in_index" => "name_index",
+                    "object_grouping_leaf_type_name" => "String",
                     "resolver" => {"name" => "self", "config" => {"arg1" => 17}}
                   },
                   "parent" => {
@@ -344,7 +348,8 @@ module ElasticGraph
                 name_in_index: "name_index",
                 computation_function: nil,
                 relation: nil,
-                resolver: ConfiguredGraphQLResolver.new(:self, {})
+                resolver: ConfiguredGraphQLResolver.new(:self, {}),
+                object_grouping_leaf_type_name: nil
               )
             }),
             "NoMetadata" => object_type_with

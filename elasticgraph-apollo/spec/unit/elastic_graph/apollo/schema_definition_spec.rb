@@ -755,7 +755,8 @@ module ElasticGraph
               results.runtime_metadata.object_types_by_name.fetch("WidgetGroupedBy").graphql_fields_by_name.fetch("component1")
             ).to eq(graphql_field_with(
               name_in_index: "component_id",
-              resolver: configured_graphql_resolver(:apollo_entity_grouped_by_ref, exposed_id_field: "the_id_field")
+              resolver: configured_graphql_resolver(:apollo_entity_grouped_by_ref, exposed_id_field: "the_id_field"),
+              object_grouping_leaf_type_name: "ID"
             ))
           end
 
@@ -930,7 +931,8 @@ module ElasticGraph
               results.runtime_metadata.object_types_by_name.fetch("WidgetGroupedBy").graphql_fields_by_name.fetch("component")
             ).to eq(graphql_field_with(
               name_in_index: "component_ids",
-              resolver: configured_graphql_resolver(:apollo_entity_grouped_by_ref, exposed_id_field: "the_id_field")
+              resolver: configured_graphql_resolver(:apollo_entity_grouped_by_ref, exposed_id_field: "the_id_field"),
+              object_grouping_leaf_type_name: "ID"
             ))
           end
 

@@ -6,24 +6,27 @@ module ElasticGraph
         attr_reader relation: Relation?
         attr_reader computation_function: ::Symbol?
         attr_reader resolver: ConfiguredGraphQLResolver?
+        attr_reader object_grouping_leaf_type_name: ::String?
 
         def initialize: (
           name_in_index: ::String?,
           relation: Relation?,
           computation_function: ::Symbol?,
-          resolver: ConfiguredGraphQLResolver?
+          resolver: ConfiguredGraphQLResolver?,
+          object_grouping_leaf_type_name: ::String?
         ) -> void
 
         def with: (
           ?name_in_index: ::String?,
           ?relation: Relation?,
           ?computation_function: ::Symbol?,
-          ?resolver: ConfiguredGraphQLResolver?
+          ?resolver: ConfiguredGraphQLResolver?,
+          ?object_grouping_leaf_type_name: ::String?
         ) -> instance
 
         def self.new:
-          (name_in_index: ::String?, relation: Relation?, computation_function: ::Symbol?, resolver: ConfiguredGraphQLResolver?) -> instance
-          | (::String?, Relation?, ::Symbol?, ConfiguredGraphQLResolver?) -> instance
+          (name_in_index: ::String?, relation: Relation?, computation_function: ::Symbol?, resolver: ConfiguredGraphQLResolver?, object_grouping_leaf_type_name: ::String?) -> instance
+          | (::String?, Relation?, ::Symbol?, ConfiguredGraphQLResolver?, ::String?) -> instance
       end
 
       class GraphQLField < GraphQLFieldSupertype
@@ -32,6 +35,7 @@ module ElasticGraph
         RELATION: "relation"
         COMPUTATION_FUNCTION: "computation_function"
         RESOLVER: "resolver"
+        OBJECT_GROUPING_LEAF_TYPE_NAME: "object_grouping_leaf_type_name"
 
         def self.from_hash: (::Hash[::String, untyped]) -> GraphQLField
         def to_dumpable_hash: () -> ::Hash[::String, untyped]

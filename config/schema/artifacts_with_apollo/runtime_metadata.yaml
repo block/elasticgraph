@@ -4026,6 +4026,7 @@ object_types_by_name:
           name: object_with_lookahead
       listed_owner:
         name_in_index: owner_ids
+        object_grouping_leaf_type_name: ID
         resolver:
           config:
             exposed_id_field: token
@@ -4035,6 +4036,7 @@ object_types_by_name:
           name: object_with_lookahead
       owner:
         name_in_index: owner_id
+        object_grouping_leaf_type_name: ID
         resolver:
           config:
             exposed_id_field: token
@@ -5886,6 +5888,7 @@ object_types_by_name:
           name: object_with_lookahead
       listed_owner:
         name_in_index: owner_ids
+        object_grouping_leaf_type_name: ID
         resolver:
           config:
             exposed_id_field: token
@@ -5907,6 +5910,7 @@ object_types_by_name:
           name: object_with_lookahead
       owner:
         name_in_index: owner_id
+        object_grouping_leaf_type_name: ID
         resolver:
           config:
             exposed_id_field: token
@@ -7155,6 +7159,7 @@ object_types_by_name:
           name: object_with_lookahead
       sponsor:
         name_in_index: sponsor_id
+        object_grouping_leaf_type_name: ID
         resolver:
           config:
             exposed_id_field: id

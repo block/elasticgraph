@@ -66,6 +66,49 @@ module ElasticGraph
         })
       end
 
+      it "dumps the type name of the backing leaf field on object grouped by fields backed by a leaf index field" do
+        grouping_field_backed_by = ->(name_in_index) { ->(f) { f.customize_grouped_by_field { |gbf| gbf.name_in_index = name_in_index } } }
+
+        metadata = object_type_metadata_for "WidgetGroupedBy" do |s|
+          s.enum_type "Color" do |t|
+            t.value "RED"
+          end
+
+          s.object_type "Money" do |t|
+            t.field "amount_cents", "Int"
+          end
+
+          s.object_type "WidgetOptions" do |t|
+            t.field "size", "Int"
+          end
+
+          s.object_type "Widget" do |t|
+            t.field "id", "ID"
+            t.field "color", "Color"
+            t.field "name", "String"
+            t.field "is_draft", "Boolean"
+            t.field "options", "WidgetOptions"
+            t.field "created_at", "DateTime"
+            t.paginated_collection_field "tags", "String", singular: "tag"
+            t.field "by_color", "Money", &grouping_field_backed_by.call("color")
+            t.field "by_name", "Money", &grouping_field_backed_by.call("name")
+            t.field "by_size", "Money", &grouping_field_backed_by.call("options.size")
+            t.field "by_is_draft", "Money", &grouping_field_backed_by.call("is_draft")
+            t.field "by_options", "Money", &grouping_field_backed_by.call("options")
+            t.field "by_unindexed", "Money", &grouping_field_backed_by.call("unindexed")
+            t.index "widgets"
+          end
+        end
+
+        leaf_type_names = metadata.graphql_fields_by_name.transform_values(&:object_grouping_leaf_type_name).compact
+        expect(leaf_type_names).to eq({
+          "by_color" => "Color",
+          "by_name" => "String",
+          "by_size" => "Int",
+          "by_is_draft" => "Boolean"
+        })
+      end
+
       it "dumps the customized `name_in_index` on aggregated values types, too, so that the query engine is made aware of the alternate name" do
         metadata = object_type_metadata_for "WidgetAggregatedValues" do |s|
           s.object_type "Widget" do |t|

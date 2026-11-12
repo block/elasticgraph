@@ -277,6 +277,52 @@ module ElasticGraph
           end
         end
 
+        describe "#object_grouping_leaf_type" do
+          let(:schema) do
+            define_schema do |s|
+              s.object_type "Person" do |t|
+                t.field "name", "String"
+              end
+
+              s.object_type "Address" do |t|
+                t.field "city", "String"
+              end
+
+              s.object_type "Photo" do |t|
+                t.field "id", "ID!"
+                t.field "photographer_id", "ID"
+                t.field "photographer", "Person", name_in_index: "photographer_id", graphql_only: true
+                t.field "address", "Address"
+                t.index "photos"
+              end
+            end
+          end
+
+          it "returns the type of the leaf index field backing an object-typed grouped-by field" do
+            field = schema.field_named("PhotoGroupedBy", "photographer")
+
+            expect(field.object_grouping_leaf_type).to be schema.type_named("ID")
+          end
+
+          it "returns nil for other fields, including the non-grouping field backed by the same leaf index field" do
+            leaf_types_by_field = {
+              "PhotoGroupedBy.photographer_id" => schema.field_named("PhotoGroupedBy", "photographer_id"),
+              "PhotoGroupedBy.address" => schema.field_named("PhotoGroupedBy", "address"),
+              "Photo.photographer" => schema.field_named("Photo", "photographer"),
+              "Photo.address" => schema.field_named("Photo", "address"),
+              "Photo.photographer_id" => schema.field_named("Photo", "photographer_id")
+            }.transform_values(&:object_grouping_leaf_type)
+
+            expect(leaf_types_by_field).to eq({
+              "PhotoGroupedBy.photographer_id" => nil,
+              "PhotoGroupedBy.address" => nil,
+              "Photo.photographer" => nil,
+              "Photo.address" => nil,
+              "Photo.photographer_id" => nil
+            })
+          end
+        end
+
         describe "#args_to_schema_form" do
           let(:field) do
             define_schema do |s|

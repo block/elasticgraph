@@ -13,6 +13,7 @@ module ElasticGraph
         attr_reader function_adapter: Aggregation::FunctionAdapter::adapter?
         attr_reader relation: SchemaArtifacts::RuntimeMetadata::Relation
         attr_reader resolver: SchemaArtifacts::RuntimeMetadata::ConfiguredGraphQLResolver?
+        def object_grouping_leaf_type: () -> Type?
 
         def aggregated?: () -> bool
         def sort_clauses_for: (::Array[::String]) -> ::Array[::Hash[::String, ::Hash[::String, ::String]]]
