@@ -9061,7 +9061,6 @@ object_types_by_name:
           name: object_with_lookahead
       widget_name:
         name_in_index: widget_names2
-        object_grouping_leaf_type_name: String
         resolver:
           name: object_with_lookahead
   WidgetCurrencyHighlights:

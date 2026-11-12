@@ -847,7 +847,7 @@ module ElasticGraph
 
             # An object-typed field can be grouped by a leaf index field (such as an Apollo entity ref). The field's own
             # type has no missing value placeholder, so we record the leaf type for the query engine to use.
-            unless type.fully_unwrapped.leaf?
+            unless type_for_derived_types.fully_unwrapped.leaf?
               f.object_grouping_leaf_type_name = self.parent_type.indexing_field_at(f.name_in_index)&.type&.fully_unwrapped&.then do |type|
                 type.name if type.leaf?
               end

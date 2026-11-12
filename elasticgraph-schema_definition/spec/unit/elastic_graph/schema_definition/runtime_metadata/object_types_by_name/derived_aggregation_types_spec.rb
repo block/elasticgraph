@@ -89,6 +89,7 @@ module ElasticGraph
             t.field "is_draft", "Boolean"
             t.field "options", "WidgetOptions"
             t.field "created_at", "DateTime"
+            t.paginated_collection_field "tags", "String", singular: "tag"
             t.field "by_color", "Money", &grouping_field_backed_by.call("color")
             t.field "by_name", "Money", &grouping_field_backed_by.call("name")
             t.field "by_size", "Money", &grouping_field_backed_by.call("options.size")
