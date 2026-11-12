@@ -13,19 +13,24 @@ module ElasticGraph
   module SchemaArtifacts
     module RuntimeMetadata
       # @private
-      class GraphQLField < ::Data.define(:name_in_index, :relation, :computation_function, :resolver)
-        EMPTY = new(nil, nil, nil, nil)
+      #
+      # `object_grouping_leaf_type_name` is only set on an object-typed grouped-by field backed by a leaf index field
+      # (such as an Apollo entity ref). It is the type name of that leaf index field.
+      class GraphQLField < ::Data.define(:name_in_index, :relation, :computation_function, :resolver, :object_grouping_leaf_type_name)
+        EMPTY = new(nil, nil, nil, nil, nil)
         NAME_IN_INDEX = "name_in_index"
         RELATION = "relation"
         COMPUTATION_FUNCTION = "computation_function"
         RESOLVER = "resolver"
+        OBJECT_GROUPING_LEAF_TYPE_NAME = "object_grouping_leaf_type_name"
 
         def self.from_hash(hash)
           new(
             name_in_index: hash[NAME_IN_INDEX],
             relation: hash[RELATION]&.then { |rel_hash| Relation.from_hash(rel_hash) },
             computation_function: hash[COMPUTATION_FUNCTION]&.to_sym,
-            resolver: hash[RESOLVER]&.then { |res_hash| ConfiguredGraphQLResolver.from_hash(res_hash) }
+            resolver: hash[RESOLVER]&.then { |res_hash| ConfiguredGraphQLResolver.from_hash(res_hash) },
+            object_grouping_leaf_type_name: hash[OBJECT_GROUPING_LEAF_TYPE_NAME]
           )
         end
 
@@ -34,6 +39,7 @@ module ElasticGraph
             # Keys here are ordered alphabetically; please keep them that way.
             COMPUTATION_FUNCTION => computation_function&.to_s,
             NAME_IN_INDEX => name_in_index,
+            OBJECT_GROUPING_LEAF_TYPE_NAME => object_grouping_leaf_type_name,
             RELATION => relation&.to_dumpable_hash,
             RESOLVER => resolver&.to_dumpable_hash
           }
@@ -47,6 +53,7 @@ module ElasticGraph
             !!computation_function ||
             name_in_index&.!=(name_in_graphql) ||
             !resolver.nil? ||
+            !object_grouping_leaf_type_name.nil? ||
             false
         end
       end

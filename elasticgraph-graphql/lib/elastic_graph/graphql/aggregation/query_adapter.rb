@@ -233,7 +233,8 @@ module ElasticGraph
             elsif indexed_as_leaf_field?(field_path, index_definitions)
               # A custom resolver can expose a single indexed value as an object. We group on that value
               # rather than on the selected subfields, which have no values of their own in the index.
-              [FieldTermGrouping.new(field_path: field_path, missing_value_placeholder: nil)]
+              leaf_type = field.object_grouping_leaf_type # : Schema::Type
+              [FieldTermGrouping.new(field_path: field_path, missing_value_placeholder: leaf_type.grouping_missing_value_placeholder)]
             end
           end
         end

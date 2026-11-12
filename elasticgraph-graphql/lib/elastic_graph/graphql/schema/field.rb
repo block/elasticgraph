@@ -37,11 +37,18 @@ module ElasticGraph
           end
           @resolver = runtime_metadata&.resolver
           @name_in_index = runtime_metadata&.name_in_index || name
+          @object_grouping_leaf_type_name = runtime_metadata&.object_grouping_leaf_type_name
           @graphql_field.extras([:lookahead]) if resolvers_needing_lookahead.include?(@resolver&.name)
         end
 
         def type
           @type ||= @schema.type_from(@graphql_field.type)
+        end
+
+        # The type of the leaf index field backing an object-typed grouped-by field (such as an Apollo entity ref).
+        # Nil for all other fields.
+        def object_grouping_leaf_type
+          @object_grouping_leaf_type ||= @object_grouping_leaf_type_name&.then { |name| @schema.type_named(name) }
         end
 
         def name

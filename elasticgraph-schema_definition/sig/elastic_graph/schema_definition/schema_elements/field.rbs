@@ -21,6 +21,7 @@ module ElasticGraph
         attr_accessor computation_function: ::Symbol?
         attr_reader filter_customizations: ::Array[^(Field) -> void]
         attr_accessor grouped_by_field_type: ::String?
+        attr_accessor object_grouping_leaf_type_name: ::String?
         attr_accessor groupable: bool?
         attr_reader sort_order_enum_value_customizations: ::Array[^(SortOrderEnumValue) -> void]
         attr_reader source: FieldSource?

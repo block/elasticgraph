@@ -775,7 +775,7 @@ module ElasticGraph
                   name: "widget_aggregations",
                   computations: [],
                   groupings: [
-                    field_term_grouping_of("amount_cents", field_names_in_graphql_query: ["price"], missing_value_placeholder: nil)
+                    field_term_grouping_of("amount_cents", field_names_in_graphql_query: ["price"], missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER)
                   ]
                 )])
               end
@@ -797,7 +797,7 @@ module ElasticGraph
                   name: "widget_aggregations",
                   computations: [],
                   groupings: [
-                    field_term_grouping_of("part", "part_amount_cents", field_names_in_graphql_query: ["part", "price"], missing_value_placeholder: nil)
+                    field_term_grouping_of("part", "part_amount_cents", field_names_in_graphql_query: ["part", "price"], missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER)
                   ]
                 )])
               end
@@ -823,10 +823,28 @@ module ElasticGraph
                   nested_sub_aggregation_of(path_in_index: ["parts_nested"], query: sub_aggregation_query_of(
                     name: "parts_nested",
                     groupings: [
-                      field_term_grouping_of("parts_nested", "part_amount_cents", field_names_in_graphql_query: ["parts_nested", "price"], missing_value_placeholder: nil)
+                      field_term_grouping_of("parts_nested", "part_amount_cents", field_names_in_graphql_query: ["parts_nested", "price"], missing_value_placeholder: MISSING_NUMERIC_PLACEHOLDER)
                     ]
                   ))
                 ])])
+              end
+            end
+
+            context "with an object grouping field backed by a leaf field that has no missing value placeholder" do
+              before(:context) do
+                self.schema_artifacts = generate_schema_artifacts_with_cost_fields(
+                  customize_widget_cost: ->(field) { field.customize_grouped_by_field { |gf| gf.name_in_index = "is_draft" } }
+                )
+              end
+
+              it "groups on the field itself, with no missing value placeholder" do
+                expect(aggregations_grouped_by_cost).to eq([aggregation_query_of(
+                  name: "widget_aggregations",
+                  computations: [],
+                  groupings: [
+                    field_term_grouping_of("is_draft", field_names_in_graphql_query: ["price"], missing_value_placeholder: nil)
+                  ]
+                )])
               end
             end
 
@@ -2086,6 +2104,7 @@ module ElasticGraph
             schema.object_type "Widget" do |type|
               type.field "id", "ID!"
               type.field "amount_cents", "Int"
+              type.field "is_draft", "Boolean"
               type.field "cost", "Money", &customize_widget_cost
               type.field "part", "Part"
               type.field "parts_nested", "[Part!]!" do |field|

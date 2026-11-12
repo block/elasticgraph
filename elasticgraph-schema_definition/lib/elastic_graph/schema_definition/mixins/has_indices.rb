@@ -387,6 +387,24 @@ module ElasticGraph
           end
         end
 
+        # Returns the indexing field at the given `name_in_index`, which can be a dot-separated path to a nested field.
+        #
+        # @private
+        def indexing_field_at(name_in_index)
+          type = self
+          field = nil
+
+          name_in_index.split(".").each do |path_part|
+            if (field = type&.indexing_fields_by_name_in_index&.fetch(path_part, nil))
+              type = field.type.fully_unwrapped.as_object_type
+            else
+              return nil
+            end
+          end
+
+          field
+        end
+
         # @private
         def fields_with_sources
           indexing_fields_by_name_in_index.values.reject { |f| f.source.nil? }
