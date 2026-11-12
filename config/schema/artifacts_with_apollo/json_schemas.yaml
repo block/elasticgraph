@@ -794,6 +794,12 @@ json_schema_version: 1
     required:
     - x
     - "y"
+  SeasonResult:
+    type: string
+    enum:
+    - WON_CHAMPIONSHIP
+    - MADE_PLAYOFFS
+    - MISSED_PLAYOFFS
   Size:
     type: string
     enum:
@@ -1044,6 +1050,10 @@ json_schema_version: 1
         anyOf:
         - "$ref": "#/$defs/TeamRecord"
         - type: 'null'
+      result:
+        anyOf:
+        - "$ref": "#/$defs/SeasonResult"
+        - type: 'null'
       year:
         anyOf:
         - "$ref": "#/$defs/Int"
@@ -1088,6 +1098,7 @@ json_schema_version: 1
         default: TeamSeason
     required:
     - record
+    - result
     - year
     - notes
     - count

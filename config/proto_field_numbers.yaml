@@ -284,7 +284,8 @@ messages:
       players_nested: 8
       players_object: 9
       stadium_location: 10
-    next_number: 11
+      result: 11
+    next_number: 12
   Widget:
     fields:
       id: 1
@@ -355,6 +356,12 @@ enums:
       ALLOY: 1
       CARBON_FIBER: 2
     next_number: 3
+  SeasonResult:
+    values:
+      WON_CHAMPIONSHIP: 1
+      MADE_PLAYOFFS: 2
+      MISSED_PLAYOFFS: 3
+    next_number: 4
   Size:
     values:
       SMALL: 1

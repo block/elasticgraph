@@ -133,8 +133,13 @@ ElasticGraph.define_schema do |schema|
     t.field "first_win_on", "Date"
   end
 
+  schema.enum_type "SeasonResult" do |t|
+    t.values "WON_CHAMPIONSHIP", "MADE_PLAYOFFS", "MISSED_PLAYOFFS"
+  end
+
   schema.object_type "TeamSeason" do |t|
     t.field "record", "TeamRecord", name_in_index: "the_record"
+    t.field "result", "SeasonResult"
     t.field "year", "Int"
     t.field "notes", "[String!]!", singular: "note"
     # `details.count` isn't really meaningful on our team model here, but we need this field

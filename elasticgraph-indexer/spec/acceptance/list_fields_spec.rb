@@ -105,6 +105,7 @@ module ElasticGraph
           "seasons_object|players_object|seasons_object|awards" => 3,
           "seasons_object|players_object|seasons_object|games_played" => 3,
           "seasons_object|players_object|seasons_object|year" => 3,
+          "seasons_object|result" => 2,
           "seasons_object|stadium_location" => 2,
           "seasons_object|stadium_location|lat" => 0,
           "seasons_object|stadium_location|lon" => 0,

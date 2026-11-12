@@ -175,6 +175,7 @@ FactoryBot.define do
     year { Faker::Number.between(from: 1950, to: 2023) }
     record { build :team_record }
     was_shortened { false }
+    result { Faker::Base.sample(["WON_CHAMPIONSHIP", "MADE_PLAYOFFS", "MISSED_PLAYOFFS"]) }
     stadium_location { build :geo_location }
 
     notes do

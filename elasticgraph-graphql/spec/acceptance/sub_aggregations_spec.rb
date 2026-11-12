@@ -41,7 +41,7 @@ module ElasticGraph
           expect(indexed_counts_from(team_seasons_nodes)).to eq({})
         end
 
-        it "supports arbitrarily deeply nested sub-aggregations", :expect_search_routing, :expect_index_exclusions do
+        it "supports arbitrarily deeply nested sub-aggregations", :expect_search_routing, :expect_index_exclusions, :expect_missing_aggregations do
           index_data
           test_ungrouped_sub_aggregations
           test_grouped_sub_aggregations
@@ -55,7 +55,7 @@ module ElasticGraph
               current_players: [build(:player, name: "Bob")],
               formed_on: "1903-01-01",
               seasons: [
-                build(:team_season, year: 2020, was_shortened: true, record: build(:team_record, wins: 50, losses: 12, first_win_on: "2020-03-02", last_win_on: "2020-11-12"), notes: ["pandemic", "shortened"], started_at: "2020-01-15T12:02:20Z", stadium_location: yankee_stadium, players: [
+                build(:team_season, year: 2020, result: "WON_CHAMPIONSHIP", was_shortened: true, record: build(:team_record, wins: 50, losses: 12, first_win_on: "2020-03-02", last_win_on: "2020-11-12"), notes: ["pandemic", "shortened"], started_at: "2020-01-15T12:02:20Z", stadium_location: yankee_stadium, players: [
                   build(:player, name: "Ted", seasons: [build(:player_season, year: 2018, games_played: 20), build(:player_season, year: 2018, games_played: 30)]),
                   build(:player, name: "Dave", seasons: [build(:player_season, year: 2022, games_played: 10)])
                 ])
@@ -67,10 +67,10 @@ module ElasticGraph
               formed_on: "1883-01-01",
               current_players: [build(:player, name: "Kat", seasons: []), build(:player, name: "Sue", seasons: [])],
               seasons: [
-                build(:team_season, year: 2020, was_shortened: true, record: build(:team_record, wins: 30, losses: 22, first_win_on: "2020-05-02", last_win_on: "2020-12-12"), notes: ["pandemic", "covid"], started_at: "2020-01-15T12:02:20Z", stadium_location: dodger_stadium, players: []),
-                build(:team_season, year: 2021, was_shortened: false, record: build(:team_record, wins: nil, losses: 22, first_win_on: nil, last_win_on: "2021-12-12"), notes: [], started_at: "2021-02-16T13:03:30Z", stadium_location: nil, players: []),
-                build(:team_season, year: 2022, was_shortened: false, record: build(:team_record, wins: 40, losses: 15, first_win_on: "2022-06-02", last_win_on: "2022-08-12"), notes: [], started_at: "2022-03-17T14:04:40Z", stadium_location: dodger_stadium, players: []),
-                build(:team_season, year: 2023, was_shortened: false, record: build(:team_record, wins: 50, losses: nil, first_win_on: "2023-01-06", last_win_on: nil), notes: [], started_at: "2023-04-18T12:02:59Z", stadium_location: dodger_stadium, players: [])
+                build(:team_season, year: 2020, result: "MADE_PLAYOFFS", was_shortened: true, record: build(:team_record, wins: 30, losses: 22, first_win_on: "2020-05-02", last_win_on: "2020-12-12"), notes: ["pandemic", "covid"], started_at: "2020-01-15T12:02:20Z", stadium_location: dodger_stadium, players: []),
+                build(:team_season, year: 2021, result: nil, was_shortened: false, record: build(:team_record, wins: nil, losses: 22, first_win_on: nil, last_win_on: "2021-12-12"), notes: [], started_at: "2021-02-16T13:03:30Z", stadium_location: nil, players: []),
+                build(:team_season, year: 2022, result: "MADE_PLAYOFFS", was_shortened: false, record: build(:team_record, wins: 40, losses: 15, first_win_on: "2022-06-02", last_win_on: "2022-08-12"), notes: [], started_at: "2022-03-17T14:04:40Z", stadium_location: dodger_stadium, players: []),
+                build(:team_season, year: 2023, result: "MISSED_PLAYOFFS", was_shortened: false, record: build(:team_record, wins: 50, losses: nil, first_win_on: "2023-01-06", last_win_on: nil), notes: [], started_at: "2023-04-18T12:02:59Z", stadium_location: dodger_stadium, players: [])
               ]
             ),
             build(
@@ -79,7 +79,7 @@ module ElasticGraph
               formed_on: "1901-01-01",
               current_players: [build(:player, name: "Ed", seasons: []), build(:player, name: "Ty", seasons: [])],
               seasons: [
-                build(:team_season, year: 2019, was_shortened: false, record: build(:team_record, wins: 40, losses: 7, first_win_on: "2019-04-02", last_win_on: "2019-07-12"), notes: ["old rules"], started_at: "2019-01-15T12:02:20Z", stadium_location: fenway_park, players: [])
+                build(:team_season, year: 2019, result: "MISSED_PLAYOFFS", was_shortened: false, record: build(:team_record, wins: 40, losses: 7, first_win_on: "2019-04-02", last_win_on: "2019-07-12"), notes: ["old rules"], started_at: "2019-01-15T12:02:20Z", stadium_location: fenway_park, players: [])
               ]
             ),
             build(
@@ -195,6 +195,7 @@ module ElasticGraph
             {"year" => 2022} => count_detail_of(1),
             {"year" => 2023} => count_detail_of(1)
           })
+          expect_last_query_to_use_non_composite_missing_aggregations_on([])
 
           # Test a simple sub-aggregation grouping of one Boolean `terms` field
           team_seasons_nodes = aggregate_season_counts_grouped_by("was_shortened")
@@ -202,6 +203,17 @@ module ElasticGraph
             {case_correctly("was_shortened") => true} => count_detail_of(2),
             {case_correctly("was_shortened") => false} => count_detail_of(4)
           })
+          expect_last_query_to_use_non_composite_missing_aggregations_on([case_correctly("seasons_nested.was_shortened")])
+
+          # Test a simple sub-aggregation grouping of one enum `terms` field
+          team_seasons_nodes = aggregate_season_counts_grouped_by("result")
+          expect(indexed_counts_from(team_seasons_nodes)).to eq({
+            {"result" => enum_value("WON_CHAMPIONSHIP")} => count_detail_of(1),
+            {"result" => enum_value("MADE_PLAYOFFS")} => count_detail_of(2),
+            {"result" => enum_value("MISSED_PLAYOFFS")} => count_detail_of(2),
+            {"result" => nil} => count_detail_of(1)
+          })
+          expect_last_query_to_use_non_composite_missing_aggregations_on([])
 
           # Test what happens if all grouped by fields are excluded via a directive.
           team_seasons_nodes = aggregate_season_counts_grouped_by("year @include(if: false)", "note @skip(if: true)")
@@ -228,6 +240,7 @@ module ElasticGraph
             {"year" => 2022, "note" => nil} => count_detail_of(1),
             {"year" => 2023, "note" => nil} => count_detail_of(1)
           })
+          expect_last_query_to_use_non_composite_missing_aggregations_on([])
 
           verify_filtered_sub_aggregations_with_grouped_by
 
@@ -241,6 +254,7 @@ module ElasticGraph
             {"record" => {case_correctly("first_win_on") => {case_correctly("as_date") => "2023-01-01"}, case_correctly("last_win_on") => {case_correctly("as_date") => nil}}} => count_detail_of(1),
             {"record" => {case_correctly("first_win_on") => {case_correctly("as_date") => nil}, case_correctly("last_win_on") => {case_correctly("as_date") => "2021-12-01"}}} => count_detail_of(1)
           })
+          expect_last_query_to_use_non_composite_missing_aggregations_on([case_correctly("seasons_nested.the_record.first_win_on"), case_correctly("seasons_nested.the_record.last_win_date")])
 
           # Group on sub-fields of an object, some date fields, and some fields with alternate `name_in_index`.
           team_seasons_nodes = aggregate_season_counts_grouped_by("record { wins, last_win_on { as_date(truncation_unit: MONTH) }, first_win_on { as_date(truncation_unit: MONTH) }}")
@@ -252,6 +266,7 @@ module ElasticGraph
             {"record" => {case_correctly("first_win_on") => {case_correctly("as_date") => "2023-01-01"}, case_correctly("last_win_on") => {case_correctly("as_date") => nil}, "wins" => 50}} => count_detail_of(1),
             {"record" => {case_correctly("first_win_on") => {case_correctly("as_date") => nil}, case_correctly("last_win_on") => {case_correctly("as_date") => "2021-12-01"}, "wins" => nil}} => count_detail_of(1)
           })
+          expect_last_query_to_use_non_composite_missing_aggregations_on([case_correctly("seasons_nested.the_record.first_win_on"), case_correctly("seasons_nested.the_record.last_win_date")])
 
           # Test using groupings on sibling and deeply nested sub-aggs.
           verify_aggregate_sibling_and_deeply_nested_grouped_counts_and_aggregated_values
@@ -293,6 +308,7 @@ module ElasticGraph
             {case_correctly("started_at") => {case_correctly("as_date_time") => "2022-03-17T00:00:00.000Z"}} => count_detail_of(1),
             {case_correctly("started_at") => {case_correctly("as_date_time") => "2023-04-18T00:00:00.000Z"}} => count_detail_of(1)
           })
+          expect_last_query_to_use_non_composite_missing_aggregations_on([case_correctly("seasons_nested.started_at")])
 
           # DateTime: as_date()
           team_seasons_nodes = aggregate_season_counts_grouped_by("started_at {as_date(truncation_unit: MONTH)}")
@@ -311,6 +327,7 @@ module ElasticGraph
             {case_correctly("started_at") => {case_correctly("as_day_of_week") => enum_value("WEDNESDAY")}} => count_detail_of(2),
             {case_correctly("started_at") => {case_correctly("as_day_of_week") => enum_value("THURSDAY")}} => count_detail_of(1)
           })
+          expect_last_query_to_use_non_composite_missing_aggregations_on([case_correctly("seasons_nested.started_at")])
 
           # DateTime: as_time_of_day() truncated to SECOND
           team_seasons_nodes = aggregate_season_counts_grouped_by("started_at {as_time_of_day(truncation_unit: SECOND)}")
@@ -320,6 +337,7 @@ module ElasticGraph
             {case_correctly("started_at") => {case_correctly("as_time_of_day") => "13:03:30"}} => count_detail_of(1),
             {case_correctly("started_at") => {case_correctly("as_time_of_day") => "14:04:40"}} => count_detail_of(1)
           })
+          expect_last_query_to_use_non_composite_missing_aggregations_on([case_correctly("seasons_nested.started_at")])
 
           # DateTime: as_time_of_day() truncated to MINUTE
           team_seasons_nodes = aggregate_season_counts_grouped_by("started_at {as_time_of_day(truncation_unit: MINUTE)}")
@@ -357,6 +375,7 @@ module ElasticGraph
             {"record" => {case_correctly("last_win_on") => {case_correctly("as_day_of_week") => enum_value("SUNDAY")}}} => count_detail_of(1),
             {"record" => {case_correctly("last_win_on") => {case_correctly("as_day_of_week") => nil}}} => count_detail_of(1)
           })
+          expect_last_query_to_use_non_composite_missing_aggregations_on([case_correctly("seasons_nested.the_record.last_win_date")])
 
           verify_geo_tile_sub_aggregations
           test_optimizable_aggregations_with_sub_aggregations
@@ -375,6 +394,11 @@ module ElasticGraph
 
       context "when sub-aggregations use the `CompositeGroupingAdapter`" do
         include_examples "sub-aggregation acceptance"
+
+        # The `composite` aggregation handles missing values with its `missing_bucket` option instead.
+        def expect_last_query_to_use_non_composite_missing_aggregations_on(_field_paths)
+          expect_last_query_to_use_missing_aggregations_on([])
+        end
 
         def build_graphql(**options)
           super(
@@ -421,6 +445,10 @@ module ElasticGraph
 
       context "when sub-aggregations use the `NonCompositeGroupingAdapter`" do
         include_examples "sub-aggregation acceptance"
+
+        def expect_last_query_to_use_non_composite_missing_aggregations_on(field_paths)
+          expect_last_query_to_use_missing_aggregations_on(field_paths)
+        end
 
         def build_graphql(**options)
           super(
@@ -481,6 +509,7 @@ module ElasticGraph
           stadium_tile([75, 96]) => count_detail_of(1), # Yankee Stadium
           stadium_tile([77, 94]) => count_detail_of(1) # Fenway Park
         })
+        expect_last_query_to_use_non_composite_missing_aggregations_on([case_correctly("seasons_nested.stadium_location")])
 
         # Zoom level 2 has a 4x4 grid of tiles, so Yankee Stadium and Fenway Park are in the same tile.
         team_seasons_nodes = aggregate_season_counts_grouped_by("stadium_location { as_geo_tile(zoom_level: 2) { x y } }")
@@ -518,6 +547,7 @@ module ElasticGraph
           {case_correctly("was_shortened") => false, **stadium_tile([0, 1])} => count_detail_of(2), # Dodgers 2022 and 2023
           {case_correctly("was_shortened") => false, **stadium_tile([1, 1])} => count_detail_of(1) # Red Sox 2019
         })
+        expect_last_query_to_use_non_composite_missing_aggregations_on([case_correctly("seasons_nested.stadium_location"), case_correctly("seasons_nested.was_shortened")])
 
         # Use the default zoom level (7).
         team_seasons_nodes = aggregate_season_counts_grouped_by("stadium_location { as_geo_tile { zoom_level x y } }", team_aggregations_args: {filter: {current_name: {equal_to_any_of: ["Red Sox"]}}})

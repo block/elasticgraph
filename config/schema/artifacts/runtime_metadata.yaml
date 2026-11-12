@@ -2128,6 +2128,8 @@ index_definitions_by_name:
         source: __self
       __counts.seasons_object|players_object|seasons_object|year:
         source: __self
+      __counts.seasons_object|result:
+        source: __self
       __counts.seasons_object|stadium_location:
         source: __self
       __counts.seasons_object|stadium_location|lat:
@@ -2452,6 +2454,8 @@ index_definitions_by_name:
         source: __self
       nested_fields2.the_seasons.players_object.seasons_object.year:
         source: __self
+      nested_fields2.the_seasons.result:
+        source: __self
       nested_fields2.the_seasons.stadium_location.lat:
         source: __self
       nested_fields2.the_seasons.stadium_location.lon:
@@ -2598,6 +2602,8 @@ index_definitions_by_name:
         source: __self
       seasons_nested.players_object.seasons_object.year:
         source: __self
+      seasons_nested.result:
+        source: __self
       seasons_nested.stadium_location.lat:
         source: __self
       seasons_nested.stadium_location.lon:
@@ -2705,6 +2711,8 @@ index_definitions_by_name:
       seasons_object.players_object.seasons_object.games_played:
         source: __self
       seasons_object.players_object.seasons_object.year:
+        source: __self
+      seasons_object.result:
         source: __self
       seasons_object.stadium_location.lat:
         source: __self
@@ -2923,6 +2931,8 @@ index_definitions_by_name:
       the_nested_fields.the_seasons.players_object.seasons_object.games_played:
         source: __self
       the_nested_fields.the_seasons.players_object.seasons_object.year:
+        source: __self
+      the_nested_fields.the_seasons.result:
         source: __self
       the_nested_fields.the_seasons.stadium_location.lat:
         source: __self
@@ -6800,6 +6810,10 @@ object_types_by_name:
         resolver:
           name: object_without_lookahead
     graphql_only_return_type: true
+  SeasonResultListFilterInput:
+    graphql_fields_by_name:
+      count:
+        name_in_index: __counts
   SizeListFilterInput:
     graphql_fields_by_name:
       count:
@@ -7839,6 +7853,9 @@ object_types_by_name:
         name_in_index: the_record
         resolver:
           name: get_record_field_value
+      result:
+        resolver:
+          name: get_record_field_value
       stadium_location:
         resolver:
           name: get_record_field_value
@@ -7867,6 +7884,9 @@ object_types_by_name:
           name: object_with_lookahead
       record:
         name_in_index: the_record
+        resolver:
+          name: object_with_lookahead
+      result:
         resolver:
           name: object_with_lookahead
       stadium_location:
@@ -7908,6 +7928,9 @@ object_types_by_name:
         name_in_index: the_record
         resolver:
           name: object_with_lookahead
+      result:
+        resolver:
+          name: object_with_lookahead
       stadium_location:
         resolver:
           name: object_with_lookahead
@@ -7933,6 +7956,9 @@ object_types_by_name:
         resolver:
           name: get_record_field_value
       players_object:
+        resolver:
+          name: get_record_field_value
+      result:
         resolver:
           name: get_record_field_value
   TeamSeasonListFilterInput:
