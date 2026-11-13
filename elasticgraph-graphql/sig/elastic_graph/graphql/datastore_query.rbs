@@ -6,6 +6,7 @@ module ElasticGraph
       attr_reader aggregations: ::Hash[::String, Aggregation::Query]
       attr_reader document_paginator: DatastoreQuery::DocumentPaginator
       attr_reader total_document_count_needed: bool
+      attr_reader field_retrieval_plan: FieldRetrievalPlan
     end
 
     # Note: this is a partial signature definition

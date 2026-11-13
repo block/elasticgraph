@@ -12,3 +12,4 @@ source "script/ci_parts/setup_env" "test" $1 $2
 unset COVERAGE
 
 script/run_specs --tag uses_datastore
+bash script/ci_parts/check_field_retrieval

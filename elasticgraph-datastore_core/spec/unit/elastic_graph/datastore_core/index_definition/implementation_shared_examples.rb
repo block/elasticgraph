@@ -294,8 +294,8 @@ module ElasticGraph
 
             expect(index.fields_by_path).to include({
               "created_at" => index_field_with,
-              "id" => index_field_with,
-              "name" => index_field_with,
+              "id" => index_field_with(doc_values_eligible: true),
+              "name" => index_field_with(doc_values_eligible: true),
               "nested_fields.nested_id" => index_field_with
             })
           end
