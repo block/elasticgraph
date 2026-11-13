@@ -1,0 +1,23 @@
+module ElasticGraph
+  module ProtoIngestion
+    module SchemaDefinition
+      class BufBreakingChangeDetector
+        BREAKING_CONFIG_JSON: ::String
+
+        @buf_command: ::String
+        @temporary_directory: ::String
+
+        def initialize: (?buf_command: ::String, ?temporary_directory: ::String) -> void
+        def breaking_changes: (current_schema: ::String, against_schema: ::String) -> (::String | nil)
+
+        private
+
+        def with_built_images: (::String current_schema, ::String against_schema) { (::String, ::String, ::String) -> untyped } -> untyped
+        def build_image: (::String schema, ::String label, ::File proto_file, ::File image_file) -> void
+        def run_buf: (*::String arguments) -> [::String, ::Process::Status]
+        def buf_failure_message: (::String action, ::String output) -> ::String
+        def normalized_output: (::String, ::String) -> ::String
+      end
+    end
+  end
+end
