@@ -48,7 +48,7 @@ jobs:
         with:
           working-directory: config/release
           bundler-cache: true
-          ruby-version: ruby
+          ruby-version: "3.4"
 
       - name: Setup Git Config
         # https://github.com/orgs/community/discussions/26560#discussioncomment-3531273
