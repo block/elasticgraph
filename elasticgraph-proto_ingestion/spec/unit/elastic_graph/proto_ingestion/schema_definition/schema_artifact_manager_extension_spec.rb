@@ -66,7 +66,10 @@ module ElasticGraph
             messages:
               Widget:
                 fields:
-                  id: 7
+                  id:
+                    field_number: 7
+                    proto_type: string
+                    list_depth: 0
                 next_number: 8
             enums:
               Status:
