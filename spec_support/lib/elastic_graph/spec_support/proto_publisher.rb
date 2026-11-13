@@ -33,10 +33,7 @@ module ElasticGraph
       end
 
       def initialize(schema_artifacts)
-        config = schema_artifacts.runtime_metadata.indexer_extension_modules.find do |extension|
-          extension.extension_ref.fetch("name") == "ElasticGraph::ProtoIngestion::IndexerExtension"
-        end.extension_ref.fetch("config")
-        @metadata = ProtoIngestion::RuntimeMetadata::Schema.from_hash(config)
+        @metadata = ProtoIngestion::RuntimeMetadata::Schema.from_schema_artifacts(schema_artifacts)
         @pool = ::Google::Protobuf::DescriptorPool.new
         source = if schema_artifacts.respond_to?(:proto_schema)
           schema_artifacts.proto_schema
