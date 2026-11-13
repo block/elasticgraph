@@ -166,6 +166,7 @@ module ElasticGraph
               )
             },
             indexer_extension_modules: [component_extension_module1],
+            schema_artifact_extensions: {"custom" => component_extension_module1},
             static_script_ids_by_scoped_name: {
               "filter/time_of_day" => "time_of_day_4474b200b6a00f385ed49f7c9669cbf3"
             }
@@ -315,6 +316,12 @@ module ElasticGraph
                 }
               }
             },
+            "schema_artifact_extensions" => {"custom" => {
+              "extension_ref" => {
+                "name" => "ElasticGraph::SchemaArtifacts::ComponentExtensionModule1",
+                "require_path" => "support/example_extensions/component_extension_modules"
+              }
+            }},
             "indexer_extension_modules" => [{
               "extension_ref" => {
                 "name" => "ElasticGraph::SchemaArtifacts::ComponentExtensionModule1",
@@ -394,6 +401,7 @@ module ElasticGraph
             graphql_extension_modules: [],
             graphql_resolvers_by_name: {},
             indexer_extension_modules: [],
+            schema_artifact_extensions: {},
             static_script_ids_by_scoped_name: {}
           )
         end

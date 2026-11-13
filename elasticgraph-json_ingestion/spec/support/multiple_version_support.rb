@@ -20,14 +20,14 @@ module ElasticGraph
         end
 
         json_schemas_by_version = results_by_version.to_h do |version, results|
-          [version, results.json_schemas_for(version)]
+          [version, results.extension_artifacts.fetch("json").json_schemas_for(version)]
         end
 
         artifacts = results_by_version.fetch(results_by_version.keys.max)
 
-        allow(artifacts).to receive(:available_json_schema_versions).and_return(json_schemas_by_version.keys.to_set)
-        allow(artifacts).to receive(:latest_json_schema_version).and_return(json_schemas_by_version.keys.max)
-        allow(artifacts).to receive(:json_schemas_for) do |version|
+        allow(artifacts.extension_artifacts.fetch("json")).to receive(:available_json_schema_versions).and_return(json_schemas_by_version.keys.to_set)
+        allow(artifacts.extension_artifacts.fetch("json")).to receive(:latest_json_schema_version).and_return(json_schemas_by_version.keys.max)
+        allow(artifacts.extension_artifacts.fetch("json")).to receive(:json_schemas_for) do |version|
           json_schemas_by_version.fetch(version)
         end
 

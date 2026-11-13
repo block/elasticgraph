@@ -23,7 +23,7 @@ module ElasticGraph
             end
           end
 
-          expect(results.available_json_schema_versions).to contain_exactly(1)
+          expect(results.extension_artifacts.fetch("json").available_json_schema_versions).to contain_exactly(1)
         end
 
         it "uses an explicitly-provided `json_schema_version`" do
@@ -34,7 +34,7 @@ module ElasticGraph
             end
           end
 
-          expect(results.available_json_schema_versions).to contain_exactly(5)
+          expect(results.extension_artifacts.fetch("json").available_json_schema_versions).to contain_exactly(5)
         end
 
         it "leaves the version unset when `json_schema_version: nil`, so accessing it fails" do
@@ -46,7 +46,7 @@ module ElasticGraph
           end
 
           expect {
-            results.available_json_schema_versions
+            results.extension_artifacts.fetch("json").available_json_schema_versions
           }.to raise_error(Errors::SchemaError, a_string_including("must be specified in the schema"))
         end
 
@@ -60,7 +60,7 @@ module ElasticGraph
             end
           end
 
-          expect(results.available_json_schema_versions).to contain_exactly(7)
+          expect(results.extension_artifacts.fetch("json").available_json_schema_versions).to contain_exactly(7)
         end
 
         it "injects `APIExtension` even when the caller passes other `extension_modules`" do
@@ -80,7 +80,7 @@ module ElasticGraph
             end
           end
 
-          expect(results.available_json_schema_versions).to contain_exactly(1)
+          expect(results.extension_artifacts.fetch("json").available_json_schema_versions).to contain_exactly(1)
         end
 
         describe "#generate_schema_artifacts" do
@@ -92,7 +92,7 @@ module ElasticGraph
               end
             end
 
-            expect(artifacts.available_json_schema_versions).to contain_exactly(1)
+            expect(artifacts.extension_artifacts.fetch("json").available_json_schema_versions).to contain_exactly(1)
           end
 
           it "does not clobber a version the block sets itself" do
@@ -105,7 +105,7 @@ module ElasticGraph
               end
             end
 
-            expect(artifacts.available_json_schema_versions).to contain_exactly(7)
+            expect(artifacts.extension_artifacts.fetch("json").available_json_schema_versions).to contain_exactly(7)
           end
         end
       end

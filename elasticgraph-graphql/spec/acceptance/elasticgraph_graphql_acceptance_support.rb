@@ -292,7 +292,7 @@ module ElasticGraph
       raw_data = super
 
       schema_artifacts = stock_schema_artifacts
-      json_schema_defs = schema_artifacts.json_schemas_for(schema_artifacts.latest_json_schema_version).fetch("$defs")
+      json_schema_defs = schema_artifacts.extension_artifacts.fetch("json").json_schemas_for(schema_artifacts.extension_artifacts.fetch("json").latest_json_schema_version).fetch("$defs")
 
       if (typename = raw_data[:__typename])
         raw_data = update_enum_values_in(raw_data, json_schema_defs, typename)

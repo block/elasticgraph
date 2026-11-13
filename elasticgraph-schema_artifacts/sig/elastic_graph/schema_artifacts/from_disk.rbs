@@ -18,16 +18,11 @@ module ElasticGraph
       @graphql_schema_string: ::String?
       @datastore_config: ::Hash[::String, untyped]?
       @runtime_metadata: SchemaArtifacts::RuntimeMetadata::Schema?
-      @available_json_schema_versions: ::Set[::Integer]?
-      @latest_json_schema_version: ::Integer?
+      @extension_artifacts: ExtensionArtifacts?
 
       def read_artifact: (::String) -> ::String
       def parsed_yaml_from: (::String) -> ::Hash[::String, untyped]
 
-      @json_schemas_by_version: ::Hash[::Integer, ::Hash[::String, untyped]]
-      def json_schemas_by_version: () -> ::Hash[::Integer, ::Hash[::String, untyped]]
-
-      def load_json_schema: (::Integer) -> ::Hash[::String, untyped]
     end
   end
 end
