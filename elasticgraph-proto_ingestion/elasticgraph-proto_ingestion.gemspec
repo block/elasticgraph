@@ -38,6 +38,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticgraph-support", ElasticGraph::VERSION
   spec.add_dependency "google-protobuf", "~> 4.36", ">= 4.36.2"
 
+  spec.add_development_dependency "elasticgraph-elasticsearch", ElasticGraph::VERSION
+  spec.add_development_dependency "elasticgraph-json_ingestion", ElasticGraph::VERSION
+  spec.add_development_dependency "elasticgraph-opensearch", ElasticGraph::VERSION
   # This gem's schema-definition extension code references `elasticgraph-schema_definition`, but
   # applications load it through schema-definition tasks after `elasticgraph-schema_definition` is already
   # available. Keeping this as a development dependency avoids a runtime dependency cycle.
