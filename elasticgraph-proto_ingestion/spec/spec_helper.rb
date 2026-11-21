@@ -17,4 +17,15 @@ RSpec.configure do |config|
   config.when_first_matching_example_defined(:proto_schema) do
     require "support/proto_schema_support"
   end
+
+  # Examples tagged with `:requires_buf` run the real Buf CLI, and are skipped where it is not installed.
+  config.before(:example, :requires_buf) do
+    require "open3"
+    _, _, status = ::Open3.capture3("buf", "--version")
+    # simplecov:disable -- CI installs Buf, so the skips are only reached on machines without it.
+    skip "Buf CLI is not installed" unless status.success?
+  rescue ::Errno::ENOENT
+    skip "Buf CLI is not installed"
+    # simplecov:enable
+  end
 end
