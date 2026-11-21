@@ -13,225 +13,249 @@ require "elastic_graph/spec_support/proto_publisher"
 module ElasticGraph
   module ProtoIngestion
     RSpec.describe RecordPreparer do
+      # Repeated fields have no presence, so they are prepared even when a record leaves them empty.
+      let(:empty_lists) { {"states" => [], "attachments" => [], "grid" => []} }
+
       %i[proto2 proto3].each do |syntax|
         context "with #{syntax}" do
-          let(:schema_artifacts) { define_preparation_schema }
-          let(:publisher) { SpecSupport::ProtoPublisher.new(schema_artifacts) }
-          let(:preparer) { described_class.new(schema_artifacts) }
-
-          it "preserves presence and exact integers without modifying or expanding the native record" do
-            native = native_record({
-              "name" => "", "active" => false, "quantity" => 0,
-              "large" => 2**63 - 1, "visits" => 2**53 - 1
-            })
-            forbid_hash_conversion(native)
-            native.freeze
-            expect(::Google::Protobuf).not_to receive(:encode_json)
-
-            expect(preparer.prepare_for_index("Product", native, nil)).to include(
-              "private_name" => "", "active" => false, "quantity" => 0,
-              "large" => 2**63 - 1, "visits" => 2**53 - 1,
-              "states" => [], "attachments" => [], "grid" => []
-            ).and exclude("id", "name", "at", "state")
-            expect(native.has_id?).to be(false)
-            expect(native.name).to eq("")
-            expect(prepare({"large" => -2**63})).to include("large" => -2**63)
+          # Defining the schema dominates each example's run time, and examples only read it, so we define it once.
+          before(:context) do
+            @schema_artifacts = define_preparation_schema(syntax)
+            @publisher = SpecSupport::ProtoPublisher.new(@schema_artifacts)
           end
 
-          it "prepares nested objects, abstract types, and nested lists directly into index fields" do
-            native = native_record({
-              "shape" => {"__typename" => "Box", "width" => 0},
-              "attachments" => [{"label" => "sample"}], "grid" => [[[0, 2], []], []]
-            })
-            forbid_hash_conversion(native.shape.box)
-            native.freeze
+          let(:preparer) { described_class.new(@schema_artifacts) }
 
-            expect(preparer.prepare_for_index("Product", native, nil)).to include(
-              "shape" => {"private_width" => 0},
-              "attachments" => [{"label" => "sample"}], "grid" => [[[0, 2], []], []]
-            )
-            expect(native.shape.box.width).to eq(0)
-            expect(native.attachments.first.label).to eq("sample")
-            expect(native.grid.first.values.first.values.to_a).to eq([0, 2])
+          it "omits singular fields that the record leaves unset" do
+            expect(prepare(native_record)).to eq(empty_lists)
           end
 
-          it "includes concrete type names only where the destination mapping requires them" do
-            properties = {
-              "__typename" => {"type" => "constant_keyword"},
-              "shape" => {"properties" => {"__typename" => {"type" => "keyword"}}}
-            }
+          it "keeps singular fields that the record explicitly sets to their default values" do
+            native = native_record({"name" => "", "active" => false, "quantity" => 0})
+
+            expect(prepare(native)).to eq(empty_lists.merge("private_name" => "", "active" => false, "quantity" => 0))
+          end
+
+          [["large", -2**63], ["large", 2**63 - 1], ["visits", -(2**53 - 1)], ["visits", 2**53 - 1]].each do |field, value|
+            it "preserves the exact `#{field}` value #{value}" do
+              expect(prepare(native_record({field => value}))).to eq(empty_lists.merge(field => value))
+            end
+          end
+
+          it "prepares nested objects" do
+            native = native_record({"attachments" => [{"label" => "sample"}]})
+
+            expect(prepare(native)).to eq(empty_lists.merge("attachments" => [{"label" => "sample"}]))
+          end
+
+          it "prepares nested lists, including empty inner lists" do
+            native = native_record({"grid" => [[[0, 2], []], []]})
+
+            expect(prepare(native)).to eq(empty_lists.merge("grid" => [[[0, 2], []], []]))
+          end
+
+          it "prepares an abstract-typed field from the fields of its concrete subtype" do
+            native = native_record({"shape" => {"__typename" => "Box", "width" => 0}})
+
+            expect(prepare(native)).to eq(empty_lists.merge("shape" => {"private_width" => 0}))
+          end
+
+          it "returns `nil` for an abstract-typed record that has no concrete subtype set" do
+            empty_shape = native_record({"__typename" => "Box"}, type: "Shape").class.new
+
+            expect(prepare(empty_shape, type: "Shape")).to be_nil
+          end
+
+          it "returns `nil` for a `nil` record" do
+            expect(prepare(nil)).to be_nil
+          end
+
+          it "includes `__typename` on a nested object when its mapping has a `keyword` `__typename`" do
             native = native_record({"shape" => {"__typename" => "Box", "width" => 2}})
-            expect(preparer.prepare_for_index("Product", native, properties)).to include(
-              "shape" => {"__typename" => "Box", "private_width" => 2}
-            ).and exclude("__typename")
+            mapping = {"shape" => {"properties" => {"__typename" => {"type" => "keyword"}}}}
 
+            expect(prepare(native, mapping: mapping)).to eq(empty_lists.merge("shape" => {"__typename" => "Box", "private_width" => 2}))
+          end
+
+          it "includes the concrete `__typename` on an abstract-typed root record when its mapping has a `keyword` `__typename`" do
             native = native_record({"__typename" => "RoundSphere", "radius" => 0.5}, type: "Shape")
-            expect(preparer.prepare_for_index("Shape!", native, {"__typename" => {"type" => "keyword"}})).to eq(
+
+            expect(prepare(native, type: "Shape", mapping: {"__typename" => {"type" => "keyword"}})).to eq(
               "__typename" => "RoundSphere", "radius" => 0.5
             )
-            expect(prepare({}, mapping: {"__typename" => {"type" => "keyword"}})).to include("__typename" => "Product")
           end
 
-          it "restores all enum names, maps zero to null, and preserves unknown values" do
-            expect(prepare({"state" => "onHold", "states" => ["ACTIVE", "onHold"], "kind" => "SPECIAL"})).to include(
-              "state" => "onHold", "states" => ["ACTIVE", "onHold"], "kind" => "SPECIAL"
-            )
-            native = native_record({})
-            native.state = 0
-            native.states.push(0, 1, 1729)
-            expect(preparer.prepare_for_index("Product", native, nil)).to include("state" => nil, "states" => [nil, "ACTIVE", 1729])
-            native.state = 1729
-            expect(preparer.prepare_for_index("Product", native, nil)).to include("state" => 1729)
+          it "omits `__typename` when its mapping is a `constant_keyword`, since the index supplies it" do
+            expect(prepare(native_record, mapping: {"__typename" => {"type" => "constant_keyword"}})).to eq(empty_lists)
           end
 
-          it "maps empty abstract wrappers and null records to null" do
-            native = native_record({"__typename" => "Box", "width" => 1}, type: "Shape")
-            expect(preparer.prepare_for_index("Shape", native.class.new, nil)).to be_nil
-            expect(preparer.prepare_for_index("Product", nil, nil)).to be_nil
+          it "converts enum values to their GraphQL names" do
+            native = native_record({"state" => "onHold", "states" => ["ACTIVE", "onHold"], "kind" => "SPECIAL"})
+
+            expect(prepare(native)).to eq(empty_lists.merge("state" => "onHold", "states" => ["ACTIVE", "onHold"], "kind" => "SPECIAL"))
           end
 
-          it "decodes scalar leaves and applies the shared scalar preparation rules" do
-            expect(prepare({
-              "at" => "2024-02-29T12:34:56.123456789Z", "released" => "2024-02-29",
-              "duration" => "30.5s", "payload" => {"z" => [false, nil, 7], "a" => 1}
-            })).to include(
-              "at" => "2024-02-29T12:34:56.123Z", "released" => "2024-02-29",
-              "duration" => "30.500s", "payload" => '{"a":1,"z":[false,null,7]}'
-            )
-            native = native_record({})
-            native.payload = "invalid json"
-            expect { preparer.prepare_for_index("Product", native, nil) }.to raise_error(::JSON::ParserError)
+          it "prepares the zero (unspecified) enum value as `nil`" do
+            native = native_record do |record|
+              record.state = 0
+              record.states.push(0)
+            end
+
+            expect(prepare(native)).to eq(empty_lists.merge("state" => nil, "states" => [nil]))
           end
 
-          it "prepares every root type and caches compiled message plans across records" do
-            expect(prepare({"name" => "sample"})).to include("private_name" => "sample")
-            expect(prepare({"label" => "second"}, type: "Other")).to include("private_label" => "second")
+          it "preserves enum numbers that have no defined value" do
+            native = native_record do |record|
+              record.state = 1729
+              record.states.push(1729)
+            end
 
-            again = native_record({"name" => "again"})
-            expect(again.class).not_to receive(:descriptor)
-            expect(preparer.prepare_for_index("Product", again, nil)).to include("private_name" => "again")
+            expect(prepare(native)).to eq(empty_lists.merge("state" => 1729, "states" => [1729]))
           end
 
-          it "uses canonical scalar metadata after built-in types are renamed" do
-            artifacts = define_preparation_schema(type_name_overrides: {"Untyped" => "Payload", "LongString" => "BigInt", "DateTime" => "Moment"})
-            renamed_publisher = SpecSupport::ProtoPublisher.new(artifacts)
-            native = native_record({"payload" => {"answer" => 42}, "large" => 99, "at" => "2024-02-29T12:34:56.123456789Z"}, via: renamed_publisher)
+          it "formats `DateTime` values with millisecond precision" do
+            native = native_record({"at" => "2024-02-29T12:34:56.123456789Z"})
 
-            expect(described_class.new(artifacts).prepare_for_index("Product", native, nil)).to include(
-              "payload" => '{"answer":42}', "large" => 99, "at" => "2024-02-29T12:34:56.123Z"
-            )
+            expect(prepare(native)).to eq(empty_lists.merge("at" => "2024-02-29T12:34:56.123Z"))
           end
 
-          it "prepares overridden string DateTime fields using DateTime indexing preparation" do
+          it "prepares other external message scalars using their scalar's indexing preparation" do
+            native = native_record({"duration" => "30.5s"})
+
+            expect(prepare(native)).to eq(empty_lists.merge("duration" => "30.500s"))
+          end
+
+          it "prepares `DateTime` values overridden to `string` using `DateTime` indexing preparation" do
             artifacts = define_proto_schema_results do |schema|
               schema.proto_schema_artifacts package_name: "preparation", syntax: syntax
               schema.on_built_in_types do |type|
                 type.protobuf type: "string" if type.name == "DateTime"
               end
+
               schema.object_type "Event" do |type|
                 type.field "id", "ID!"
                 type.field "at", "DateTime"
                 type.index "events"
               end
             end
+            native = native_record({"at" => "2024-02-29T06:34:56.123456789-06:00"}, type: "Event", via: SpecSupport::ProtoPublisher.new(artifacts))
 
-            overridden_publisher = SpecSupport::ProtoPublisher.new(artifacts)
-            native = native_record({"at" => "2024-02-29T06:34:56.123456789-06:00"}, type: "Event", via: overridden_publisher)
-            expect(described_class.new(artifacts).prepare_for_index("Event", native, nil)).to include(
-              "at" => "2024-02-29T12:34:56.123Z"
+            expect(prepare(native, type: "Event", via: described_class.new(artifacts))).to eq("at" => "2024-02-29T12:34:56.123Z")
+          end
+
+          it "prepares `Untyped` values as canonical JSON" do
+            native = native_record({"payload" => {"z" => [false, nil, 7], "a" => 1}})
+
+            expect(prepare(native)).to eq(empty_lists.merge("payload" => '{"a":1,"z":[false,null,7]}'))
+          end
+
+          it "raises an error when an `Untyped` value is not valid JSON" do
+            native = native_record { |record| record.payload = "invalid json" }
+
+            expect { prepare(native) }.to raise_error(::JSON::ParserError)
+          end
+
+          it "prepares records of different root types with the same preparer" do
+            expect(prepare(native_record({"name" => "first"}))).to eq(empty_lists.merge("private_name" => "first"))
+            expect(prepare(native_record({"label" => "second"}, type: "Other"), type: "Other")).to eq("private_label" => "second")
+          end
+
+          it "applies the canonical scalar preparation to renamed built-in scalars" do
+            artifacts = define_preparation_schema(syntax, type_name_overrides: {"Untyped" => "Payload", "LongString" => "BigInt", "DateTime" => "Moment"})
+            native = native_record(
+              {"payload" => {"answer" => 42}, "large" => 99, "at" => "2024-02-29T12:34:56.123456789Z"},
+              via: SpecSupport::ProtoPublisher.new(artifacts)
             )
-          end
 
-          def native_record(record, type: "Product", via: publisher)
-            via.round_trip(Indexer::Event.new(
-              op: "upsert", type: type, id: "p1", version: 1,
-              record: record, schema_version: nil, ingestion_format: "proto"
-            )).record
-          end
-
-          def prepare(record, type: "Product", mapping: nil)
-            preparer.prepare_for_index(type, native_record(record, type: type), mapping)
-          end
-
-          def forbid_hash_conversion(message)
-            # Mocking a native message gives it a singleton class, which breaks descriptor lookup on JRuby.
-            message.class.prepend(::Module.new do
-              def to_h
-                # simplecov:disable -- only fails when preparation expands a native record into a public hash.
-                raise "Native records must not be expanded into public hashes."
-                # simplecov:enable
-              end
-            end)
-          end
-
-          define_method :define_preparation_schema do |**options|
-            define_proto_schema_results(**options) do |schema|
-              schema.proto_schema_artifacts package_name: "preparation", syntax: syntax
-              schema.enum_type("State") { |type| type.values "ACTIVE", "onHold" }
-              schema.enum_type("Kind") { |type| type.values "STANDARD", "SPECIAL" }
-              schema.scalar_type("Duration") do |type|
-                type.mapping type: "keyword"
-                type.protobuf type: "google.protobuf.Duration", import: "google/protobuf/duration.proto"
-              end
-
-              schema.object_type("Box") do |type|
-                type.field "id", "ID!"
-                type.field "width", "Int", name_in_index: "private_width"
-              end
-
-              schema.object_type("RoundSphere") do |type|
-                type.field "id", "ID!"
-                type.field "radius", "Float"
-              end
-
-              schema.union_type("Shape") do |type|
-                type.subtypes "Box", "RoundSphere"
-                type.index "shapes"
-              end
-
-              schema.object_type("Attachment") { |type| type.field "label", "String" }
-
-              schema.object_type("Other") do |type|
-                type.field "id", "ID!"
-                type.field "label", "String", name_in_index: "private_label"
-                type.index "others"
-              end
-
-              schema.object_type "Product" do |type|
-                type.field "id", "ID!"
-                type.field "name", "String", name_in_index: "private_name"
-                type.field "active", "Boolean"
-                type.field "quantity", "Int"
-                type.field "large", "LongString"
-                type.field "visits", "JsonSafeLong"
-                type.field "at", "DateTime"
-                type.field "released", "Date"
-                type.field "duration", "Duration"
-                type.field "payload", "Untyped"
-                type.field "state", "State"
-                type.field "states", "[State!]!"
-                type.field "kind", "Kind"
-                type.field "shape", "Shape"
-                type.field("attachments", "[Attachment]") { |field| field.mapping type: "object" }
-                type.field "grid", "[[[Int!]!]!]!"
-                type.index "products"
-              end
-            end
+            expect(prepare(native, via: described_class.new(artifacts))).to eq(
+              empty_lists.merge("payload" => '{"answer":42}', "large" => 99, "at" => "2024-02-29T12:34:56.123Z")
+            )
           end
         end
       end
 
-      it "requires the protobuf extension metadata" do
+      it "raises a clear error when the schema artifacts lack protobuf runtime metadata" do
         artifacts = define_schema(schema_element_name_form: :snake_case) do |schema|
           schema.object_type("Item") do |type|
             type.field "id", "ID!"
             type.index "items"
           end
         end
+
         expect { described_class.new(artifacts) }.to raise_error(
           Errors::ConfigError,
           /Protobuf runtime metadata is missing\. Enable `ElasticGraph::ProtoIngestion::SchemaDefinition::APIExtension`/
         )
+      end
+
+      # Publishes `record` through real protobuf encoding and returns the decoded native message. The message
+      # is frozen (deeply, by `google-protobuf`), so every example also verifies that preparation does not mutate it.
+      def native_record(record = {}, type: "Product", via: @publisher)
+        native = via.round_trip(Indexer::Event.new(
+          op: "upsert", type: type, id: "p1", version: 1,
+          record: record, schema_version: nil, ingestion_format: "proto"
+        )).record
+
+        yield native if block_given?
+        native.freeze
+      end
+
+      def prepare(native, type: "Product", mapping: nil, via: preparer)
+        via.prepare_for_index(type, native, mapping)
+      end
+
+      def define_preparation_schema(syntax, **options)
+        define_proto_schema_results(**options) do |schema|
+          schema.proto_schema_artifacts package_name: "preparation", syntax: syntax
+          schema.enum_type("State") { |type| type.values "ACTIVE", "onHold" }
+          schema.enum_type("Kind") { |type| type.values "STANDARD", "SPECIAL" }
+          schema.scalar_type("Duration") do |type|
+            type.mapping type: "keyword"
+            type.protobuf type: "google.protobuf.Duration", import: "google/protobuf/duration.proto"
+          end
+
+          schema.object_type("Box") do |type|
+            type.field "id", "ID!"
+            type.field "width", "Int", name_in_index: "private_width"
+          end
+
+          schema.object_type("RoundSphere") do |type|
+            type.field "id", "ID!"
+            type.field "radius", "Float"
+          end
+
+          schema.union_type("Shape") do |type|
+            type.subtypes "Box", "RoundSphere"
+            type.index "shapes"
+          end
+
+          schema.object_type("Attachment") { |type| type.field "label", "String" }
+
+          schema.object_type("Other") do |type|
+            type.field "id", "ID!"
+            type.field "label", "String", name_in_index: "private_label"
+            type.index "others"
+          end
+
+          schema.object_type "Product" do |type|
+            type.field "id", "ID!"
+            type.field "name", "String", name_in_index: "private_name"
+            type.field "active", "Boolean"
+            type.field "quantity", "Int"
+            type.field "large", "LongString"
+            type.field "visits", "JsonSafeLong"
+            type.field "at", "DateTime"
+            type.field "duration", "Duration"
+            type.field "payload", "Untyped"
+            type.field "state", "State"
+            type.field "states", "[State!]!"
+            type.field "kind", "Kind"
+            type.field "shape", "Shape"
+            type.field("attachments", "[Attachment]") { |field| field.mapping type: "object" }
+            type.field "grid", "[[[Int!]!]!]!"
+            type.index "products"
+          end
+        end
       end
     end
   end
