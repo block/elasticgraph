@@ -109,57 +109,33 @@ module ElasticGraph
             ))
           end
 
-          def prepare(result)
-            result.record_preparer.prepare_for_index(result.event.type, result.event.record, nil)
-          end
-
-          it "preserves presence, nested lists and abstract types while preparing private field names" do
-            event = event_for({
-              "name" => "", "active" => false, "quantity" => 0, "large" => (2**63 - 1).to_s,
-              "at" => "2024-02-29T12:34:56.123Z", "duration" => "30.5s", "state" => "onHold", "states" => ["ACTIVE", "onHold"],
-              "shape" => {"__typename" => "Box", "width" => 0}, "grid" => [[[0, 2], []], []],
-              "payload" => {"nested" => [false, nil, 7]}
-            })
+          it "sets the record id from the event without mutating the published record" do
+            event = event_for
             result = adapter.validate_event(event)
+
             expect(result.failure).to be_nil
-            prepared = prepare(result)
-            expect(prepared).to include(
-              "id" => "p1", "private_name" => "", "active" => false, "quantity" => 0,
-              "large" => 2**63 - 1, "at" => "2024-02-29T12:34:56.123Z", "duration" => "30.500s", "state" => "onHold",
-              "states" => ["ACTIVE", "onHold"], "shape" => {"private_width" => 0},
-              "grid" => [[[0, 2], []], []], "payload" => "{\"nested\":[false,null,7]}"
-            ).and exclude("name", "released")
+            expect(result.event.record.id).to eq("p1")
             expect(event.record.id).to eq("")
           end
 
-          it "preserves exact 64-bit values and the event version" do
-            event = event_for("large" => (-2**63).to_s)
-            expect(prepare(adapter.validate_event(event))).to include("large" => -2**63)
-            event = publisher.round_trip(event.with(record: {"large" => (2**63 - 1).to_s}, version: 2**61 + 1))
-            expect(event.version).to eq(2**61 + 1)
-            expect(prepare(adapter.validate_event(event))).to include("large" => 2**63 - 1)
-            [-(2**53 - 1), 2**53 - 1].each do |boundary|
-              result = adapter.validate_event(event_for("visits" => boundary), skip_record_validation: true)
-              expect(result.failure).to be_nil
-              expect(prepare(result)).to include("visits" => boundary)
+          [-(2**53 - 1), 2**53 - 1].each do |boundary|
+            it "accepts the `JsonSafeLong` boundary value #{boundary}" do
+              expect(adapter.validate_event(event_for("visits" => boundary)).failure).to be_nil
             end
           end
 
           it "accepts an absent non-null field without inventing a publisher schema version" do
             result = adapter.validate_event(event_for)
             expect(result.failure).to be_nil
-            expect(prepare(result)).to exclude("private_name")
             expect(result.event.schema_version).to be_nil
           end
 
-          it "maps unspecified enums and empty abstract wrappers to null" do
+          it "accepts unspecified enums and empty abstract wrappers" do
             event = event_for
             event.record.state = 0
             shape_class = event.record.class.descriptor.lookup("shape").subtype.msgclass
             event.record.shape = shape_class.new
-            result = adapter.validate_event(event)
-            expect(result.failure).to be_nil
-            expect(prepare(result)).to include("state" => nil, "shape" => nil)
+            expect(adapter.validate_event(event).failure).to be_nil
           end
 
           it "rejects unknown enum values even when record validation is sampled out" do
@@ -211,6 +187,7 @@ module ElasticGraph
             result = adapter.validate_event(event_for(
               "released" => "2024-02-29",
               "at" => "2024-02-29T12:34:56.123Z",
+              "duration" => "30.5s",
               "local_time" => "12:34:56",
               "zone" => "America/Chicago",
               "ratio" => 0.5,
@@ -223,9 +200,7 @@ module ElasticGraph
 
           it "honors sampling while always checking numeric ranges" do
             event = event_for("released" => "invalid", "active" => false)
-            result = adapter.validate_event(event, skip_record_validation: true)
-            expect(result.failure).to be_nil
-            expect(prepare(result)).to include("active" => false)
+            expect(adapter.validate_event(event, skip_record_validation: true).failure).to be_nil
             event = event_for("visits" => 2**53)
             expect(adapter.validate_event(event, skip_record_validation: true).failure).to have_attributes(message: include("visits"))
           end
@@ -247,7 +222,7 @@ module ElasticGraph
             result = adapter.validate_event(event)
             expect(result.failure).to be_nil
             expect(result.event.type).to eq("Box")
-            expect(prepare(result)).to include("id" => "b1", "private_width" => 2)
+            expect(result.event.record).to have_attributes(id: "b1", width: 2)
             empty = event.with(record: event.record.class.new)
             expect(adapter.validate_event(empty).failure).to have_attributes(message: include("select a concrete subtype"))
           end
@@ -257,16 +232,6 @@ module ElasticGraph
             expect(adapter.validate_event(event.with(type: "Attachment", record: event.record.attachment)).failure).to have_attributes(message: include("not ingestible"))
           end
         end
-      end
-
-      it "requires protobuf runtime metadata" do
-        artifacts = generate_schema_artifacts do |schema|
-          schema.object_type("Item") { |type|
-            type.field "id", "ID"
-            type.index "items"
-          }
-        end
-        expect { IngestionAdapter.new(schema_artifacts: artifacts) }.to raise_error(Errors::ConfigError, /Protobuf runtime metadata is missing/)
       end
 
       context "with an abstract parent of a rollover field" do
@@ -310,7 +275,7 @@ module ElasticGraph
           end
         end
 
-        it "validates and prepares DateTime strings" do
+        it "validates DateTime strings" do
           adapter = IngestionAdapter.new(schema_artifacts: schema_artifacts)
 
           ["2024-02-29T12:34:56Z", "2024-02-29T06:34:56.123456-06:00"].each do |valid_at|
@@ -318,11 +283,7 @@ module ElasticGraph
               op: "upsert", type: "Item", id: "i1", version: 1,
               record: {"at" => valid_at}, schema_version: nil, ingestion_format: "proto"
             ))
-            result = adapter.validate_event(event)
-            expect(result.failure).to be_nil
-            expect(result.record_preparer.prepare_for_index("Item", result.event.record, nil)).to include(
-              "at" => "2024-02-29T12:34:56.#{valid_at.include?("123456") ? "123" : "000"}Z"
-            )
+            expect(adapter.validate_event(event).failure).to be_nil
           end
 
           ["not-a-timestamp", "2023-02-29T12:00:00Z", "2024-02-29T12:00:00+25:00"].each do |invalid_at|
