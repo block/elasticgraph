@@ -7,9 +7,11 @@
 # frozen_string_literal: true
 
 require "elastic_graph/constants"
+require "elastic_graph/indexer/indexing_preparers/date_time"
 require "elastic_graph/proto_ingestion"
 require "elastic_graph/proto_ingestion/proto_conversions"
 require "elastic_graph/proto_ingestion/runtime_metadata/schema"
+require "google/protobuf"
 require "json"
 require "time"
 
@@ -37,8 +39,12 @@ module ElasticGraph
       private
 
       # Resolved once per protobuf message class so subsequent records do not inspect descriptors.
-      Type = ::Data.define(:name, :fields)
-      Field = ::Data.define(:name, :name_in_index, :presence_method, :list_depth, :leaf_preparer)
+      Type = ::Data.define(:name, :fields) do
+        # @implements Type
+      end
+      Field = ::Data.define(:name, :name_in_index, :presence_method, :list_depth, :leaf_preparer) do
+        # @implements Field
+      end
       private_constant :Type, :Field
 
       def prepare_message(message, mapping_properties)
@@ -53,7 +59,7 @@ module ElasticGraph
           return prepare_message(message.public_send(alternative), mapping_properties)
         end
 
-        prepared = {} # : Hash[String, untyped]
+        prepared = {} # : ::Hash[::String, untyped]
         fields.each do |field|
           next if field.presence_method && !message.public_send(field.presence_method)
 
@@ -121,7 +127,7 @@ module ElasticGraph
         when :message
           message_descriptor = leaf.subtype # : ::Google::Protobuf::Descriptor
           unless message_descriptor.name.start_with?("#{@metadata.package_name}.")
-            leaf_preparer = ->(value) { ::Time.at(value.seconds, value.nanos, :nanosecond, in: "UTC").iso8601(DATE_TIME_PRECISION) }
+            leaf_preparer = build_scalar_preparer(leaf, field_meta, message_descriptor: message_descriptor)
           end
         else
           leaf_preparer = build_scalar_preparer(leaf, field_meta)
@@ -136,7 +142,7 @@ module ElasticGraph
           overrides = @metadata.types_by_name[name]&.non_standard_enum_values_by_name || {}
           entries = descriptor.to_h
           prefix = entries.key(0).to_s.delete_suffix("_UNSPECIFIED")
-          values = {} # : Hash[Symbol | Integer, String?]
+          values = {} # : ::Hash[::Symbol | ::Integer, ::String?]
 
           entries.each do |symbol, number|
             key = symbol.to_s
@@ -149,15 +155,22 @@ module ElasticGraph
         end
       end
 
-      def build_scalar_preparer(leaf_field, field_meta)
+      def build_scalar_preparer(leaf_field, field_meta, message_descriptor: nil)
         if (type_name = field_meta&.type)
           scalar = @metadata.types_by_name.fetch(type_name).scalar
         end
 
-        type_name ||= DEFAULT_SCALARS_BY_PROTO_TYPE.fetch(leaf_field.type.to_s)
+        proto_type = message_descriptor ? message_descriptor.name : leaf_field.type.to_s
+        type_name ||= DEFAULT_SCALARS_BY_PROTO_TYPE.fetch(proto_type)
         preparer = @scalar_types_by_name.fetch(type_name).load_indexing_preparer.extension_class # : singleton(SchemaArtifacts::RuntimeMetadata::ScalarIndexingPreparerInterface)
 
-        if scalar == "Untyped"
+        if message_descriptor
+          if proto_type == "google.protobuf.Timestamp" && preparer == Indexer::IndexingPreparers::DateTime
+            ->(value) { ::Time.at(value.seconds, value.nanos, :nanosecond, in: "UTC").iso8601(DATE_TIME_PRECISION) }
+          else
+            ->(value) { preparer.prepare_for_indexing(::JSON.parse(::Google::Protobuf.encode_json(value))) }
+          end
+        elsif scalar == "Untyped"
           ->(value) { preparer.prepare_for_indexing(::JSON.parse(value)) }
         else
           ->(value) { preparer.prepare_for_indexing(value) }

@@ -93,10 +93,10 @@ module ElasticGraph
           it "decodes scalar leaves and applies the shared scalar preparation rules" do
             expect(prepare({
               "at" => "2024-02-29T12:34:56.123456789Z", "released" => "2024-02-29",
-              "payload" => {"z" => [false, nil, 7], "a" => 1}
+              "duration" => "30.5s", "payload" => {"z" => [false, nil, 7], "a" => 1}
             })).to include(
               "at" => "2024-02-29T12:34:56.123Z", "released" => "2024-02-29",
-              "payload" => '{"a":1,"z":[false,null,7]}'
+              "duration" => "30.500s", "payload" => '{"a":1,"z":[false,null,7]}'
             )
             native = native_record({})
             native.payload = "invalid json"
@@ -119,6 +119,26 @@ module ElasticGraph
 
             expect(described_class.new(artifacts).prepare_for_index("Product", native, nil)).to include(
               "payload" => '{"answer":42}', "large" => 99, "at" => "2024-02-29T12:34:56.123Z"
+            )
+          end
+
+          it "prepares overridden string DateTime fields using DateTime indexing preparation" do
+            artifacts = define_proto_schema_results do |schema|
+              schema.proto_schema_artifacts package_name: "preparation", syntax: syntax
+              schema.on_built_in_types do |type|
+                type.protobuf type: "string" if type.name == "DateTime"
+              end
+              schema.object_type "Event" do |type|
+                type.field "id", "ID!"
+                type.field "at", "DateTime"
+                type.index "events"
+              end
+            end
+
+            overridden_publisher = SpecSupport::ProtoPublisher.new(artifacts)
+            native = native_record({"at" => "2024-02-29T06:34:56.123456789-06:00"}, type: "Event", via: overridden_publisher)
+            expect(described_class.new(artifacts).prepare_for_index("Event", native, nil)).to include(
+              "at" => "2024-02-29T12:34:56.123Z"
             )
           end
 
@@ -149,6 +169,10 @@ module ElasticGraph
               schema.proto_schema_artifacts package_name: "preparation", syntax: syntax
               schema.enum_type("State") { |type| type.values "ACTIVE", "onHold" }
               schema.enum_type("Kind") { |type| type.values "STANDARD", "SPECIAL" }
+              schema.scalar_type("Duration") do |type|
+                type.mapping type: "keyword"
+                type.protobuf type: "google.protobuf.Duration", import: "google/protobuf/duration.proto"
+              end
 
               schema.object_type("Box") do |type|
                 type.field "id", "ID!"
@@ -182,6 +206,7 @@ module ElasticGraph
                 type.field "visits", "JsonSafeLong"
                 type.field "at", "DateTime"
                 type.field "released", "Date"
+                type.field "duration", "Duration"
                 type.field "payload", "Untyped"
                 type.field "state", "State"
                 type.field "states", "[State!]!"
