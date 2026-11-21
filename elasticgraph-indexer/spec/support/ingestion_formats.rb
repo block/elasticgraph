@@ -65,6 +65,10 @@ module ElasticGraph
         json_ingestion_schema_definition_extension_modules
       end
 
+      # JSON events carry their JSON schema version, and the indexer keeps every dumped version, so there is nothing to record.
+      def record_dumped_schema_version(version, schema_artifacts)
+      end
+
       # Publishes the given events in this ingestion format, returning the events the indexer receives.
       def round_trip_indexing_events(events, schema_artifacts: ingestion_schema_artifacts)
         events
@@ -87,9 +91,10 @@ module ElasticGraph
         [ProtoIngestion::SchemaDefinition::APIExtension]
       end
 
-      # Capture publishers before another dump overwrites their schema and metadata.
-      # These versions select test fixtures only; no version is placed on the protobuf wire.
-      def capture_proto_publisher(version, schema_artifacts)
+      # Captures a publisher for each dumped schema version before another dump overwrites its schema and metadata,
+      # so that events built for an old version are published as an old publisher would publish them. These versions
+      # select test fixtures only; no version is placed on the protobuf wire.
+      def record_dumped_schema_version(version, schema_artifacts)
         (@proto_publishers_by_version ||= {})[version] = SpecSupport::ProtoPublisher.new(schema_artifacts)
       end
 

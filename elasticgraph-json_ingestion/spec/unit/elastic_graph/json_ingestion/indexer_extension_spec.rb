@@ -7,14 +7,14 @@
 # frozen_string_literal: true
 
 require "elastic_graph/json_ingestion/indexer_extension"
-require "elastic_graph/json_ingestion/schema_definition/api_extension"
 
 module ElasticGraph
   module JSONIngestion
     RSpec.describe IndexerExtension, :builds_indexer, :factories do
+      # The stock schema artifacts also register the protobuf ingestion adapter, so these examples use a schema defined
+      # with JSON ingestion support alone.
       let(:schema_artifacts) do
-        generate_schema_artifacts(extension_modules: [SchemaDefinition::APIExtension]) do |schema|
-          schema.json_schema_version 1
+        generate_schema_artifacts do |schema|
           schema.object_type "Component" do |type|
             type.field "id", "ID!"
             type.field "name", "String"

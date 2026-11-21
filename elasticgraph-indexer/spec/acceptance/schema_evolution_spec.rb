@@ -104,17 +104,23 @@ module ElasticGraph
       end
 
       context "when a schema has evolved to lose a new field and we are running on a new datastore cluster that doesn't have the removed field in its mapping" do
-        it "can still ingest old schema version events that have the removed field", pending: format == :proto && "Protobuf dumps do not require explicit field deletions yet." do
+        if format == :json
+          it "requires the removed field to be declared deleted before dumping" do
+            write_address_schema_def(json_schema_version: 1, address_extras: "t.field 'deprecated', 'String'")
+            dump_artifacts
+
+            # Attempt to drop the field; ElasticGraph should give us an error due to it still existing in the old JSON schema version.
+            write_address_schema_def(json_schema_version: 2)
+            expect { dump_artifacts }.to abort_with a_string_including(
+              "The `Address.deprecated` field (which existed in JSON schema version 1) no longer exists in the current schema definition."
+            )
+          end
+        end
+
+        it "can still ingest old schema version events that have the removed field" do
           write_address_schema_def(json_schema_version: 1, address_extras: "t.field 'deprecated', 'String'")
           dump_artifacts
 
-          # Attempt to drop the field; ElasticGraph should give us an error due to it still existing in the old JSON schema version.
-          write_address_schema_def(json_schema_version: 2)
-          expect { dump_artifacts }.to abort_with a_string_including(
-            "The `Address.deprecated` field (which existed in JSON schema version 1) no longer exists in the current schema definition."
-          )
-
-          # Try again after indicating the field has been deleted.
           write_address_schema_def(json_schema_version: 2, address_extras: "t.deleted_field 'deprecated'")
           dump_artifacts
 
@@ -212,26 +218,26 @@ module ElasticGraph
         end
 
         context "when a public field is renamed and `name_in_index` is used to make the new field keep reading and writing the existing index field" do
-          it "can index events for either JSON schema version", pending: format == :proto && "Protobuf dumps do not require explicit rename or deletion declarations yet." do
-            # Write a v1 schema with a `full_name` field that is called `name` in the index
-            write_teams_schema_def(json_schema_version: 1) do |team_def|
-              safe_replace(
-                team_def,
-                't.field "name", "String"',
-                't.field "full_name", "String", name_in_index: "name"'
+          if format == :json
+            it "requires the rename to be declared before dumping" do
+              write_v1_teams_schema_def_with_full_name
+              dump_artifacts
+
+              # Attempt to write a v2 schema with the `full_name` field renamed to `name` (while keeping the same field name in the index)
+              # ElasticGraph should raise an error since it's not sure what to do with that field on old events.
+              write_teams_schema_def(json_schema_version: 2) do |team_def|
+                expect(team_def).to include 't.field "name", "String"'
+                team_def
+              end
+              expect { dump_artifacts }.to abort_with a_string_including(
+                "The `Player.full_name` field (which existed in JSON schema version 1) no longer exists in the current schema definition."
               )
             end
-            dump_artifacts
+          end
 
-            # Attempt to write a v2 schema with the `full_name` field renamed to `name` (while keeping the same field name in the index)
-            # ElasticGraph should raise an error since it's not sure what to do with that field on old events.
-            write_teams_schema_def(json_schema_version: 2) do |team_def|
-              expect(team_def).to include 't.field "name", "String"'
-              team_def
-            end
-            expect { dump_artifacts }.to abort_with a_string_including(
-              "The `Player.full_name` field (which existed in JSON schema version 1) no longer exists in the current schema definition."
-            )
+          it "can index events for either JSON schema version" do
+            write_v1_teams_schema_def_with_full_name
+            dump_artifacts
 
             write_teams_schema_def(json_schema_version: 2) do |team_def|
               safe_replace(
@@ -254,32 +260,46 @@ module ElasticGraph
               process_indexing_events([v1_event, v2_event], via: boot_indexer)
             }.not_to raise_error
           end
+
+          # Write a v1 schema with a `full_name` field that is called `name` in the index.
+          def write_v1_teams_schema_def_with_full_name
+            write_teams_schema_def(json_schema_version: 1) do |team_def|
+              safe_replace(
+                team_def,
+                't.field "name", "String"',
+                't.field "full_name", "String", name_in_index: "name"'
+              )
+            end
+          end
         end
 
         context "when an embedded type that was in an old JSON schema has been dropped" do
-          it "correctly ignores that type's data when ingesting old events", pending: format == :proto && "Protobuf dumps do not require explicit field and type deletions yet." do
-            write_teams_schema_def(json_schema_version: 1) do |team_def|
-              # V1 has a `team_details: TeamDetails` field.
-              expect(team_def).to include('schema.object_type "TeamDetails"', 't.field "details", "TeamDetails"')
-              team_def
-            end
-            dump_artifacts
+          if format == :json
+            it "requires the field and type to be declared deleted before dumping" do
+              write_v1_teams_schema_def_with_details
+              dump_artifacts
 
-            # Attempt to write a v2 schema with the `TeamDetails` type and referencing field removed.
-            # ElasticGraph should raise an error since it's not sure what to do with that field/type on old events.
-            write_teams_schema_def(json_schema_version: 2) do |team_def|
-              safe_replace(
-                safe_replace(team_def, 't.field "details", "TeamDetails"', ""),
-                /schema.object_type "TeamDetails".*?\bend\n/m,
-                ""
+              # Attempt to write a v2 schema with the `TeamDetails` type and referencing field removed.
+              # ElasticGraph should raise an error since it's not sure what to do with that field/type on old events.
+              write_teams_schema_def(json_schema_version: 2) do |team_def|
+                safe_replace(
+                  safe_replace(team_def, 't.field "details", "TeamDetails"', ""),
+                  /schema.object_type "TeamDetails".*?\bend\n/m,
+                  ""
+                )
+              end
+              expect {
+                dump_artifacts
+              }.to abort_with a_string_including(
+                "The `Team.details` field (which existed in JSON schema version 1) no longer exists in the current schema definition.",
+                "The `TeamDetails` type (which existed in JSON schema version 1) no longer exists in the current schema definition."
               )
             end
-            expect {
-              dump_artifacts
-            }.to abort_with a_string_including(
-              "The `Team.details` field (which existed in JSON schema version 1) no longer exists in the current schema definition.",
-              "The `TeamDetails` type (which existed in JSON schema version 1) no longer exists in the current schema definition."
-            )
+          end
+
+          it "correctly ignores that type's data when ingesting old events" do
+            write_v1_teams_schema_def_with_details
+            dump_artifacts
 
             write_teams_schema_def(json_schema_version: 2) do |team_def|
               safe_replace(
@@ -296,10 +316,47 @@ module ElasticGraph
               process_indexing_events([v1_event], via: boot_indexer)
             }.not_to raise_error
           end
+
+          def write_v1_teams_schema_def_with_details
+            write_teams_schema_def(json_schema_version: 1) do |team_def|
+              # V1 has a `team_details: TeamDetails` field.
+              expect(team_def).to include('schema.object_type "TeamDetails"', 't.field "details", "TeamDetails"')
+              team_def
+            end
+          end
         end
 
         context "when an indexed type that was in an old JSON schema has been dropped" do
-          it "ignores an old event attempting to upsert that type", pending: format == :proto && "Protobuf needs type-deletion checks and handling of historical envelopes." do
+          if format == :json
+            it "requires the type to be declared deleted before dumping" do
+              write_v1_address_schema_def_with_team
+              dump_artifacts
+
+              # Attempt to drop the `Team` indexed type--ElasticGraph should fail indicating it is still on the v1 schema.
+              write_address_schema_def(json_schema_version: 2)
+              expect {
+                dump_artifacts
+              }.to abort_with a_string_including(
+                "The `Team` type (which existed in JSON schema version 1) no longer exists in the current schema definition."
+              )
+            end
+          end
+
+          # The current protobuf envelope reserves the deleted type's alternative, so an old event decodes without a record.
+          it "ignores an old event attempting to upsert that type", pending: format == :proto && "Protobuf ingestion does not yet skip old events for deleted types." do
+            write_v1_address_schema_def_with_team
+            dump_artifacts
+
+            write_address_schema_def(json_schema_version: 2, schema_extras: 'schema.deleted_type "Team"')
+            dump_artifacts
+
+            v1_event = build_upsert_event(:team, __json_schema_version: 1)
+            process_indexing_events([v1_event], via: boot_indexer)
+
+            expect(search_for_ids("teams")).to be_empty
+          end
+
+          def write_v1_address_schema_def_with_team
             write_address_schema_def(json_schema_version: 1, schema_extras: <<~EOS)
               schema.object_type "Team" do |t|
                 t.field "id", "ID!"
@@ -312,23 +369,6 @@ module ElasticGraph
                 end
               end
             EOS
-            dump_artifacts
-
-            # Attempt to drop the `Team` indexed type--ElasticGraph should fail indicating it is still on the v1 schema.
-            write_address_schema_def(json_schema_version: 2)
-            expect {
-              dump_artifacts
-            }.to abort_with a_string_including(
-              "The `Team` type (which existed in JSON schema version 1) no longer exists in the current schema definition."
-            )
-
-            write_address_schema_def(json_schema_version: 2, schema_extras: 'schema.deleted_type "Team"')
-            dump_artifacts
-
-            v1_event = build_upsert_event(:team, __json_schema_version: 1)
-            process_indexing_events([v1_event], via: boot_indexer)
-
-            expect(search_for_ids("teams")).to be_empty
           end
         end
       end
@@ -413,9 +453,7 @@ module ElasticGraph
             output: output
           )
         end
-        if respond_to?(:capture_proto_publisher)
-          capture_proto_publisher(@publisher_version, SchemaArtifacts::FromDisk.new("config/schema/artifacts"))
-        end
+        record_dumped_schema_version(@publisher_version, SchemaArtifacts::FromDisk.new("config/schema/artifacts"))
       end
 
       def boot_indexer

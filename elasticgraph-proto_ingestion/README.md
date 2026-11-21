@@ -86,20 +86,17 @@ schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside y
 
 ## Indexing Adapter
 
-The schema extension registers a `proto` ingestion adapter with the shared indexer. The adapter
-validates native protobuf records against ElasticGraph scalar constraints and prepares the
-records for normal, derived, and multi-source indexing. It uses the typed protobuf runtime metadata
-from the schema dump for private index field names and scalar and enum rules.
+The schema extension registers a `proto` ingestion adapter with the indexer. It accepts
+`ElasticGraph::Indexer::Event` instances with `ingestion_format: "proto"`, `schema_version: nil`,
+and a native protobuf message as `record`, decoded with descriptors from the same schema dump.
+Decoding the transport payload into those events is up to the caller.
 
-Transport integrations must validate the event envelope and decode records with descriptors from
-the same schema dump before passing `ElasticGraph::Indexer::Event` instances to the processor.
-The events use `ingestion_format: "proto"`, `schema_version: nil`, and a native protobuf message
-as `record`. Transport payload decoding and a public protobuf indexer wrapper will follow separately.
+The adapter validates records against ElasticGraph scalar constraints and prepares them for indexing:
 
-Generated optional fields preserve explicit zero, false, and empty strings. Protobuf repeated fields
-represent an absent list as an empty list. The adapter does not enforce GraphQL non-null fields,
-because events contain no publisher schema version. Numeric range checks remain active when general
-record validation is sampled out. Rollover timestamps are required when an event targets a rollover index.
+- Optional fields keep explicit zero, `false`, and empty-string values. An absent repeated field is an empty list.
+- GraphQL non-null fields are not enforced, since protobuf events carry no publisher schema version.
+- `JsonSafeLong` ranges and enum values are checked even when record validation is sampled out.
+- Rollover timestamps are required when an event targets a rollover index.
 
 ## Schema Definition API
 
