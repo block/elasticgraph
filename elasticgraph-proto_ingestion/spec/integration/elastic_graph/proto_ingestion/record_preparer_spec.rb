@@ -174,6 +174,25 @@ module ElasticGraph
         end
       end
 
+      it "finds the protobuf runtime metadata among other registered indexer extensions" do
+        stub_const("OtherIndexerExtension", ::Module.new)
+        artifacts = define_proto_schema_results do |schema|
+          schema.proto_schema_artifacts package_name: "preparation"
+          # `defined_at` just needs a valid require path, but needs to be outside ElasticGraph
+          # to not mess with our code coverage measurement.
+          schema.register_indexer_extension OtherIndexerExtension, defined_at: "time"
+
+          schema.object_type("Item") do |type|
+            type.field "id", "ID!"
+            type.field "label", "String", name_in_index: "private_label"
+            type.index "items"
+          end
+        end
+        native = native_record({"label" => "sample"}, type: "Item", via: SpecSupport::ProtoPublisher.new(artifacts))
+
+        expect(prepare(native, type: "Item", via: described_class.new(artifacts))).to eq("private_label" => "sample")
+      end
+
       it "raises a clear error when the schema artifacts lack protobuf runtime metadata" do
         artifacts = define_schema(schema_element_name_form: :snake_case) do |schema|
           schema.object_type("Item") do |type|
