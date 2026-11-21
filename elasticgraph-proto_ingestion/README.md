@@ -88,23 +88,31 @@ schema artifact, and will maintain a `proto_field_numbers.yaml` file alongside y
 
 Install the [Buf CLI](https://buf.build/docs/installation/) anywhere that dumps schema artifacts.
 Once `schema.proto` exists, ElasticGraph compiles the existing and proposed schemas with Buf whenever
-the artifact changes. It then applies Buf's strict [`FILE` breaking-change
-rules](https://buf.build/docs/breaking/rules/) so changes that break generated code, JSON, or the binary
-wire format cannot be dumped accidentally. Imported schemas are compiled using the project's normal
-Buf configuration and are excluded from the comparison itself, keeping this check scoped to the
-generated `schema.proto`.
+the artifact changes. It then applies Buf's [`WIRE` breaking-change rules](https://buf.build/docs/breaking/rules/),
+which reject changes that would make the indexer misread binary messages that publishers have
+already serialized. Imported schemas are compiled using the project's normal Buf configuration and
+are excluded from the comparison itself, keeping this check scoped to the generated `schema.proto`.
+
+The `WIRE` rules allow routine schema evolution:
+
+- Adding fields, types, and enum values.
+- Removing fields and enum values. ElasticGraph keeps their numbers in `proto_field_numbers.yaml` and
+  emits `reserved` statements for them, so their numbers are never reused.
+- Renaming fields with `renamed_from`. The field keeps its number.
+- Wire-compatible type changes, such as `Int` to `JsonSafeLong` (`int32` to `int64`).
+
+They reject changes such as:
+
+- Changing a field to a wire-incompatible type, such as `String` to `Int` (`string` to `int32`).
+- Changing a field between a single value and a list.
+- Changing the protobuf package.
+- Restoring a field or enum value that was removed. ElasticGraph would reassign its old number,
+  which removes the `reserved` statement that protects it.
 
 A breaking change always fails the dump. Protobuf has no schema version to bump: consumers that
 already deserialize these messages would misread them, and you cannot update every consumer at the
-same moment. So there is no flag to accept a breaking change.
-
-To get past the error, make the change compatible:
-
-- Add a new field instead of a change to the type or the name of an existing field.
-- Reserve the number of every field you remove.
-- Keep enum value numbers stable, and reserve the numbers of values you remove.
-
-Compatible additions dump normally and need no extra step.
+same moment. So there is no flag to accept a breaking change. Instead, add a field with a new name,
+and use a new name rather than restoring a removed field or enum value.
 
 ## Schema Definition API
 

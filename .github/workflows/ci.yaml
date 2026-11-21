@@ -91,8 +91,8 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
+      # Buf is needed both for README snippet validation and for the specs that exercise the real Buf CLI.
       - name: Setup Buf
-        if: matrix.build_part == 'run_misc_checks'
         uses: bufbuild/buf-action@8c6a16e16f12ba20b6470afa9c2ba9b5ba8c97c3 # v1.5.0
         with:
           version: "1.72.0"

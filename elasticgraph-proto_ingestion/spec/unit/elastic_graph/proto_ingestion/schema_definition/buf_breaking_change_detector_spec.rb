@@ -12,7 +12,7 @@ module ElasticGraph
   module ProtoIngestion
     module SchemaDefinition
       RSpec.describe BufBreakingChangeDetector do
-        it "builds both schemas at one logical path and uses Buf's FILE rules to detect breaking changes" do
+        it "builds both schemas at one logical path and uses Buf's WIRE rules to detect breaking changes" do
           calls = stub_buf(
             build_results: [["", successful_status], ["", successful_status]],
             breaking_result: ["schema.proto: Field changed type.", failed_status(100)]
@@ -85,6 +85,74 @@ module ElasticGraph
             "Buf CLI is required",
             "https://buf.build/docs/installation"
           )
+        end
+
+        context "with the real Buf CLI", :in_temp_dir, :requires_buf do
+          let(:original_schema) do
+            widget_schema(<<~EOS)
+              optional string id = 1;
+              optional string name = 2;
+              optional int32 count = 3;
+            EOS
+          end
+
+          let(:schema_without_count) do
+            widget_schema(<<~EOS)
+              optional string id = 1;
+              optional string name = 2;
+              reserved 3; // Previously used by count.
+            EOS
+          end
+
+          it "allows adding a field" do
+            expect(breaking_changes_from(original_schema, to: original_schema.sub("optional int32 count = 3;", "optional int32 count = 3;\n  optional string color = 4;"))).to be_nil
+          end
+
+          it "allows removing a field whose number is reserved" do
+            expect(breaking_changes_from(original_schema, to: schema_without_count)).to be_nil
+          end
+
+          it "allows renaming a field that keeps its number" do
+            expect(breaking_changes_from(original_schema, to: original_schema.sub("int32 count = 3;", "int32 total = 3;"))).to be_nil
+          end
+
+          it "allows wire-compatible type changes" do
+            expect(breaking_changes_from(original_schema, to: original_schema.sub("int32 count", "int64 count"))).to be_nil
+          end
+
+          it "rejects wire-incompatible type changes" do
+            expect(breaking_changes_from(original_schema, to: original_schema.sub("int32 count", "string count"))).to include(
+              "schema.proto",
+              'changed type from "int32" to "string"'
+            )
+          end
+
+          it "rejects changing a single-valued field into a list" do
+            expect(breaking_changes_from(original_schema, to: original_schema.sub("optional int32 count", "repeated int32 count"))).to include(
+              'changed cardinality from "optional with explicit presence" to "repeated"'
+            )
+          end
+
+          it "rejects restoring a removed field, which would drop its reservation" do
+            expect(breaking_changes_from(schema_without_count, to: original_schema)).to include(
+              'Previously present reserved range "[3]" on message "Widget" is missing values: [3] were removed.'
+            )
+          end
+
+          def breaking_changes_from(against_schema, to:)
+            described_class.new.breaking_changes(current_schema: to, against_schema: against_schema)
+          end
+
+          def widget_schema(fields)
+            <<~EOS
+              syntax = "proto3";
+              package elasticgraph;
+
+              message Widget {
+              #{fields.lines.map { |line| "  #{line}" }.join.chomp}
+              }
+            EOS
+          end
         end
 
         def stub_buf(build_results:, breaking_result: nil)

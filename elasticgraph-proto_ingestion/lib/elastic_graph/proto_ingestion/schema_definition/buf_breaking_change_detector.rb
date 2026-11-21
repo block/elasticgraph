@@ -18,7 +18,12 @@ module ElasticGraph
       #
       # @private
       class BufBreakingChangeDetector
-        BREAKING_CONFIG_JSON = %({"version":"v2","breaking":{"use":["FILE"]}})
+        # ElasticGraph publishers and the indexer exchange binary protobuf messages, so Buf's `WIRE`
+        # rules check exactly what must stay compatible: field numbers, wire types, cardinality, and
+        # reservations. The stricter `FILE`, `PACKAGE`, and `WIRE_JSON` categories also protect generated
+        # source code or protobuf JSON names. They reject routine schema evolution, such as removing a
+        # field or using `renamed_from`, without protecting anything the indexer reads.
+        BREAKING_CONFIG_JSON = %({"version":"v2","breaking":{"use":["WIRE"]}})
 
         def initialize(buf_command: "buf", temporary_directory: ::Dir.pwd)
           @buf_command = buf_command

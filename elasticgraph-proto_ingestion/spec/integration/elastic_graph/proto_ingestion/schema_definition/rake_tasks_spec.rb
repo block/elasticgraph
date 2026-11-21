@@ -171,7 +171,7 @@ module ElasticGraph
               "Buf detected a breaking change",
               "Field changed type from string to int32",
               "Protobuf offers no way to version your way out of this",
-              "reserve the"
+              "use a new name rather than restore a field"
             )
             expect(read_artifact(PROTO_SCHEMA_FILE)).to eq(original_proto)
           end
@@ -199,6 +199,61 @@ module ElasticGraph
             expect {
               run_rake_with_proto("schema_artifacts:dump")
             }.to abort_with("Buf could not compile an import.")
+          end
+
+          context "with the real Buf CLI", :requires_buf do
+            it "dumps a field removal and reserves the removed field's number" do
+              write_proto_schema(table_defs: <<~EOS)
+                s.object_type "Product" do |t|
+                  t.field "id", "ID"
+                  t.field "name", "String"
+                  t.field "price", "Int"
+                  t.index "products"
+                end
+              EOS
+              run_rake_with_proto("schema_artifacts:dump")
+
+              write_proto_schema(table_defs: <<~EOS)
+                s.object_type "Product" do |t|
+                  t.field "id", "ID"
+                  t.field "price", "Int"
+                  t.index "products"
+                end
+              EOS
+
+              expect {
+                run_rake_with_proto("schema_artifacts:dump")
+              }.to change { read_artifact(PROTO_SCHEMA_FILE) }
+                .to(a_string_including("reserved 2; // Previously used by name.").and(excluding("string name = 2;")))
+            end
+
+            it "refuses to dump a wire-incompatible type change" do
+              write_proto_schema(table_defs: <<~EOS)
+                s.object_type "Product" do |t|
+                  t.field "id", "ID"
+                  t.field "price", "Int"
+                  t.index "products"
+                end
+              EOS
+              run_rake_with_proto("schema_artifacts:dump")
+              original_proto = read_artifact(PROTO_SCHEMA_FILE)
+
+              write_proto_schema(table_defs: <<~EOS)
+                s.object_type "Product" do |t|
+                  t.field "id", "ID"
+                  t.field "price", "String"
+                  t.index "products"
+                end
+              EOS
+
+              expect {
+                run_rake_with_proto("schema_artifacts:dump")
+              }.to abort_with a_string_including(
+                "Buf detected a breaking change",
+                'Field "2" with name "price" on message "Product" changed type from "int32" to "string".'
+              )
+              expect(read_artifact(PROTO_SCHEMA_FILE)).to eq(original_proto)
+            end
           end
         end
 

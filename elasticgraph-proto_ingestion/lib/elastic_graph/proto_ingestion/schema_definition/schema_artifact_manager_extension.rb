@@ -88,8 +88,8 @@ module ElasticGraph
 
             Protobuf offers no way to version your way out of this. Consumers that already read
             these messages would misread them after this change. Make the change compatible
-            instead: add a new field rather than retype or rename an existing one, and reserve the
-            number of every field you remove.
+            instead: add a field with a new name rather than change the type or list depth of an
+            existing field, and use a new name rather than restore a field that was removed.
           EOS
         rescue Errors::SchemaError => e
           abort e.message
