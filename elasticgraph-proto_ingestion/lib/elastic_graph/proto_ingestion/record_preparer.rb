@@ -48,8 +48,6 @@ module ElasticGraph
       private_constant :Type, :Field
 
       def prepare_message(message, mapping_properties)
-        return nil if message.nil?
-
         type = @mutex.synchronize { @types[message.class] ||= build_type(message.class.descriptor) }
         fields = type.fields
         unless fields
@@ -123,7 +121,8 @@ module ElasticGraph
         when :enum
           enum_descriptor = leaf.subtype # : ::Google::Protobuf::EnumDescriptor
           enum_values = build_enum(enum_descriptor)
-          leaf_preparer = ->(value) { enum_values.fetch(value, value) }
+          # Events with unknown enum numbers are rejected before preparation.
+          leaf_preparer = ->(value) { enum_values.fetch(value) }
         when :message
           message_descriptor = leaf.subtype # : ::Google::Protobuf::Descriptor
           unless message_descriptor.name.start_with?("#{@metadata.package_name}.")
