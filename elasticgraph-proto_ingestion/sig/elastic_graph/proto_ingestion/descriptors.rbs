@@ -1,0 +1,30 @@
+module ElasticGraph
+  module ProtoIngestion
+    module Descriptors
+      class UnwrappedField < ::Data
+        attr_reader name: ::String
+        attr_reader presence_method: ::Symbol?
+        attr_reader list_depth: ::Integer
+        attr_reader leaf: ::Google::Protobuf::FieldDescriptor
+
+        def self.new: (
+          name: ::String,
+          presence_method: ::Symbol?,
+          list_depth: ::Integer,
+          leaf: ::Google::Protobuf::FieldDescriptor
+        ) -> UnwrappedField
+      end
+
+      def self.type_name: (::Google::Protobuf::Descriptor | ::Google::Protobuf::EnumDescriptor, RuntimeMetadata::Schema) -> ::String
+      def self.internal_message?: (::Google::Protobuf::Descriptor, RuntimeMetadata::Schema) -> bool
+      def self.abstract?: (::Google::Protobuf::Descriptor) -> bool
+      def self.unwrap_abstract: (untyped) -> untyped
+      def self.unwrap_field: (::Google::Protobuf::Descriptor, ::Google::Protobuf::FieldDescriptor) -> UnwrappedField
+      def self.scalar_info: (
+        ::Google::Protobuf::FieldDescriptor,
+        RuntimeMetadata::Field?,
+        RuntimeMetadata::Schema
+      ) -> [::String, ::String]
+    end
+  end
+end

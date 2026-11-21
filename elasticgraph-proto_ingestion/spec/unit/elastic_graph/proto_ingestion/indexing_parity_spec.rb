@@ -58,6 +58,10 @@ module ElasticGraph
             generate_schema_artifacts(extension_modules: [SchemaDefinition::APIExtension]) do |schema|
               schema.proto_schema_artifacts package_name: "elasticgraph", syntax: syntax
               schema.enum_type("State") { |type| type.values "ACTIVE", "onHold" }
+              schema.scalar_type("Duration") do |type|
+                type.mapping type: "keyword"
+                type.protobuf type: "google.protobuf.Duration", import: "google/protobuf/duration.proto"
+              end
               schema.object_type("Box") { |type|
                 type.field "id", "ID!"
                 type.field "width", "Int", name_in_index: "private_width"
@@ -83,6 +87,7 @@ module ElasticGraph
                 type.field "ratio", "Float"
                 type.field "released", "Date"
                 type.field "at", "DateTime"
+                type.field "duration", "Duration"
                 type.field "local_time", "LocalTime"
                 type.field "zone", "TimeZone"
                 type.field "state", "State"
@@ -111,7 +116,7 @@ module ElasticGraph
           it "preserves presence, nested lists and abstract types while preparing private field names" do
             event = event_for({
               "name" => "", "active" => false, "quantity" => 0, "large" => (2**63 - 1).to_s,
-              "at" => "2024-02-29T12:34:56.123Z", "state" => "onHold", "states" => ["ACTIVE", "onHold"],
+              "at" => "2024-02-29T12:34:56.123Z", "duration" => "30.5s", "state" => "onHold", "states" => ["ACTIVE", "onHold"],
               "shape" => {"__typename" => "Box", "width" => 0}, "grid" => [[[0, 2], []], []],
               "payload" => {"nested" => [false, nil, 7]}
             })
@@ -120,7 +125,7 @@ module ElasticGraph
             prepared = prepare(result)
             expect(prepared).to include(
               "id" => "p1", "private_name" => "", "active" => false, "quantity" => 0,
-              "large" => 2**63 - 1, "at" => "2024-02-29T12:34:56.123Z", "state" => "onHold",
+              "large" => 2**63 - 1, "at" => "2024-02-29T12:34:56.123Z", "duration" => "30.500s", "state" => "onHold",
               "states" => ["ACTIVE", "onHold"], "shape" => {"private_width" => 0},
               "grid" => [[[0, 2], []], []], "payload" => "{\"nested\":[false,null,7]}"
             ).and exclude("name", "released")
@@ -288,6 +293,92 @@ module ElasticGraph
             result = adapter.validate_event(publisher.round_trip(event), skip_record_validation: true)
             expect(result.failure).to have_attributes(message: include("record.stamp.at", "rollover index"))
           end
+        end
+      end
+
+      context "when DateTime is overridden to string" do
+        let(:schema_artifacts) do
+          generate_schema_artifacts(extension_modules: [SchemaDefinition::APIExtension]) do |schema|
+            schema.on_built_in_types do |type|
+              type.protobuf type: "string" if type.name == "DateTime"
+            end
+            schema.object_type "Item" do |type|
+              type.field "id", "ID!"
+              type.field "at", "DateTime"
+              type.index "items"
+            end
+          end
+        end
+
+        it "validates and prepares DateTime strings" do
+          adapter = IngestionAdapter.new(schema_artifacts: schema_artifacts)
+
+          ["2024-02-29T12:34:56Z", "2024-02-29T06:34:56.123456-06:00"].each do |valid_at|
+            event = publisher.round_trip(Indexer::Event.new(
+              op: "upsert", type: "Item", id: "i1", version: 1,
+              record: {"at" => valid_at}, schema_version: nil, ingestion_format: "proto"
+            ))
+            result = adapter.validate_event(event)
+            expect(result.failure).to be_nil
+            expect(result.record_preparer.prepare_for_index("Item", result.event.record, nil)).to include(
+              "at" => "2024-02-29T12:34:56.#{valid_at.include?("123456") ? "123" : "000"}Z"
+            )
+          end
+
+          ["not-a-timestamp", "2023-02-29T12:00:00Z", "2024-02-29T12:00:00+25:00"].each do |invalid_at|
+            event = publisher.round_trip(Indexer::Event.new(
+              op: "upsert", type: "Item", id: "i1", version: 1,
+              record: {"at" => invalid_at}, schema_version: nil, ingestion_format: "proto"
+            ))
+            expect(adapter.validate_event(event).failure).to have_attributes(message: include("record.at is not a valid DateTime"))
+          end
+        end
+      end
+
+      context "with a repeated derived id_source targeting a rollover index" do
+        let(:schema_artifacts) do
+          generate_schema_artifacts(extension_modules: [SchemaDefinition::APIExtension]) do |schema|
+            schema.object_type "Tag" do |type|
+              type.field "id", "ID!"
+              type.field "created_at", "DateTime"
+              type.field "item_name", "String" do |f|
+                f.sourced_from "item", "name"
+              end
+              type.relates_to_one "item", "Item", via: "tag_ids", dir: :in do |rel|
+                rel.equivalent_field "created_at"
+              end
+              type.index("tags") do |index|
+                index.rollover :yearly, "created_at"
+                index.has_had_multiple_sources!
+              end
+            end
+            schema.object_type "Item" do |type|
+              type.field "id", "ID!"
+              type.field "name", "String"
+              type.field "tag_ids", "[ID!]"
+              type.field "created_at", "DateTime"
+              type.relates_to_many "tags", "Tag", via: "tag_ids", dir: :out, singular: "tag"
+              type.index "items"
+            end
+          end
+        end
+
+        it "checks rollover timestamps only when the repeated id_source has non-empty values" do
+          adapter = IngestionAdapter.new(schema_artifacts: schema_artifacts)
+
+          without_tags = publisher.round_trip(Indexer::Event.new(
+            op: "upsert", type: "Item", id: "i1", version: 1,
+            record: {"tag_ids" => []}, schema_version: nil, ingestion_format: "proto"
+          ))
+          expect(adapter.validate_event(without_tags).failure).to be_nil
+
+          with_tags_missing_ts = publisher.round_trip(Indexer::Event.new(
+            op: "upsert", type: "Item", id: "i1", version: 1,
+            record: {"tag_ids" => ["t1"]}, schema_version: nil, ingestion_format: "proto"
+          ))
+          expect(adapter.validate_event(with_tags_missing_ts).failure).to have_attributes(
+            message: include("record.created_at", "rollover index")
+          )
         end
       end
     end

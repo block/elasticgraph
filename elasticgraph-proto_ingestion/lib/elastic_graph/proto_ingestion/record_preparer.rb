@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/proto_ingestion"
+require "elastic_graph/proto_ingestion/descriptors"
 require "elastic_graph/proto_ingestion/proto_conversions"
 require "elastic_graph/proto_ingestion/runtime_metadata/schema"
 require "google/protobuf"
@@ -114,7 +115,7 @@ module ElasticGraph
           return AbstractType.new(types_by_alternative)
         end
 
-        name = type_name_for(descriptor)
+        name = Descriptors.type_name(descriptor, @metadata)
         overrides = @metadata.types_by_name[name]&.fields_by_name || {}
         fields = descriptor.map do |entry|
           field = entry # : ::Google::Protobuf::FieldDescriptor
@@ -125,21 +126,9 @@ module ElasticGraph
       end
 
       def build_field(descriptor, field, field_meta)
-        name = field.name
-        name_in_index = field_meta&.name_in_index || name
-        presence_method = (field.label == :repeated) ? nil : :"has_#{name}?"
-
-        list_depth = 0
-        leaf = field
-        while leaf.label == :repeated
-          list_depth += 1
-          break unless leaf.type == :message
-
-          wrapper = leaf.subtype # : ::Google::Protobuf::Descriptor
-          break unless wrapper.name.start_with?("#{descriptor.name}.")
-
-          leaf = wrapper.lookup("values") # : ::Google::Protobuf::FieldDescriptor
-        end
+        info = Descriptors.unwrap_field(descriptor, field)
+        name_in_index = field_meta&.name_in_index || info.name
+        leaf = info.leaf
 
         case leaf.type
         when :enum
@@ -149,21 +138,21 @@ module ElasticGraph
           leaf_preparer = ->(value) { enum_values.fetch(value) }
         when :message
           message_descriptor = leaf.subtype # : ::Google::Protobuf::Descriptor
-          if message_descriptor.name.start_with?("#{@metadata.package_name}.")
+          if Descriptors.internal_message?(message_descriptor, @metadata)
             child_type = resolve_type(message_descriptor)
           else
-            leaf_preparer = build_scalar_preparer(leaf, field_meta, message_descriptor: message_descriptor)
+            leaf_preparer = build_scalar_preparer(leaf, field_meta)
           end
         else
           leaf_preparer = build_scalar_preparer(leaf, field_meta)
         end
 
-        Field.new(name, name_in_index, presence_method, list_depth, leaf_preparer, child_type)
+        Field.new(info.name, name_in_index, info.presence_method, info.list_depth, leaf_preparer, child_type)
       end
 
       def build_enum(descriptor)
         @enums[descriptor] ||= begin
-          name = type_name_for(descriptor)
+          name = Descriptors.type_name(descriptor, @metadata)
           overrides = @metadata.types_by_name[name]&.non_standard_enum_values_by_name || {}
           entries = descriptor.to_h
           prefix = entries.key(0).to_s.delete_suffix("_UNSPECIFIED")
@@ -180,16 +169,11 @@ module ElasticGraph
         end
       end
 
-      def build_scalar_preparer(leaf_field, field_meta, message_descriptor: nil)
-        if (type_name = field_meta&.type)
-          scalar = @metadata.types_by_name.fetch(type_name).scalar
-        end
-
-        proto_type = message_descriptor ? message_descriptor.name : leaf_field.type.to_s
-        type_name ||= DEFAULT_SCALARS_BY_PROTO_TYPE.fetch(proto_type)
+      def build_scalar_preparer(leaf_field, field_meta)
+        type_name, scalar = Descriptors.scalar_info(leaf_field, field_meta, @metadata)
         preparer = @scalar_types_by_name.fetch(type_name).load_indexing_preparer.extension_class # : singleton(SchemaArtifacts::RuntimeMetadata::ScalarIndexingPreparerInterface)
 
-        if message_descriptor
+        if leaf_field.type == :message
           # Message scalars (such as `google.protobuf.Timestamp`) are prepared from their canonical protobuf JSON form.
           ->(value) { preparer.prepare_for_indexing(::JSON.parse(::Google::Protobuf.encode_json(value))) }
         elsif scalar == "Untyped"
@@ -197,10 +181,6 @@ module ElasticGraph
         else
           ->(value) { preparer.prepare_for_indexing(value) }
         end
-      end
-
-      def type_name_for(descriptor)
-        descriptor.name.delete_prefix("#{@metadata.package_name}.")
       end
     end
   end

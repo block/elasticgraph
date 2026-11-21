@@ -46,12 +46,7 @@ module ElasticGraph
       def build_type: (::Google::Protobuf::Descriptor) -> typePlan
       def build_field: (::Google::Protobuf::Descriptor, ::Google::Protobuf::FieldDescriptor, RuntimeMetadata::Field?) -> Field
       def build_enum: (::Google::Protobuf::EnumDescriptor) -> ::Hash[::Symbol | ::Integer, ::String?]
-      def build_scalar_preparer: (
-        ::Google::Protobuf::FieldDescriptor,
-        RuntimeMetadata::Field?,
-        ?message_descriptor: ::Google::Protobuf::Descriptor?
-      ) -> ^(untyped) -> untyped
-      def type_name_for: (::Google::Protobuf::Descriptor | ::Google::Protobuf::EnumDescriptor) -> ::String
+      def build_scalar_preparer: (::Google::Protobuf::FieldDescriptor, RuntimeMetadata::Field?) -> ^(untyped) -> untyped
     end
   end
 end

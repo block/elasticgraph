@@ -12,7 +12,7 @@ module ElasticGraph
   module ProtoIngestion
     # Enables protobuf ingestion for schemas using the protobuf schema definition extension.
     module IndexerExtension
-      # @return [Hash<String, ElasticGraph::Indexer::IngestionAdapter::Interface>] the installed ingestion adapters
+      # @return [Hash<String, Indexer::IngestionAdapter::Interface>] the installed ingestion adapters
       def ingestion_adapters_by_format
         @ingestion_adapters_by_format ||= super.merge("proto" => IngestionAdapter.new(schema_artifacts: schema_artifacts))
       end
