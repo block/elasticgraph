@@ -6,14 +6,11 @@
 #
 # frozen_string_literal: true
 
-require "elastic_graph/constants"
-require "elastic_graph/indexer/indexing_preparers/date_time"
 require "elastic_graph/proto_ingestion"
 require "elastic_graph/proto_ingestion/proto_conversions"
 require "elastic_graph/proto_ingestion/runtime_metadata/schema"
 require "google/protobuf"
 require "json"
-require "time"
 
 module ElasticGraph
   module ProtoIngestion
@@ -164,11 +161,8 @@ module ElasticGraph
         preparer = @scalar_types_by_name.fetch(type_name).load_indexing_preparer.extension_class # : singleton(SchemaArtifacts::RuntimeMetadata::ScalarIndexingPreparerInterface)
 
         if message_descriptor
-          if proto_type == "google.protobuf.Timestamp" && preparer == Indexer::IndexingPreparers::DateTime
-            ->(value) { ::Time.at(value.seconds, value.nanos, :nanosecond, in: "UTC").iso8601(DATE_TIME_PRECISION) }
-          else
-            ->(value) { preparer.prepare_for_indexing(::JSON.parse(::Google::Protobuf.encode_json(value))) }
-          end
+          # Message scalars (such as `google.protobuf.Timestamp`) are prepared from their canonical protobuf JSON form.
+          ->(value) { preparer.prepare_for_indexing(::JSON.parse(::Google::Protobuf.encode_json(value))) }
         elsif scalar == "Untyped"
           ->(value) { preparer.prepare_for_indexing(::JSON.parse(value)) }
         else
