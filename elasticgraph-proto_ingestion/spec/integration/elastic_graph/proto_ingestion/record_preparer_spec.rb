@@ -152,9 +152,10 @@ module ElasticGraph
         expect { prepare(native) }.to raise_error(::JSON::ParserError)
       end
 
-      it "prepares records of different root types with the same preparer" do
+      it "prepares multiple records of the same and different root types with the same preparer" do
         expect(prepare(native_record({"name" => "first"}))).to eq(empty_lists.merge("private_name" => "first"))
-        expect(prepare(native_record({"label" => "second"}, type: "Other"), type: "Other")).to eq("private_label" => "second")
+        expect(prepare(native_record({"name" => "second"}))).to eq(empty_lists.merge("private_name" => "second"))
+        expect(prepare(native_record({"label" => "other"}, type: "Other"), type: "Other")).to eq("private_label" => "other")
       end
 
       it "applies the canonical scalar preparation to renamed built-in scalars" do

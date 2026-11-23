@@ -1,9 +1,11 @@
 module ElasticGraph
   module ProtoIngestion
     class RecordPreparer
+      type typePlan = Type | AbstractType
+
       @metadata: RuntimeMetadata::Schema
       @scalar_types_by_name: ::Hash[::String, SchemaArtifacts::RuntimeMetadata::ScalarType]
-      @types: ::Hash[::Class, Type]
+      @types: ::Hash[::Class, typePlan]
       @enums: ::Hash[::Google::Protobuf::EnumDescriptor, ::Hash[::Symbol | ::Integer, ::String?]]
       @mutex: ::Mutex
 
@@ -12,8 +14,15 @@ module ElasticGraph
 
       class Type < ::Data
         attr_reader name: ::String
-        attr_reader fields: ::Array[Field]?
-        def self.new: (::String, ::Array[Field]?) -> Type
+        attr_reader fields: ::Array[Field]
+        def self.new: (::String, ::Array[Field]) -> Type
+        def prepare: (untyped, ::Hash[::String, untyped]?) -> ::Hash[::String, untyped]
+      end
+
+      class AbstractType < ::Data
+        attr_reader types_by_alternative: ::Hash[::Symbol, typePlan]
+        def self.new: (::Hash[::Symbol, typePlan]) -> AbstractType
+        def prepare: (untyped, ::Hash[::String, untyped]?) -> ::Hash[::String, untyped]?
       end
 
       class Field < ::Data
@@ -22,14 +31,19 @@ module ElasticGraph
         attr_reader presence_method: ::Symbol?
         attr_reader list_depth: ::Integer
         attr_reader leaf_preparer: (^(untyped) -> untyped)?
-        def self.new: (::String, ::String, ::Symbol?, ::Integer, (^(untyped) -> untyped)?) -> Field
+        attr_reader child_type: typePlan?
+        def self.new: (::String, ::String, ::Symbol?, ::Integer, (^(untyped) -> untyped)?, typePlan?) -> Field
+        def prepare_into: (::Hash[::String, untyped], untyped, ::Hash[::String, untyped]?) -> void
+
+        private
+
+        def prepare_value: (untyped, ::Hash[::String, untyped]?, ::Integer) -> untyped
       end
 
       private
 
-      def prepare_message: (untyped, ::Hash[::String, untyped]?) -> ::Hash[::String, untyped]?
-      def prepare_value: (Field, untyped, ::Integer, ::Hash[::String, untyped]?) -> untyped
-      def build_type: (::Google::Protobuf::Descriptor) -> Type
+      def resolve_type: (::Google::Protobuf::Descriptor) -> typePlan
+      def build_type: (::Google::Protobuf::Descriptor) -> typePlan
       def build_field: (::Google::Protobuf::Descriptor, ::Google::Protobuf::FieldDescriptor, RuntimeMetadata::Field?) -> Field
       def build_enum: (::Google::Protobuf::EnumDescriptor) -> ::Hash[::Symbol | ::Integer, ::String?]
       def build_scalar_preparer: (

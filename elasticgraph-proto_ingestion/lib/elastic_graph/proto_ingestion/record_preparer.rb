@@ -30,60 +30,88 @@ module ElasticGraph
       # Implements the indexer's record-preparer interface without an intermediate public record hash.
       # Does not mutate the native message or its nested values.
       def prepare_for_index(_type_name, message, mapping_properties)
-        prepare_message(message, mapping_properties)
+        type = @mutex.synchronize { @types[message.class] ||= build_type(message.class.descriptor) }
+        type.prepare(message, mapping_properties)
       end
 
       private
 
-      # Resolved once per protobuf message class so subsequent records do not inspect descriptors.
-      Type = ::Data.define(:name, :fields)
-      Field = ::Data.define(:name, :name_in_index, :presence_method, :list_depth, :leaf_preparer)
-      private_constant :Type, :Field
+      # Resolved once per protobuf message class (together with all nested message types) so
+      # preparation acquires `@mutex` once per root record and never re-inspects descriptors.
+      Type = ::Data.define(:name, :fields) do
+        # @implements Type
 
-      def prepare_message(message, mapping_properties)
-        type = @mutex.synchronize { @types[message.class] ||= build_type(message.class.descriptor) }
-        fields = type.fields
-        unless fields
+        def prepare(message, mapping_properties)
+          prepared = {} # : ::Hash[::String, untyped]
+          fields.each { |field| field.prepare_into(prepared, message, mapping_properties) }
+
+          typename_type = mapping_properties&.dig("__typename", "type")
+          if typename_type && typename_type != "constant_keyword"
+            prepared["__typename"] = name
+          end
+
+          prepared
+        end
+      end
+
+      # Prepares a message of a union or interface type by dispatching its `value` oneof
+      # to the pre-resolved concrete `Type` for the active alternative.
+      AbstractType = ::Data.define(:types_by_alternative) do
+        # @implements AbstractType
+
+        def prepare(message, mapping_properties)
           alternative = message.value
           return nil unless alternative
 
-          return prepare_message(message.public_send(alternative), mapping_properties)
+          types_by_alternative.fetch(alternative).prepare(message.public_send(alternative), mapping_properties)
         end
-
-        prepared = {} # : ::Hash[::String, untyped]
-        fields.each do |field|
-          next if field.presence_method && !message.public_send(field.presence_method)
-
-          nested_mapping = mapping_properties&.dig(field.name_in_index, "properties")
-          prepared[field.name_in_index] = prepare_value(field, message[field.name], field.list_depth, nested_mapping)
-        end
-
-        typename_type = mapping_properties&.dig("__typename", "type")
-        if typename_type && typename_type != "constant_keyword"
-          prepared["__typename"] = type.name
-        end
-
-        prepared
       end
 
-      def prepare_value(field, value, depth, nested_mapping)
-        if depth > 0
-          return value.map do |item|
-            prepare_value(field, (depth > 1) ? item.values : item, depth - 1, nested_mapping)
-          end
+      Field = ::Data.define(:name, :name_in_index, :presence_method, :list_depth, :leaf_preparer, :child_type) do
+        # @implements Field
+
+        # Adds this field's prepared value to `prepared`, unless `message` leaves this singular field unset.
+        def prepare_into(prepared, message, mapping_properties)
+          return if presence_method && !message.public_send(presence_method)
+
+          nested_mapping = child_type ? mapping_properties&.dig(name_in_index, "properties") : nil
+          prepared[name_in_index] = prepare_value(message[name], nested_mapping, list_depth)
         end
 
-        if (leaf_preparer = field.leaf_preparer)
-          leaf_preparer.call(value)
-        else
-          prepare_message(value, nested_mapping)
+        private
+
+        def prepare_value(value, nested_mapping, depth)
+          if depth > 0
+            return value.map do |item|
+              prepare_value((depth > 1) ? item.values : item, nested_mapping, depth - 1)
+            end
+          end
+
+          if (child = child_type)
+            child.prepare(value, nested_mapping)
+          else
+            preparer = leaf_preparer # : ^(untyped) -> untyped
+            preparer.call(value)
+          end
         end
+      end
+      private_constant :Type, :AbstractType, :Field
+
+      def resolve_type(descriptor)
+        @types[descriptor.msgclass] ||= build_type(descriptor)
       end
 
       def build_type(descriptor)
-        name = type_name_for(descriptor)
-        return Type.new(name, nil) if descriptor.lookup_oneof("value")
+        if (oneof = descriptor.lookup_oneof("value"))
+          types_by_alternative = {} # : ::Hash[::Symbol, Type | AbstractType]
+          oneof.each do |field|
+            subtype = field.subtype # : ::Google::Protobuf::Descriptor
+            types_by_alternative[field.name.to_sym] = resolve_type(subtype)
+          end
+          return AbstractType.new(types_by_alternative)
+        end
 
+        name = type_name_for(descriptor)
         overrides = @metadata.types_by_name[name]&.fields_by_name || {}
         fields = descriptor.map do |entry|
           field = entry # : ::Google::Protobuf::FieldDescriptor
@@ -118,14 +146,16 @@ module ElasticGraph
           leaf_preparer = ->(value) { enum_values.fetch(value) }
         when :message
           message_descriptor = leaf.subtype # : ::Google::Protobuf::Descriptor
-          unless message_descriptor.name.start_with?("#{@metadata.package_name}.")
+          if message_descriptor.name.start_with?("#{@metadata.package_name}.")
+            child_type = resolve_type(message_descriptor)
+          else
             leaf_preparer = build_scalar_preparer(leaf, field_meta, message_descriptor: message_descriptor)
           end
         else
           leaf_preparer = build_scalar_preparer(leaf, field_meta)
         end
 
-        Field.new(name, name_in_index, presence_method, list_depth, leaf_preparer)
+        Field.new(name, name_in_index, presence_method, list_depth, leaf_preparer, child_type)
       end
 
       def build_enum(descriptor)
