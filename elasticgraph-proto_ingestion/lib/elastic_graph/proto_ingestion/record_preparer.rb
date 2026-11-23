@@ -36,12 +36,8 @@ module ElasticGraph
       private
 
       # Resolved once per protobuf message class so subsequent records do not inspect descriptors.
-      Type = ::Data.define(:name, :fields) do
-        # @implements Type
-      end
-      Field = ::Data.define(:name, :name_in_index, :presence_method, :list_depth, :leaf_preparer) do
-        # @implements Field
-      end
+      Type = ::Data.define(:name, :fields)
+      Field = ::Data.define(:name, :name_in_index, :presence_method, :list_depth, :leaf_preparer)
       private_constant :Type, :Field
 
       def prepare_message(message, mapping_properties)

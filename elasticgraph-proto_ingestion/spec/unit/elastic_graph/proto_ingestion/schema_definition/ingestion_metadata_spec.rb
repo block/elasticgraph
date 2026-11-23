@@ -84,6 +84,22 @@ module ElasticGraph
           )
         end
 
+        it "records the canonical scalar of a scalar renamed to its wire type's default scalar name" do
+          config = ingestion_config(type_name_overrides: {"JsonSafeLong" => "LongString", "LongString" => "BigInt"}) do |s|
+            s.object_type "Event" do |t|
+              t.field "id", "ID"
+              t.field "visits", "JsonSafeLong"
+              t.index "events"
+            end
+          end
+
+          expect(config.fetch("types_by_name")).to eq(
+            "Event" => {"fields_by_name" => {"id" => {"type" => "ID"}, "visits" => {"type" => "LongString"}}},
+            "ID" => {"scalar" => "ID"},
+            "LongString" => {"scalar" => "JsonSafeLong"}
+          )
+        end
+
         it "records canonical scalars when built-in names differ from the wire defaults" do
           config = ingestion_config(type_name_overrides: {"JsonSafeLong" => "SafeLong", "DateTime" => "Moment"}) do |s|
             s.object_type "Event" do |t|

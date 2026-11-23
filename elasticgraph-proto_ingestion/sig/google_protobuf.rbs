@@ -1,7 +1,7 @@
-# rbs_collection describes this accessor as Symbol?, but google-protobuf returns a descriptor.
 module Google
   module Protobuf
     class FieldDescriptor
+      # rbs_collection describes this accessor as Symbol?, but google-protobuf returns a descriptor.
       def subtype: () -> (Descriptor | EnumDescriptor)? | ...
     end
   end

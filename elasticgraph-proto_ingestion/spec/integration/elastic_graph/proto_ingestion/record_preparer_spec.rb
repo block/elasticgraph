@@ -14,7 +14,7 @@ module ElasticGraph
   module ProtoIngestion
     RSpec.describe RecordPreparer do
       # Repeated fields have no presence, so they are prepared even when a record leaves them empty.
-      let(:empty_lists) { {"states" => [], "attachments" => [], "grid" => []} }
+      let(:empty_lists) { {"states" => [], "attachments" => [], "private_shapes" => [], "grid" => []} }
 
       # Defining the schema dominates each example's run time, and examples only read it, so we define it once.
       before(:context) do
@@ -71,6 +71,16 @@ module ElasticGraph
         mapping = {"shape" => {"properties" => {"__typename" => {"type" => "keyword"}}}}
 
         expect(prepare(native, mapping: mapping)).to eq(empty_lists.merge("shape" => {"__typename" => "Box", "private_width" => 2}))
+      end
+
+      it "includes `__typename` on the objects of a list field whose mapping, under its `name_in_index`, has a `keyword` `__typename`" do
+        native = native_record({"shapes" => [{"__typename" => "Box", "width" => 1}, {"__typename" => "RoundSphere", "radius" => 0.5}]})
+        mapping = {"private_shapes" => {"properties" => {"__typename" => {"type" => "keyword"}}}}
+
+        expect(prepare(native, mapping: mapping)).to eq(empty_lists.merge("private_shapes" => [
+          {"__typename" => "Box", "private_width" => 1},
+          {"__typename" => "RoundSphere", "radius" => 0.5}
+        ]))
       end
 
       it "includes the concrete `__typename` on an abstract-typed root record when its mapping has a `keyword` `__typename`" do
@@ -223,6 +233,7 @@ module ElasticGraph
             type.field "kind", "Kind"
             type.field "shape", "Shape"
             type.field("attachments", "[Attachment]") { |field| field.mapping type: "object" }
+            type.field("shapes", "[Shape]", name_in_index: "private_shapes") { |field| field.mapping type: "object" }
             type.field "grid", "[[[Int!]!]!]!"
             type.index "products"
           end

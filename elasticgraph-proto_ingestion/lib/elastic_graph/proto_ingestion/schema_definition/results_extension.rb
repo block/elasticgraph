@@ -6,6 +6,7 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/proto_ingestion/indexer_extension"
 require "elastic_graph/proto_ingestion/schema_definition/schema"
 require "elastic_graph/schema_artifacts/runtime_metadata/component_extension"
 
@@ -38,7 +39,7 @@ module ElasticGraph
         def build_runtime_metadata
           metadata = super
           extension = SchemaArtifacts::RuntimeMetadata::ComponentExtension.new({
-            "name" => "ElasticGraph::ProtoIngestion::IndexerExtension",
+            "name" => IndexerExtension.name,
             "require_path" => "elastic_graph/proto_ingestion/indexer_extension",
             "config" => protobuf_schema_generator.proto_ingestion_metadata.to_dumpable_hash
           })
