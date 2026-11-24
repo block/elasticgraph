@@ -11,6 +11,7 @@ require "elastic_graph/indexer/event"
 require "elastic_graph/indexer/event_id"
 require "elastic_graph/indexer/malformed_event_error"
 require "elastic_graph/support/json_schema/validator_factory"
+require "elastic_graph/support/thread_safe_cache"
 
 module ElasticGraph
   module JSONIngestion
@@ -25,10 +26,7 @@ module ElasticGraph
         @schema_artifacts = schema_artifacts
         @logger = logger
         @configure_record_validator = configure_record_validator
-        # A `Hash.new { |h, k| h[k] = ... }` cache is not thread-safe on JRuby: concurrent writes can lose
-        # entries. Guard the cache with a mutex so this validator can be shared across threads on any Ruby.
-        @validator_factories_by_version = {} # : ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
-        @validator_factories_mutex = ::Mutex.new
+        @validator_factories_by_version = Support::ThreadSafeCache.new # : Support::ThreadSafeCache[::Integer, Support::JSONSchema::ValidatorFactory]
       end
 
       # Validates the envelope of each decoded JSON event and builds an {ElasticGraph::Indexer::Event}
@@ -136,9 +134,7 @@ module ElasticGraph
       end
 
       def validator_factory_for(json_schema_version)
-        @validator_factories_mutex.synchronize do
-          @validator_factories_by_version[json_schema_version] ||= build_validator_factory(json_schema_version)
-        end
+        @validator_factories_by_version.fetch_or_store(json_schema_version) { build_validator_factory(json_schema_version) }
       end
 
       def build_validator_factory(json_schema_version)

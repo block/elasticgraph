@@ -10,6 +10,7 @@ require "elastic_graph/datastore_core/index_definition"
 require "elastic_graph/errors"
 require "elastic_graph/graphql/schema/field"
 require "elastic_graph/graphql/schema/enum_value"
+require "elastic_graph/support/thread_safe_cache"
 require "forwardable"
 
 module ElasticGraph
@@ -36,9 +37,7 @@ module ElasticGraph
         )
           @schema = schema
           @graphql_type = graphql_type
-          @enum_values_by_name = Hash.new do |hash, key|
-            hash[key] = lookup_enum_value_by_name(key)
-          end
+          @enum_values_by_name = Support::ThreadSafeCache.new # : Support::ThreadSafeCache[::String, EnumValue?]
 
           @index_definitions = index_definitions
           @object_runtime_metadata = object_runtime_metadata
@@ -167,7 +166,7 @@ module ElasticGraph
         end
 
         def enum_value_named(enum_value_name)
-          @enum_values_by_name[enum_value_name]
+          @enum_values_by_name.fetch_or_store(enum_value_name) { lookup_enum_value_by_name(enum_value_name) }
         end
 
         def coerce_result(result)

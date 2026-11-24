@@ -12,6 +12,7 @@ require "elastic_graph/errors"
 require "elastic_graph/graphql/query_context"
 require "elastic_graph/graphql/schema/field"
 require "elastic_graph/graphql/schema/type"
+require "elastic_graph/support/thread_safe_cache"
 
 module ElasticGraph
   # Wraps a GraphQL::Schema object in order to provide higher-level, more convenient APIs
@@ -42,22 +43,13 @@ module ElasticGraph
         @logger = logger
         @runtime_metadata = runtime_metadata
         @datastore_search_router = datastore_search_router
+        @index_definitions_by_graphql_type = index_definitions_by_graphql_type
 
-        resolvers_needing_lookahead = runtime_metadata.graphql_resolvers_by_name.filter_map do |name, resolver|
+        @resolvers_needing_lookahead = runtime_metadata.graphql_resolvers_by_name.filter_map do |name, resolver|
           name if resolver.needs_lookahead
         end.to_set
 
-        @types_by_graphql_type = Hash.new do |hash, key|
-          hash[key] = Type.new(
-            self,
-            key,
-            index_definitions_by_graphql_type[key.graphql_name] || [],
-            runtime_metadata.object_types_by_name[key.graphql_name],
-            runtime_metadata.enum_types_by_name[key.graphql_name],
-            runtime_metadata.scalar_types_by_name[key.graphql_name],
-            resolvers_needing_lookahead
-          )
-        end
+        @types_by_graphql_type = Support::ThreadSafeCache.new # : Support::ThreadSafeCache[::GraphQL::Schema::_Type, Type]
 
         # Note: as part of loading the schema, the GraphQL gem may use the resolver (such
         # when a directive has a custom scalar) so we must wait to instantiate the schema
@@ -107,7 +99,7 @@ module ElasticGraph
       end
 
       def type_from(graphql_type)
-        @types_by_graphql_type[graphql_type]
+        @types_by_graphql_type.fetch_or_store(graphql_type) { build_type(graphql_type) }
       end
 
       # Note: this does not support "wrapped" types (e.g. `Int!` or `[Int]` compared to `Int`),
@@ -193,8 +185,20 @@ module ElasticGraph
 
       def build_types_by_name
         graphql_schema.types(visibility_profile: :boot).transform_values do |graphql_type|
-          @types_by_graphql_type[graphql_type]
+          type_from(graphql_type)
         end
+      end
+
+      def build_type(graphql_type)
+        Type.new(
+          self,
+          graphql_type,
+          @index_definitions_by_graphql_type[graphql_type.graphql_name] || [],
+          @runtime_metadata.object_types_by_name[graphql_type.graphql_name],
+          @runtime_metadata.enum_types_by_name[graphql_type.graphql_name],
+          @runtime_metadata.scalar_types_by_name[graphql_type.graphql_name],
+          @resolvers_needing_lookahead
+        )
       end
 
       # Intentionally private: public callers should use `document_types_stored_in` instead.

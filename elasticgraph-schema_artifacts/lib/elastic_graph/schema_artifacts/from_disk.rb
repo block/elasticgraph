@@ -11,6 +11,7 @@ require "elastic_graph/errors"
 require "elastic_graph/schema_artifacts/artifacts_helper_methods"
 require "elastic_graph/schema_artifacts/runtime_metadata/schema"
 require "elastic_graph/support/memoizable_data"
+require "elastic_graph/support/thread_safe_cache"
 require "yaml"
 
 module ElasticGraph
@@ -69,7 +70,7 @@ module ElasticGraph
             "Available versions: #{available_json_schema_versions.sort.join(", ")}."
         end
 
-        json_schemas_by_version[version] # : ::Hash[::String, untyped]
+        @json_schemas_by_version.fetch_or_store(version) { load_json_schema(version) }
       end
 
       # Provides the set of available JSON schema versions.
@@ -134,6 +135,10 @@ module ElasticGraph
 
       private
 
+      def after_initialize
+        @json_schemas_by_version = Support::ThreadSafeCache.new # : Support::ThreadSafeCache[::Integer, ::Hash[::String, untyped]]
+      end
+
       def read_artifact(artifact_name)
         file_name = ::File.join(artifacts_dir, artifact_name)
 
@@ -147,13 +152,6 @@ module ElasticGraph
 
       def parsed_yaml_from(artifact_name)
         ::YAML.safe_load(read_artifact(artifact_name))
-      end
-
-      def json_schemas_by_version
-        @json_schemas_by_version ||= ::Hash.new do |hash, raw_json_schema_version|
-          json_schema_version = raw_json_schema_version # : Integer
-          hash[json_schema_version] = load_json_schema(json_schema_version)
-        end
       end
 
       # Loads the given JSON schema version from disk.

@@ -135,6 +135,8 @@ module ElasticGraph
         private
 
         def after_initialize
+          super
+
           unless timestamp_field_path && ROLLOVER_SUFFIX_FORMATS_BY_FREQUENCY.key?(frequency)
             raise Errors::SchemaError, "Rollover index config 'timestamp_field' or 'frequency' is invalid."
           end

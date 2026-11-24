@@ -7,6 +7,7 @@
 # frozen_string_literal: true
 
 require "elastic_graph/support/json_schema/validator"
+require "elastic_graph/support/thread_safe_cache"
 require "json_schemer"
 
 module ElasticGraph
@@ -43,10 +44,7 @@ module ElasticGraph
           )
 
           @sanitize_pii = sanitize_pii
-          # A `Hash.new { |h, k| h[k] = ... }` cache is not thread-safe on JRuby: concurrent writes can lose
-          # entries. Guard the cache with a mutex so a factory can be shared across threads on any Ruby.
-          @validators_by_type_name = {} # : ::Hash[::String, Validator]
-          @validators_mutex = ::Mutex.new
+          @validators_by_type_name = ThreadSafeCache.new # : ThreadSafeCache[::String, Validator]
         end
 
         # Gets the {Validator} for a particular ElasticGraph type.
@@ -54,8 +52,8 @@ module ElasticGraph
         # @param type_name [String] name of an ElasticGraph type
         # @return [Validator]
         def validator_for(type_name)
-          @validators_mutex.synchronize do
-            @validators_by_type_name[type_name] ||= Validator.new(
+          @validators_by_type_name.fetch_or_store(type_name) do
+            Validator.new(
               schema: root_schema.ref("#/$defs/#{type_name}"),
               sanitize_pii: @sanitize_pii
             )

@@ -1,0 +1,11 @@
+module ElasticGraph
+  module Support
+    class ThreadSafeCache[K < ::Hash::_Key, V]
+      def initialize: () -> void
+      def fetch_or_store: (K) { () -> V } -> V
+
+      @values_by_key: ::Hash[K, V]
+      @monitor: ::Monitor
+    end
+  end
+end

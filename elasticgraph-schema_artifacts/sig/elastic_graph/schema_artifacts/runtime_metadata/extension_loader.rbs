@@ -10,7 +10,7 @@ module ElasticGraph
         private
 
         @interface_def: extensionClass
-        @loaded_by_name: ::Hash[::String, Extension]
+        @loaded_by_name: Support::ThreadSafeCache[::String, Extension]
 
         def load_extension: (::String, ::String) -> Extension
       end
