@@ -5,8 +5,7 @@ module ElasticGraph
         attr_reader root_schema: ::JSONSchemer::Schema
         @raw_schema: ::Hash[::String, untyped]
         @sanitize_pii: bool
-        @validators_by_type_name: ::Hash[::String, Validator]
-        @validators_mutex: ::Thread::Mutex
+        @validators_by_type_name: ThreadSafeCache[::String, Validator]
         def initialize: (schema: ::Hash[::String, untyped], sanitize_pii: bool) -> void
         def validator_for: (::String) -> Validator
         def with_unknown_properties_disallowed: (?except: ::Array[::String]) -> ValidatorFactory

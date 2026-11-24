@@ -9,6 +9,7 @@
 require "elastic_graph/errors"
 require "elastic_graph/schema_artifacts/runtime_metadata/extension"
 require "elastic_graph/schema_artifacts/runtime_metadata/interface_verifier"
+require "elastic_graph/support/thread_safe_cache"
 
 module ElasticGraph
   module SchemaArtifacts
@@ -41,13 +42,13 @@ module ElasticGraph
 
         def initialize(interface_def)
           @interface_def = interface_def
-          @loaded_by_name = {}
+          @loaded_by_name = Support::ThreadSafeCache.new # : Support::ThreadSafeCache[::String, Extension]
         end
 
         # Loads the extension using the provided constant name, after requiring the `from` path.
         # Memoizes the result.
         def load(constant_name, from:, config:)
-          (@loaded_by_name[constant_name] ||= load_extension(constant_name, from)).tap do |extension|
+          @loaded_by_name.fetch_or_store(constant_name) { load_extension(constant_name, from) }.tap do |extension|
             if extension.require_path != from
               raise Errors::InvalidExtensionError, "Extension `#{constant_name}` cannot be loaded from `#{from}`, " \
                 "since it has already been loaded from `#{extension.require_path}`."

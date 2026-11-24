@@ -9,6 +9,7 @@
 require "elastic_graph/datastore_core/index_config_normalizer"
 require "elastic_graph/errors"
 require "elastic_graph/support/hash_util"
+require "elastic_graph/support/thread_safe_cache"
 
 module ElasticGraph
   class DatastoreCore
@@ -126,8 +127,7 @@ module ElasticGraph
         # on the provided `source` to only contain the paths of fields that are populated by the
         # given source.
         def list_counts_field_paths_for_source(source)
-          @list_counts_field_paths_for_source ||= {} # : ::Hash[::String, ::Set[::String]]
-          @list_counts_field_paths_for_source[source] ||= identify_list_counts_field_paths_for_source(source)
+          @list_counts_field_paths_for_source.fetch_or_store(source) { identify_list_counts_field_paths_for_source(source) }
         end
 
         # The value of the painless `index_data` script's `sourcedFromNestedPaths` param: nested `sourced_from`
@@ -144,6 +144,10 @@ module ElasticGraph
         alias_method :inspect, :to_s
 
         private
+
+        def after_initialize
+          @list_counts_field_paths_for_source = Support::ThreadSafeCache.new # : Support::ThreadSafeCache[::String, ::Set[::String]]
+        end
 
         def identify_list_counts_field_paths_for_source(source)
           fields_by_path.filter_map do |path, field|

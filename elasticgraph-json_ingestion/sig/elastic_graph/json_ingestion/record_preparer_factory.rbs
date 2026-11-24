@@ -9,7 +9,8 @@ module ElasticGraph
       private
 
       @schema_artifacts: schemaArtifacts
-      @preparers_by_json_schema_version: ::Hash[::Integer, ::ElasticGraph::Indexer::RecordPreparer]
+      @indexing_preparer_by_scalar_type_name: ::Hash[::String, SchemaArtifacts::RuntimeMetadata::extensionClass?]
+      @preparers_by_json_schema_version: Support::ThreadSafeCache[::Integer, ::ElasticGraph::Indexer::RecordPreparer]
 
       def build_type_metas_from: (::Hash[::String, untyped]) -> ::Array[::ElasticGraph::Indexer::RecordPreparer::TypeMetadata]
     end

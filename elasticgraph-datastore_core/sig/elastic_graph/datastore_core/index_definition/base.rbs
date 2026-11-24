@@ -9,7 +9,7 @@ module ElasticGraph
         @accessible_cluster_names_to_index_into: ::Array[::String]?
         @known_related_query_rollover_indices: ::Array[RolloverIndex]?
         @searches_could_hit_incomplete_docs: bool
-        @list_counts_field_paths_for_source: ::Hash[::String, ::Set[::String]]
+        @list_counts_field_paths_for_source: Support::ThreadSafeCache[::String, ::Set[::String]]
         @sourced_from_nested_paths_as_painless_param: ::Hash[::String, ::Array[::Hash[::String, ::String]]]?
         @max_result_window: ::Integer?
 
@@ -17,6 +17,7 @@ module ElasticGraph
 
         private
 
+        def after_initialize: () -> void
         def identify_list_counts_field_paths_for_source: (::String) -> ::Set[::String]
       end
     end

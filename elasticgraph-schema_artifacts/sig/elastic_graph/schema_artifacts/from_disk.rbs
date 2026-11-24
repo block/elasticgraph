@@ -21,11 +21,11 @@ module ElasticGraph
       @available_json_schema_versions: ::Set[::Integer]?
       @latest_json_schema_version: ::Integer?
 
+      def after_initialize: () -> void
       def read_artifact: (::String) -> ::String
       def parsed_yaml_from: (::String) -> ::Hash[::String, untyped]
 
-      @json_schemas_by_version: ::Hash[::Integer, ::Hash[::String, untyped]]
-      def json_schemas_by_version: () -> ::Hash[::Integer, ::Hash[::String, untyped]]
+      @json_schemas_by_version: Support::ThreadSafeCache[::Integer, ::Hash[::String, untyped]]
 
       def load_json_schema: (::Integer) -> ::Hash[::String, untyped]
     end
