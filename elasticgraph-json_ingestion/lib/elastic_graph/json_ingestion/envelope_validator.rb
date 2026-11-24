@@ -25,6 +25,10 @@ module ElasticGraph
         @schema_artifacts = schema_artifacts
         @logger = logger
         @configure_record_validator = configure_record_validator
+        # A `Hash.new { |h, k| h[k] = ... }` cache is not thread-safe on JRuby: concurrent writes can lose
+        # entries. Guard the cache with a mutex so this validator can be shared across threads on any Ruby.
+        @validator_factories_by_version = {} # : ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
+        @validator_factories_mutex = ::Mutex.new
       end
 
       # Validates the envelope of each decoded JSON event and builds an {ElasticGraph::Indexer::Event}
@@ -66,8 +70,7 @@ module ElasticGraph
       # @param selected_json_schema_version [Integer] the JSON schema version to validate against
       # @return [ElasticGraph::Support::JSONSchema::Validator]
       def validator(type, selected_json_schema_version)
-        factory = validator_factories_by_version[selected_json_schema_version] # : Support::JSONSchema::ValidatorFactory
-        factory.validator_for(type)
+        validator_factory_for(selected_json_schema_version).validator_for(type)
       end
 
       private
@@ -132,20 +135,23 @@ module ElasticGraph
         )
       end
 
-      def validator_factories_by_version
-        @validator_factories_by_version ||= ::Hash.new do |hash, raw_json_schema_version|
-          json_schema_version = raw_json_schema_version # : Integer
-          factory = Support::JSONSchema::ValidatorFactory.new(
-            schema: @schema_artifacts.json_schemas_for(json_schema_version),
-            sanitize_pii: true
-          )
-
-          if (configure_record_validator = @configure_record_validator)
-            factory = configure_record_validator.call(factory)
-          end
-
-          hash[json_schema_version] = factory
+      def validator_factory_for(json_schema_version)
+        @validator_factories_mutex.synchronize do
+          @validator_factories_by_version[json_schema_version] ||= build_validator_factory(json_schema_version)
         end
+      end
+
+      def build_validator_factory(json_schema_version)
+        factory = Support::JSONSchema::ValidatorFactory.new(
+          schema: @schema_artifacts.json_schemas_for(json_schema_version),
+          sanitize_pii: true
+        )
+
+        if (configure_record_validator = @configure_record_validator)
+          factory = configure_record_validator.call(factory)
+        end
+
+        factory
       end
 
       # simplecov:disable -- this should not be called. Instead, it exists to guard against wrongly raising an error from this class.

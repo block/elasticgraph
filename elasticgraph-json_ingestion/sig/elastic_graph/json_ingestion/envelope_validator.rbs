@@ -24,8 +24,10 @@ module ElasticGraph
       def envelope_failure_for: (decodedEvent) -> ::ElasticGraph::Indexer::MalformedEventError[decodedEvent]?
       def malformed: (decodedEvent, validation_target: ::String, message: ::String) -> ::ElasticGraph::Indexer::MalformedEventError[decodedEvent]
 
-      @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]?
-      def validator_factories_by_version: () -> ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
+      @validator_factories_by_version: ::Hash[::Integer, Support::JSONSchema::ValidatorFactory]
+      @validator_factories_mutex: ::Thread::Mutex
+      def validator_factory_for: (::Integer) -> Support::JSONSchema::ValidatorFactory
+      def build_validator_factory: (::Integer) -> Support::JSONSchema::ValidatorFactory
 
       def raise: (*untyped) -> bot
     end

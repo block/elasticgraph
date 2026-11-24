@@ -43,12 +43,10 @@ module ElasticGraph
           )
 
           @sanitize_pii = sanitize_pii
-          @validators_by_type_name = ::Hash.new do |hash, key|
-            hash[key] = Validator.new(
-              schema: root_schema.ref("#/$defs/#{key}"),
-              sanitize_pii: sanitize_pii
-            )
-          end
+          # A `Hash.new { |h, k| h[k] = ... }` cache is not thread-safe on JRuby: concurrent writes can lose
+          # entries. Guard the cache with a mutex so a factory can be shared across threads on any Ruby.
+          @validators_by_type_name = {} # : ::Hash[::String, Validator]
+          @validators_mutex = ::Mutex.new
         end
 
         # Gets the {Validator} for a particular ElasticGraph type.
@@ -56,7 +54,12 @@ module ElasticGraph
         # @param type_name [String] name of an ElasticGraph type
         # @return [Validator]
         def validator_for(type_name)
-          @validators_by_type_name[type_name] # : Validator
+          @validators_mutex.synchronize do
+            @validators_by_type_name[type_name] ||= Validator.new(
+              schema: root_schema.ref("#/$defs/#{type_name}"),
+              sanitize_pii: @sanitize_pii
+            )
+          end
         end
 
         # Returns a new factory configured to disallow unknown properties. By default, JSON schema
