@@ -6,6 +6,8 @@
 #
 # frozen_string_literal: true
 
+require "elastic_graph/errors"
+require "elastic_graph/proto_ingestion/indexer_extension"
 require "elastic_graph/proto_ingestion/runtime_metadata/type"
 
 module ElasticGraph
@@ -19,6 +21,16 @@ module ElasticGraph
       # @private
       Schema = ::Data.define(:package_name, :types_by_name) do
         # @implements Schema
+
+        def self.from_schema_artifacts(schema_artifacts)
+          extension = schema_artifacts.runtime_metadata.indexer_extension_modules.find do |candidate|
+            candidate.extension_ref.fetch("name") == IndexerExtension.name
+          end
+          unless extension
+            raise Errors::ConfigError, "Protobuf runtime metadata is missing. Enable `ElasticGraph::ProtoIngestion::SchemaDefinition::APIExtension` and dump schema artifacts."
+          end
+          from_hash(extension.extension_ref.fetch("config"))
+        end
 
         def self.from_hash(hash)
           types = hash["types_by_name"] || {} # : ::Hash[::String, untyped]
