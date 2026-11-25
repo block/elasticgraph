@@ -38,6 +38,7 @@ module ElasticGraph
 
       # Resolved once per protobuf message class (together with all nested message types) so
       # preparation acquires `@mutex` once per root record and never re-inspects descriptors.
+      # @private
       Type = ::Data.define(:name, :fields) do
         # @implements Type
 
@@ -56,6 +57,7 @@ module ElasticGraph
 
       # Prepares a message of a union or interface type by dispatching its `value` oneof
       # to the pre-resolved concrete `Type` for the active alternative.
+      # @private
       AbstractType = ::Data.define(:types_by_alternative) do
         # @implements AbstractType
 
@@ -67,6 +69,7 @@ module ElasticGraph
         end
       end
 
+      # @private
       Field = ::Data.define(:name, :name_in_index, :presence_method, :list_depth, :leaf_preparer, :child_type) do
         # @implements Field
 
