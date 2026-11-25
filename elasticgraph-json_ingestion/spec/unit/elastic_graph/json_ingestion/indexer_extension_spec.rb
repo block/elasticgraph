@@ -11,8 +11,20 @@ require "elastic_graph/json_ingestion/indexer_extension"
 module ElasticGraph
   module JSONIngestion
     RSpec.describe IndexerExtension, :builds_indexer, :factories do
+      # The stock schema artifacts also register the protobuf ingestion adapter, so these examples use a schema defined
+      # with JSON ingestion support alone.
+      let(:schema_artifacts) do
+        generate_schema_artifacts do |schema|
+          schema.object_type "Component" do |type|
+            type.field "id", "ID!"
+            type.field "name", "String"
+            type.index "components"
+          end
+        end
+      end
+
       it "makes the JSON ingestion adapter available to indexers built for schemas defined with JSON ingestion support, with no configuration needed" do
-        indexer = build_indexer
+        indexer = build_indexer(schema_artifacts: schema_artifacts)
 
         expect(indexer.ingestion_adapters_by_format).to match("json" => an_instance_of(IngestionAdapter))
         expect(indexer.ingestion_adapters_by_format).to be(indexer.ingestion_adapters_by_format), "expected the adapters to be memoized"
@@ -31,7 +43,7 @@ module ElasticGraph
           end
         end
 
-        indexer = build_indexer(extension_modules: [extension])
+        indexer = build_indexer(schema_artifacts: schema_artifacts, extension_modules: [extension])
 
         expect(indexer.ingestion_adapters_by_format).to match(
           "json" => an_instance_of(IngestionAdapter),
@@ -40,14 +52,14 @@ module ElasticGraph
       end
 
       it "adds the JSON adapter to an explicitly empty ingestion adapter registry" do
-        indexer = build_indexer(ingestion_adapters_by_format: {})
+        indexer = build_indexer(schema_artifacts: schema_artifacts, ingestion_adapters_by_format: {})
 
         expect(indexer.ingestion_adapters_by_format).to match("json" => an_instance_of(IngestionAdapter))
       end
 
       it "adds the JSON adapter to an explicitly injected ingestion adapter registry" do
         adapters = {"custom" => Object.new}
-        indexer = build_indexer(ingestion_adapters_by_format: adapters)
+        indexer = build_indexer(schema_artifacts: schema_artifacts, ingestion_adapters_by_format: adapters)
 
         expect(indexer.ingestion_adapters_by_format).to match(
           "json" => an_instance_of(IngestionAdapter),

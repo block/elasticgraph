@@ -8,10 +8,17 @@
 
 module ElasticGraph
   module ProtoIngestion
-    # Indexer extension that schemas using {SchemaDefinition::APIExtension} register in their runtime
-    # metadata, configured with the ingestion facts that protobuf descriptors cannot express. It does
-    # not yet install a protobuf ingestion adapter.
+    # Enables protobuf ingestion for schemas using the protobuf schema definition extension.
     module IndexerExtension
+      # @return [Hash<String, Indexer::IngestionAdapter::Interface>] the installed ingestion adapters
+      def ingestion_adapters_by_format
+        @ingestion_adapters_by_format ||= begin
+          # Required lazily so files referencing `IndexerExtension.name` (such as `RuntimeMetadata::Schema`
+          # and `SchemaDefinition::ResultsExtension`) do not trigger a circular require or load the indexer.
+          require "elastic_graph/proto_ingestion/ingestion_adapter"
+          super.merge("proto" => IngestionAdapter.new(schema_artifacts: schema_artifacts))
+        end
+      end
     end
   end
 end

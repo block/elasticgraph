@@ -4,5 +4,9 @@ module Google
       # rbs_collection describes this accessor as Symbol?, but google-protobuf returns a descriptor.
       def subtype: () -> (Descriptor | EnumDescriptor)? | ...
     end
+
+    module MessageExts
+      def class: () -> singleton(AbstractMessage)
+    end
   end
 end

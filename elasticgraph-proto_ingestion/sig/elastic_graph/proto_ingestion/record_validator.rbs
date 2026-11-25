@@ -1,0 +1,61 @@
+module ElasticGraph
+  module ProtoIngestion
+    class RecordValidator
+      type typePlan = Type | AbstractType
+
+      DATE_TIME_STRING_REGEX: ::Regexp
+      TIMESTAMP_SECONDS_RANGE: ::Range[::Integer]
+      TIMESTAMP_NANOS_RANGE: ::Range[::Integer]
+      WIRE_CONTRACT_SCALARS: ::Set[::String]
+      SCALAR_CHECKS: ::Hash[::String, ^(untyped) -> boolish]
+      STRING_DATE_TIME_CHECK: ^(untyped) -> boolish
+
+      def self.valid_date?: (::String) -> boolish
+      def self.valid_date_time_string?: (::String) -> boolish
+      def self.valid_timestamp?: (untyped) -> bool
+      def self.valid_json?: (::String) -> bool
+
+      @metadata: RuntimeMetadata::Schema
+      @types: ::Hash[::Class, typePlan]
+      @mutex: ::Mutex
+
+      def initialize: (RuntimeMetadata::Schema) -> void
+      def error_for: (untyped, ?::String, ?wire_contract_only: bool) -> ::String?
+
+      class Type < ::Data
+        attr_reader fields: ::Array[Field]
+        def self.new: (::Array[Field]) -> Type
+        def error_for: (untyped, ::String, bool) -> ::String?
+      end
+
+      class AbstractType < ::Data
+        attr_reader types_by_alternative: ::Hash[::Symbol, typePlan]
+        def self.new: (::Hash[::Symbol, typePlan]) -> AbstractType
+        def error_for: (untyped, ::String, bool) -> ::String?
+      end
+
+      class Field < ::Data
+        attr_reader name: ::String
+        attr_reader presence_method: ::Symbol?
+        attr_reader list_depth: ::Integer
+        attr_reader wire_contract: bool
+        attr_reader error_suffix: ::String?
+        attr_reader leaf_check: (^(untyped) -> boolish)?
+        attr_reader child_type: typePlan?
+        def self.new: (::String, ::Symbol?, ::Integer, bool, ::String?, (^(untyped) -> boolish)?, typePlan?) -> Field
+        def error_for: (untyped, ::String, bool) -> ::String?
+
+        private
+
+        def validate_value: (untyped, ::Integer, ::String, bool) -> ::String?
+      end
+
+      private
+
+      def resolve_type: (::Google::Protobuf::Descriptor) -> typePlan
+      def build_type: (::Google::Protobuf::Descriptor) -> typePlan
+      def build_field: (::Google::Protobuf::Descriptor, ::Google::Protobuf::FieldDescriptor, RuntimeMetadata::Field?) -> Field?
+      def build_scalar_field: (Descriptors::UnwrappedField, ::Google::Protobuf::FieldDescriptor, RuntimeMetadata::Field?) -> Field?
+    end
+  end
+end
