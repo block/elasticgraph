@@ -1,0 +1,20 @@
+module ElasticGraph
+  class GraphQL
+    module FieldRetrieval
+      interface _Planner
+        def plan: (
+          requested_fields: Array[String], request_all_fields: bool, highlighting: bool,
+          index_definitions: Array[DatastoreCore::_IndexDefinition]
+        ) -> FieldRetrievalPlan
+      end
+
+      class Source
+        include _Planner
+      end
+
+      class Automatic < Source
+        MAX_DOCVALUE_FIELDS: Integer
+      end
+    end
+  end
+end

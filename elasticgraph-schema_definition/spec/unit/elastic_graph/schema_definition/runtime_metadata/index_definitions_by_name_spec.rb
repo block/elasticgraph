@@ -395,6 +395,33 @@ module ElasticGraph
       end
 
       describe "#fields_by_path" do
+        it "marks only direct scalars with lossless mappings as eligible for doc values" do
+          fields = fields_by_path_for "things" do |s|
+            s.object_type "Details" do |t|
+              t.field "name", "String"
+            end
+            s.object_type "Thing" do |t|
+              t.field "id", "ID!"
+              t.field "name", "String", name_in_index: "indexed_name"
+              t.field "count", "Int"
+              t.field "flag", "Boolean"
+              t.field "hidden", "String", returnable: false
+              t.field "tags", "[String!]!"
+              t.field "details", "Details"
+              t.field("text", "String") { |f| f.mapping type: "text" }
+              t.field("substituted", "Int") { |f| f.mapping null_value: 0 }
+              t.field("computed", "Int") { |f| f.runtime_script "emit(1)" }
+              t.field "created_at", "DateTime"
+              t.field "cost", "Float"
+              t.field("truncated", "Float") { |f| f.mapping type: "integer" }
+              t.field("coerced", "String") { |f| f.mapping type: "integer" }
+              t.index "things"
+            end
+          end
+
+          expect(fields.filter_map { |path, field| path if field.doc_values_eligible }).to contain_exactly("id", "indexed_name", "count", "flag")
+        end
+
         it "records the source of each field, defaulting to `#{SELF_RELATIONSHIP_NAME}` for fields that do not use `sourced_from`" do
           fields_by_path = fields_by_path_for "components" do |s|
             s.object_type "Component" do |t|
@@ -424,9 +451,9 @@ module ElasticGraph
           end
 
           expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "widget_name" => index_field_with(source: "widget"),
-            "widget_type" => index_field_with(source: "widget")
+            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
+            "widget_name" => index_field_with(source: "widget", doc_values_eligible: true),
+            "widget_type" => index_field_with(source: "widget", doc_values_eligible: true)
           })
         end
 
@@ -461,7 +488,7 @@ module ElasticGraph
           end
 
           expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
+            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
             "widget_fields.id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
             "widget_fields.name" => index_field_with(source: "widget"),
             "widget_fields.type" => index_field_with(source: "widget")
@@ -479,8 +506,8 @@ module ElasticGraph
           end
 
           expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "type" => index_field_with(source: SELF_RELATIONSHIP_NAME)
+            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
+            "type" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true)
           })
         end
 
@@ -515,11 +542,29 @@ module ElasticGraph
           end
 
           expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
+            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
             "nested.id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
             "nested.name2" => index_field_with(source: "widget"),
             "nested.type" => index_field_with(source: "widget")
           })
+        end
+
+        it "requires scalar eligibility in every subtype sharing an index path" do
+          fields = fields_by_path_for "things" do |s|
+            {"HiddenThing" => false, "VisibleThing" => true}.each do |name, returnable|
+              s.object_type name do |t|
+                t.field "id", "ID!"
+                t.field "value", "String", returnable: returnable
+              end
+            end
+            s.union_type "Thing" do |t|
+              t.subtypes "HiddenThing", "VisibleThing"
+              t.index "things"
+            end
+          end
+
+          expect(fields.fetch("value").doc_values_eligible).to be false
+          expect(fields.fetch("id").doc_values_eligible).to be true
         end
 
         it "includes fields from all subtypes of a type union" do
@@ -550,11 +595,11 @@ module ElasticGraph
           end
 
           expect(fields_by_path).to eq({
-            "component_id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "name" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "type" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "widget_name" => index_field_with(source: "widget")
+            "component_id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
+            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
+            "name" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
+            "type" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
+            "widget_name" => index_field_with(source: "widget", doc_values_eligible: true)
           })
         end
 
@@ -588,11 +633,11 @@ module ElasticGraph
           end
 
           expect(fields_by_path).to eq({
-            "component_id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "name" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "type" => index_field_with(source: SELF_RELATIONSHIP_NAME),
-            "widget_name" => index_field_with(source: "widget")
+            "component_id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
+            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
+            "name" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
+            "type" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
+            "widget_name" => index_field_with(source: "widget", doc_values_eligible: true)
           })
         end
 
@@ -625,7 +670,7 @@ module ElasticGraph
           end
 
           expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
+            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
             "widget_name_and_type.name" => index_field_with(source: "widget"),
             "widget_name_and_type.type" => index_field_with(source: "widget")
           })
@@ -737,7 +782,7 @@ module ElasticGraph
           end
 
           expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
+            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
             "widget_name_and_type.name" => index_field_with(source: "widget"),
             "widget_name_and_type.types" => index_field_with(source: "widget"),
             "#{LIST_COUNTS_FIELD}.widget_name_and_type" => index_field_with(source: "widget"),
@@ -784,7 +829,7 @@ module ElasticGraph
           end
 
           expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
+            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
             "#{LIST_COUNTS_FIELD}.widget_details" => index_field_with(source: "widget"),
             "widget_details.#{LIST_COUNTS_FIELD}.name_and_type" => index_field_with(source: "widget"),
             "widget_details.#{LIST_COUNTS_FIELD}.name_and_type|name" => index_field_with(source: "widget"),
@@ -834,7 +879,7 @@ module ElasticGraph
           end
 
           expect(fields_by_path).to eq({
-            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME),
+            "id" => index_field_with(source: SELF_RELATIONSHIP_NAME, doc_values_eligible: true),
             "#{LIST_COUNTS_FIELD}.widget_details" => index_field_with(source: "widget"),
             "#{LIST_COUNTS_FIELD}.widget_details|name_and_type" => index_field_with(source: "widget"),
             "#{LIST_COUNTS_FIELD}.widget_details|size" => index_field_with(source: "widget"),

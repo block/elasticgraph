@@ -519,10 +519,13 @@ module ElasticGraph
           indexing_fields_by_name_in_index.flat_map do |name, field|
             path = path_prefix + name
             source = field.source&.relationship_name || parent_source
-            index_field = SchemaArtifacts::RuntimeMetadata::IndexField.new(source: source)
+            index_field = SchemaArtifacts::RuntimeMetadata::IndexField.new(
+              source: source,
+              doc_values_eligible: path_prefix.empty? && field.doc_values_eligible?
+            )
 
             list_count_field_tuples = field.paths_to_lists_for_count_indexing.map do |subpath|
-              [list_counts_state.path_to_count_subfield(subpath), index_field] # : [::String, SchemaArtifacts::RuntimeMetadata::IndexField]
+              [list_counts_state.path_to_count_subfield(subpath), SchemaArtifacts::RuntimeMetadata::IndexField.new(source: source)] # : [::String, SchemaArtifacts::RuntimeMetadata::IndexField]
             end
 
             if (object_type = field.type.fully_unwrapped.as_object_type)
