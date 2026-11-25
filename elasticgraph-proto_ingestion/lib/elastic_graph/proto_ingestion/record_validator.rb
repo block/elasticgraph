@@ -76,53 +76,89 @@ module ElasticGraph
       # Wire-critical numeric ranges and unknown enum values are never sampled out.
       def error_for(message, path = "record", wire_contract_only: false)
         type = @mutex.synchronize { @types[message.class] ||= build_type(message.class.descriptor) }
-        fields = type.fields
-        unless fields
-          concrete = Descriptors.unwrap_abstract(message)
-          return nil unless concrete
-
-          return error_for(concrete, path, wire_contract_only: wire_contract_only)
-        end
-
-        fields.each do |field|
-          next if wire_contract_only && !field.wire_contract
-          next if field.presence_method && !message.public_send(field.presence_method)
-
-          if (error = validate_value(field, message[field.name], field.list_depth, "#{path}.#{field.name}", wire_contract_only))
-            return error
-          end
-        end
-        nil
+        type.error_for(message, path, wire_contract_only)
       end
 
       private
 
+      # Resolved once per protobuf message class (together with all nested message types) so
+      # validation acquires `@mutex` once per root record and never re-inspects descriptors.
+      # @private
       Type = ::Data.define(:fields) do
         # @implements Type
-      end
-      Field = ::Data.define(:name, :presence_method, :list_depth, :wire_contract, :error_suffix, :leaf_check) do
-        # @implements Field
-      end
-      private_constant :Type, :Field
 
-      def validate_value(field, value, depth, path, wire_contract_only)
-        if depth > 0
-          value.each_with_index do |item, index|
-            nested = (depth > 1) ? item.values : item
-            if (error = validate_value(field, nested, depth - 1, "#{path}[#{index}]", wire_contract_only))
+        def error_for(message, path, wire_contract_only)
+          fields.each do |field|
+            if (error = field.error_for(message, path, wire_contract_only))
               return error
             end
           end
-          return nil
+          nil
+        end
+      end
+
+      # Validates a message of a union or interface type by dispatching its `value` oneof
+      # to the pre-resolved concrete `Type` for the active alternative.
+      # @private
+      AbstractType = ::Data.define(:types_by_alternative) do
+        # @implements AbstractType
+
+        def error_for(message, path, wire_contract_only)
+          alternative = message.value
+          return nil unless alternative
+
+          types_by_alternative.fetch(alternative).error_for(message.public_send(alternative), path, wire_contract_only)
+        end
+      end
+
+      # @private
+      Field = ::Data.define(:name, :presence_method, :list_depth, :wire_contract, :error_suffix, :leaf_check, :child_type) do
+        # @implements Field
+
+        # Returns the first validation error for this field on `message`, or `nil` when valid or skipped.
+        def error_for(message, path, wire_contract_only)
+          return nil if wire_contract_only && !wire_contract
+          return nil if presence_method && !message.public_send(presence_method)
+
+          validate_value(message[name], list_depth, "#{path}.#{name}", wire_contract_only)
         end
 
-        return error_for(value, path, wire_contract_only: wire_contract_only) unless (leaf_check = field.leaf_check)
+        private
 
-        "#{path} #{field.error_suffix}" unless leaf_check.call(value)
+        def validate_value(value, depth, path, wire_contract_only)
+          if depth > 0
+            value.each_with_index do |item, index|
+              nested = (depth > 1) ? item.values : item
+              if (error = validate_value(nested, depth - 1, "#{path}[#{index}]", wire_contract_only))
+                return error
+              end
+            end
+            return nil
+          end
+
+          if (child = child_type)
+            child.error_for(value, path, wire_contract_only)
+          else
+            check = leaf_check # : ^(untyped) -> boolish
+            "#{path} #{error_suffix}" unless check.call(value)
+          end
+        end
+      end
+      private_constant :Type, :AbstractType, :Field
+
+      def resolve_type(descriptor)
+        @types[descriptor.msgclass] ||= build_type(descriptor)
       end
 
       def build_type(descriptor)
-        return Type.new(nil) if Descriptors.abstract?(descriptor)
+        if (oneof = descriptor.lookup_oneof("value"))
+          types_by_alternative = {} # : ::Hash[::Symbol, Type | AbstractType]
+          oneof.each do |field|
+            subtype = field.subtype # : ::Google::Protobuf::Descriptor
+            types_by_alternative[field.name.to_sym] = resolve_type(subtype)
+          end
+          return AbstractType.new(types_by_alternative)
+        end
 
         name = Descriptors.type_name(descriptor, @metadata)
         overrides = @metadata.types_by_name[name]&.fields_by_name || {}
@@ -141,11 +177,11 @@ module ElasticGraph
         when :enum
           enum_descriptor = leaf.subtype # : ::Google::Protobuf::EnumDescriptor
           valid_symbols = enum_descriptor.to_h.keys.to_set
-          Field.new(info.name, info.presence_method, info.list_depth, true, "has an unknown enum value.", ->(value) { valid_symbols.include?(value) })
+          Field.new(info.name, info.presence_method, info.list_depth, true, "has an unknown enum value.", ->(value) { valid_symbols.include?(value) }, nil)
         when :message
           message_descriptor = leaf.subtype # : ::Google::Protobuf::Descriptor
           if Descriptors.internal_message?(message_descriptor, @metadata)
-            Field.new(info.name, info.presence_method, info.list_depth, true, nil, nil)
+            Field.new(info.name, info.presence_method, info.list_depth, true, nil, nil, resolve_type(message_descriptor))
           else
             build_scalar_field(info, leaf, field_meta)
           end
@@ -169,7 +205,8 @@ module ElasticGraph
           info.list_depth,
           WIRE_CONTRACT_SCALARS.include?(scalar),
           "is not a valid #{type_name}.",
-          check
+          check,
+          nil
         )
       end
     end

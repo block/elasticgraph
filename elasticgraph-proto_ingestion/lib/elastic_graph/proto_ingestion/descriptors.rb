@@ -14,9 +14,8 @@ module ElasticGraph
     # @private
     module Descriptors
       # Unwrapped metadata extracted from a protobuf field descriptor.
-      UnwrappedField = ::Data.define(:name, :presence_method, :list_depth, :leaf) do
-        # @implements UnwrappedField
-      end
+      # @private
+      UnwrappedField = ::Data.define(:name, :presence_method, :list_depth, :leaf)
 
       def self.type_name(descriptor, metadata)
         descriptor.name.delete_prefix("#{metadata.package_name}.")

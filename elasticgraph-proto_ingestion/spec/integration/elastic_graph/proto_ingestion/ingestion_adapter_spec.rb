@@ -8,6 +8,7 @@
 
 require "elastic_graph/indexer/event"
 require "elastic_graph/proto_ingestion/indexer_extension"
+require "elastic_graph/proto_ingestion/ingestion_adapter"
 require "elastic_graph/spec_support/proto_publisher"
 
 module ElasticGraph
